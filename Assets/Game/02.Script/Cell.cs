@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -26,13 +27,13 @@ namespace ThreeMatch.InGame
             _row = row;
             _cellImageType = cellImageType;
         }
-        
-        public void CreateCellBehaviour(GameObject prefab, Vector3 position)
+
+        public void CreateCellBehaviour(GameObject prefab)
         {
             var obj = Object.Instantiate(prefab);
             obj.name = $"Cell {_row} / {_column}";
             _cellBehaviour = obj.GetOrAddComponent<CellBehaviour>();
-            _cellBehaviour.Initialize(position, (int)_cellImageType);
+            _cellBehaviour.Initialize((int)_cellImageType);
         }
 
         public void Swap(Vector3 position, int row, int column)
@@ -44,14 +45,21 @@ namespace ThreeMatch.InGame
             _cellBehaviour.Swap(position);
         }
 
+        public void UpdateRowAndColumn(int row, int column)
+        {
+            _row = row;
+            _column = column;
+            CellBehaviour.name = $"Cell {_row} / {_column}";
+        }
+
         public bool IsSameColorType(CellImageType cellImageType)
         {
             return cellImageType == _cellImageType;
         }
-
-        public void UndoSwap()
+        
+        public void PostSwapProcess(List<Vector3> movePositionList)
         {
-            _cellBehaviour.UndoSwap();
+            _cellBehaviour.Move(movePositionList).Forget();
         }
 
         public void RemoveCell()

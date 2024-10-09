@@ -2,9 +2,9 @@
 /shelf/
 /workspace.xml
 # Rider ignored files
-/projectSettingsUpdater.xml
+/.idea.ThreeMatch.iml
 /contentModel.xml
-/.idea.Three match puzzle.iml
+/projectSettingsUpdater.xml
 /modules.xml
 # Editor-based HTTP Client requests
 /httpRequests/

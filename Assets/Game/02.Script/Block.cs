@@ -10,6 +10,8 @@ namespace ThreeMatch.InGame
         public Vector3 Position => _blockBehaviour.transform.position;
         public BlockType BlockType => _blockType;
         public BlockBehaviour BlockBehaviour => _blockBehaviour;
+        public int Row => _row;
+        public int Column => _column;
         
         private int _column;
         private int _row;
