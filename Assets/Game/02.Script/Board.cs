@@ -9,6 +9,13 @@ namespace ThreeMatch.InGame
 {
     public class Board
     {
+        [Serializable]
+        public struct CellMovementInfo
+        {
+            public Cell cell;
+            public List<Vector3> movePositionList;
+        }
+        
         private Cell[,] _cellArray;
         private Block[,] _blockArray;
         private int _row;
@@ -41,7 +48,7 @@ namespace ThreeMatch.InGame
 
         private void OnPointerDown(Vector2 beginPosition)
         {
-            if (_selectedCell != null)
+            if (_selectedCell != null || _isSwapping)
             {
                 return;
             }
@@ -75,9 +82,19 @@ namespace ThreeMatch.InGame
             bool isSuccess = await TrySwap(cell, _selectedCell);
             if (isSuccess)
             {
-                await PostSwapProcess(); 
+                do
+                {
+                    await PostSwapProcess();
+                } while (CheckMatchingCell());
             }
-            
+
+            //살짝 딜레이를 줌
+            await UniTask.WaitForSeconds(0.5f);
+            ResetDrag();
+        }
+
+        private void ResetDrag()
+        {
             _isSwapping = false;
             _selectedCell = null;
             _neighborCellList.Clear();
@@ -85,9 +102,118 @@ namespace ThreeMatch.InGame
         
         private void OnPointerUp(Vector2 endPosition)
         {
-            _isSwapping = false;
-            _selectedCell = null;
-            _neighborCellList.Clear();
+            // _isSwapping = false;
+            // _selectedCell = null;
+            // _neighborCellList.Clear();
+        }
+
+        private bool CheckMatchingCell()
+        {
+            List<Cell> matchedCellList = new();
+            for (int i = 0; i < _row; i++)
+            {
+                for (int j = 0; j < _column; j++)
+                {
+                    Block block = _blockArray[i, j];
+                    Cell cell = _cellArray[i, j];
+
+                    if (block.BlockType == BlockType.None || cell == null)
+                    {
+                        continue;
+                    }
+
+                    List<Cell> cellANeighborSameImageCellList = GetNeighborSameImageCellList(cell);
+                    foreach (Cell c in cellANeighborSameImageCellList)
+                    {
+                        if (!matchedCellList.Contains(c))
+                        {
+                            matchedCellList.Add(c);
+                        }
+                    }
+                }
+            }
+            
+            if (matchedCellList.Count >= Const.RemovableMatchedCellCount)
+            {
+                foreach (Cell c in matchedCellList)
+                {
+                    _cellArray[c.Row, c.Column] = null;
+                    c.RemoveCell();
+                }
+
+                return true;
+            }
+            
+            return false;
+        }
+        
+        private async UniTask PostSwapProcess()
+        {
+            Dictionary<int, List<CellMovementInfo>>
+                cellMovementInfoDict = new Dictionary<int, List<CellMovementInfo>>();
+            for (int i = 0; i < _row; i++)
+            {
+                for (int j = 0; j < _column; j++)
+                {
+                    Block block = _blockArray[i, j];
+                    Cell cell = _cellArray[i, j];
+                    var cellMovePositionList = new List<Vector3>();
+                    //비어있는 블록을 기준으로 찾기
+                    if (block.BlockType != BlockType.None && cell == null)
+                    {
+                        int[] direction = { 0, 1, -1 };
+                        foreach (int columnDir in direction)
+                        {
+                            cellMovePositionList.Add(block.Position);
+                            Cell spawnOrMoveCell = null;
+                            bool isSuccess = TrySpawnOrMoveCell(i, j, columnDir, ref cellMovePositionList, ref spawnOrMoveCell);
+                            if (isSuccess)
+                            {
+                                CellMovementInfo info = new CellMovementInfo();
+                                info.movePositionList = cellMovePositionList;
+                                info.cell = spawnOrMoveCell;
+                                if (!cellMovementInfoDict.TryGetValue(spawnOrMoveCell.Column, out var cellMovementInfoList))
+                                {
+                                    cellMovementInfoList = new List<CellMovementInfo>();
+                                }
+                                
+                                cellMovementInfoList.Add(info);
+                                cellMovementInfoDict[spawnOrMoveCell.Column] = cellMovementInfoList;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            int maxCount = 0;
+            foreach (KeyValuePair<int, List<CellMovementInfo>> cellMovementInfo in cellMovementInfoDict)
+            {
+                int key = cellMovementInfo.Key;
+                List<CellMovementInfo> cellMovementInfoList = cellMovementInfo.Value;
+
+                if (cellMovementInfoList.Count > maxCount)
+                {
+                    maxCount = cellMovementInfoList.Count;
+                }
+                
+                //낮은 것부터 차례대로 이동 시킨다.
+                MoveCell(cellMovementInfoList, key).Forget();
+            }
+
+            float waitTime = maxCount * Const.CellMoveAnimationDuration;
+            // Debug.Log($"waitTime {waitTime} / {maxCount} / {Const.CellMoveAnimationDuration}");
+            await UniTask.WaitForSeconds(waitTime);
+        }
+
+        private async UniTask MoveCell(List<CellMovementInfo> cellMovementInfoList, int key)
+        {
+            // cellMovementInfoList.Sort((a, b)=> a.cell.Column.CompareTo(b.cell.Column));
+            foreach (CellMovementInfo info in cellMovementInfoList)
+            {
+                // Debug.Log($"key {key} {info.cell.Name}  movelist count {info.movePositionList.Count}");
+                await info.cell.PostSwapProcess(info.movePositionList);
+            }
         }
 
         private async UniTask<bool> TrySwap(Cell cellA, Cell cellB)
@@ -147,20 +273,21 @@ namespace ThreeMatch.InGame
         
         private List<Cell> GetNeighborSameImageCellList(Cell cell)
         {
-            var verticalSameImageCellList = new List<Cell>(Const.RemovableMatchedCellCount);
-            var horizontalSameImageCellList = new List<Cell>(Const.RemovableMatchedCellCount);
+            int removableMatchedCellCount = Const.RemovableMatchedCellCount;
+            var verticalSameImageCellList = new List<Cell>(removableMatchedCellCount);
+            var horizontalSameImageCellList = new List<Cell>(removableMatchedCellCount);
             
             int row = cell.Row;
             int column = cell.Column;
             AddSameImageCell(row, column, cell.CellImageType, ref verticalSameImageCellList, ref horizontalSameImageCellList);
 
             var resultCellList = new List<Cell>();
-            if (verticalSameImageCellList.Count >= Const.RemovableMatchedCellCount)
+            if (verticalSameImageCellList.Count >= removableMatchedCellCount)
             {
                 resultCellList.AddRange(verticalSameImageCellList);
             }
 
-            if (horizontalSameImageCellList.Count >= Const.RemovableMatchedCellCount)
+            if (horizontalSameImageCellList.Count >= removableMatchedCellCount)
             {
                 resultCellList.AddRange(horizontalSameImageCellList);
             }
@@ -260,29 +387,12 @@ namespace ThreeMatch.InGame
             return false;
         }
 
-        [Serializable]
-        public struct CellMovementInfo
-        {
-            public Cell cell;
-            public List<Vector3> movePositionList;
-        }
-
-        private void AddCellMovementInfo(Cell cell, List<Vector3> movePositionList, ref List<CellMovementInfo> cellMovementInfoList)
-        {
-            CellMovementInfo info = new CellMovementInfo();
-            info.cell = cell;
-            info.movePositionList = movePositionList;
-            cellMovementInfoList.Add(info);
-        }
         
-        private bool TrySpawnAndMoveCell(int row, int column, int columnDir, ref List<Vector3> cellMovePositionList)
+        private bool TrySpawnOrMoveCell(int row, int column, int columnDir, ref List<Vector3> cellMovePositionList, ref Cell cell)
         {
             int targetColumn = column + columnDir;
-
-            // 보드 범위를 벗어났는지 확인
             if (targetColumn < 0 || targetColumn >= _column)
             {
-                cellMovePositionList.Clear();
                 return false;
             }
 
@@ -295,7 +405,7 @@ namespace ThreeMatch.InGame
                     newCell.CreateCellBehaviour(_cellPrefab);
                     Vector3 spawnPosition = _blockArray[k - 1, targetColumn].Position + new Vector3(0, 2.5f, 0);
                     newCell.CellBehaviour.UpdatePosition(spawnPosition);
-                    newCell.PostSwapProcess(cellMovePositionList);
+                    cell = newCell;
                     _cellArray[row, column] = newCell;
                     return true;
                 }
@@ -305,20 +415,17 @@ namespace ThreeMatch.InGame
                 // 비어있는 블록이면 실패 처리
                 if (block.BlockType == BlockType.None)
                 {
-                    cellMovePositionList.Clear();
-                    Debug.Log($"{row} / {column} / {columnDir}");
                     return false;
                 }
 
                 Cell targetCell = _cellArray[k, targetColumn];
-        
                 // 타겟 셀을 찾았을 경우
                 if (targetCell != null)
                 {
                     _cellArray[row, column] = targetCell;
                     _cellArray[k, targetColumn] = null;
                     targetCell.UpdateRowAndColumn(row, column);
-                    targetCell.PostSwapProcess(cellMovePositionList);
+                    cell = targetCell;
                     return true;
                 }
 
@@ -326,91 +433,7 @@ namespace ThreeMatch.InGame
                 cellMovePositionList.Add(block.Position);
             }
 
-            cellMovePositionList.Clear();
             return false;
-        }
-        
-        private async UniTask PostSwapProcess()
-        {
-            Dictionary<int, List<CellMovementInfo>>
-                cellMovementInfoDict = new Dictionary<int, List<CellMovementInfo>>();
-            for (int i = 0; i < _row; i++)
-            {
-                for (int j = 0; j < _column; j++)
-                {
-                    Block block = _blockArray[i, j];
-                    Cell cell = _cellArray[i, j];
-                    var cellMovePositionList = new List<Vector3>();
-                    List<CellMovementInfo> cellMovementInfoList = new();
-                    //비어있는 블록을 기준으로 찾기
-                    if (block.BlockType != BlockType.None && cell == null)
-                    {
-                        Debug.Log($"{i} / {j} / {block.BlockBehaviour.name}");
-                        int[] direction = { 0, 1, -1 };
-                        foreach (int columnDir in direction)
-                        {
-                            cellMovePositionList.Add(block.Position);
-                            bool isSuccess = TrySpawnAndMoveCell(i, j, columnDir, ref cellMovePositionList);
-                            if (isSuccess)
-                            {
-                                break;
-                            }
-                        }
-                        
-                        // for (int k = i + 1; k <= _row; k++)
-                        // {
-                        //     if (k == _row)
-                        //     {
-                        //         Cell newCell = CreateCell(i, j);
-                        //         newCell.CreateCellBehaviour(_cellPrefab);
-                        //         Vector3 spawnPosition = _blockArray[k - 1, j].Position +
-                        //                                 new Vector3(0, 2.5f, 0);
-                        //         newCell.CellBehaviour.UpdatePosition(spawnPosition);
-                        //         newCell.PostSwapProcess(cellMovePositionList);
-                        //         _cellArray[i, j] = newCell;
-                        //         // AddCellMovementInfo(newCell, cellMovePositionList, ref cellMovementInfoList);
-                        //         // cellMovementInfoDict.Add(j, cellMovementInfoList);
-                        //         break;
-                        //     }
-                        //  
-                        //     Block b = _blockArray[k, j];   
-                        //     if (b.BlockType == BlockType.None)
-                        //     {
-                        //         break;
-                        //     }
-                        //
-                        //     Cell c = _cellArray[k, j];
-                        //     if (c != null)
-                        //     {
-                        //         _cellArray[i, j] = c;
-                        //         _cellArray[k, j] = null;
-                        //         c.UpdateRowAndColumn(i, j);
-                        //         c.PostSwapProcess(cellMovePositionList);
-                        //         // AddCellMovementInfo(c, cellMovePositionList, ref cellMovementInfoList);
-                        //         // cellMovementInfoDict.Add(j, cellMovementInfoList);
-                        //         break;
-                        //     }
-                        //     
-                        //     cellMovePositionList.Add(b.Position);
-                        // }
-                        
-                        cellMovePositionList.Clear();
-                    }
-                }
-            }
-            
-            // foreach (var cellMovementInfo in cellMovementInfoDict)
-            // {
-            //     int key = cellMovementInfo.Key;
-            //     List<CellMovementInfo> cellMovementInfoList = cellMovementInfo.Value;
-            //     //낮은 것부터 차례대로 이동 시킨다.
-            //     cellMovementInfoList.Sort((a, b)=> a.cell.Column.CompareTo(b.cell.Column));
-            //     
-            //     foreach (CellMovementInfo info in cellMovementInfoList)
-            //     {
-            //         info.cell.PostSwapProcess(info.movePositionList);
-            //     }
-            // }
         }
 
         private Block FindBlockWithoutCell(int row, int column)
@@ -569,6 +592,15 @@ namespace ThreeMatch.InGame
             
             CreateBlockBehaviour(centerPosition, blockPrefab);
             CreateCellBehaviour(cellPrefab);
+            BuildAfterProcess();
+        }
+
+        private async void BuildAfterProcess()
+        {
+            while (CheckMatchingCell())
+            {
+                await PostSwapProcess();
+            }
         }
 
         private void CreateBlockBehaviour(Vector2 centerPosition, GameObject blockPrefab)
