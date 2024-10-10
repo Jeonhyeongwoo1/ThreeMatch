@@ -57,9 +57,10 @@ namespace ThreeMatch.InGame
             return cellImageType == _cellImageType;
         }
         
-        public void PostSwapProcess(List<Vector3> movePositionList)
+        public async UniTask PostSwapProcess(List<Vector3> movePositionList)
         {
             _cellBehaviour.Move(movePositionList).Forget();
+            await UniTask.WaitForSeconds(Const.CellMoveAnimationDuration);
         }
 
         public void RemoveCell()

@@ -18,5 +18,9 @@ namespace ThreeMatch.InGame
         {
             _board.Build(centerPosition, blockPrefab, cellPrefab);
         }
+
+        public void Ready()
+        {
+        }
     }   
 }

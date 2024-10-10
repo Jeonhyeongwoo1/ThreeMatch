@@ -28,5 +28,10 @@ namespace ThreeMatch.InGame.Manager
                 Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.5f));
             stage.Build(centerPosition, _blockPrefab, _cellPrefab);
         }
+
+        public void ReadyStage()
+        {
+            // _currentStage.
+        }
     }
 }
