@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using ThreeMatch.InGame.Manager;
+using UnityEditor.VersionControl;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -14,6 +15,13 @@ namespace ThreeMatch.InGame
         {
             public Cell cell;
             public List<Vector3> movePositionList;
+        }
+        
+        [Serializable]
+        public struct MatchedSameImageCellInfo
+        {
+            public CellMatchedType cellMatchedType;
+            public List<Cell> cellList;
         }
         
         private Cell[,] _cellArray;
@@ -78,19 +86,26 @@ namespace ThreeMatch.InGame
             }
 
             _isSwapping = true;
-            
             bool isSuccess = await TrySwap(cell, _selectedCell);
             if (isSuccess)
             {
                 do
                 {
                     await PostSwapProcess();
-                } while (CheckMatchingCell());
+                } while (await CheckMatchingCell());
             }
 
             //살짝 딜레이를 줌
             await UniTask.WaitForSeconds(0.5f);
             ResetDrag();
+        }
+
+        private void OnPointerUp(Vector2 endPosition)
+        {
+            if (_selectedCell != null && !_isSwapping)
+            {
+                ResetDrag();
+            }
         }
 
         private void ResetDrag()
@@ -99,17 +114,10 @@ namespace ThreeMatch.InGame
             _selectedCell = null;
             _neighborCellList.Clear();
         }
-        
-        private void OnPointerUp(Vector2 endPosition)
-        {
-            // _isSwapping = false;
-            // _selectedCell = null;
-            // _neighborCellList.Clear();
-        }
 
-        private bool CheckMatchingCell()
+        private async UniTask<bool> CheckMatchingCell()
         {
-            List<Cell> matchedCellList = new();
+            List<UniTask> taskList = new List<UniTask>();
             for (int i = 0; i < _row; i++)
             {
                 for (int j = 0; j < _column; j++)
@@ -117,34 +125,28 @@ namespace ThreeMatch.InGame
                     Block block = _blockArray[i, j];
                     Cell cell = _cellArray[i, j];
 
-                    if (block.BlockType == BlockType.None || cell == null)
+                    if (block.BlockType == BlockType.None || cell == null || cell.CellType != CellType.Normal)
+                    {
+                        continue;
+                    }
+                    
+                    MatchedSameImageCellInfo? matchedSameImageCellInfo = GetMatchedSameImageCellInfo(cell);
+                    if (!matchedSameImageCellInfo.HasValue)
                     {
                         continue;
                     }
 
-                    List<Cell> cellANeighborSameImageCellList = GetNeighborSameImageCellList(cell);
-                    foreach (Cell c in cellANeighborSameImageCellList)
-                    {
-                        if (!matchedCellList.Contains(c))
-                        {
-                            matchedCellList.Add(c);
-                        }
-                    }
+                    taskList.Add(HandleMatchedCell(matchedSameImageCellInfo));
                 }
             }
-            
-            if (matchedCellList.Count >= Const.RemovableMatchedCellCount)
-            {
-                foreach (Cell c in matchedCellList)
-                {
-                    _cellArray[c.Row, c.Column] = null;
-                    c.RemoveCell();
-                }
 
-                return true;
+            if (taskList.Count <= 0)
+            {
+                return false;
             }
             
-            return false;
+            await UniTask.WhenAll(taskList);
+            return true;
         }
         
         private async UniTask PostSwapProcess()
@@ -216,42 +218,301 @@ namespace ThreeMatch.InGame
             }
         }
 
+        private async UniTask<bool> HandleMatchedCell(MatchedSameImageCellInfo? matchedSameImageCellInfo)
+        {
+            if (!matchedSameImageCellInfo.HasValue)
+            {
+                return false;
+            }
+
+            List<Cell> cellList = matchedSameImageCellInfo.Value.cellList;
+            CellMatchedType cellMatchedType = matchedSameImageCellInfo.Value.cellMatchedType;
+            switch (cellMatchedType)
+            {
+                case CellMatchedType.Three:
+                    foreach (Cell cell in cellList)
+                    {
+                        _cellArray[cell.Row, cell.Column] = null;
+                        cell.RemoveCell();
+                    }
+
+                    await UniTask.WaitForSeconds(Const.CellRemoveAnimationDuration);
+                    return true;
+                case CellMatchedType.Vertical_Four:
+                case CellMatchedType.Horizontal_Four:
+                case CellMatchedType.Five:
+                case CellMatchedType.Five_Shape:
+                    Debug.LogWarning("Match :" + cellMatchedType);
+                    //첫번쨰 셀로 모두 합치기
+                    Cell firstCell = cellList[0];
+                    List<UniTask> moveTaskList = new(cellList.Count - 2);
+                    for (int i = 1; i < cellList.Count; i++)
+                    {
+                        Cell cell = cellList[i];
+                        if (cell == firstCell)
+                        {
+                            continue;
+                        }
+                        
+                        _cellArray[cell.Row, cell.Column] = null;
+                        var moveTask = cell.CellBehaviour.MoveAsync(firstCell.Position).ContinueWith(() =>
+                        {
+                            cell.RemoveCell();
+                        });
+                        
+                        moveTaskList.Add(moveTask);
+                    }
+                    await UniTask.WhenAll(moveTaskList);
+                    
+                    firstCell.SetCellTypeFromMatch(cellMatchedType);
+                    return true;
+                case CellMatchedType.None:
+                default:
+                    return false;
+            }
+        }
+ 
+        private async UniTask ActivateRocketProcessAsync(int row, int column, int startIndex, int endIndex, bool isPositive,bool isUpDir, Cell activateCell)
+        {
+            int step = isPositive ? 1 : -1;
+            UniTask cellTask = UniTask.CompletedTask;
+            for (int i = startIndex; i != endIndex; i += step)
+            {
+                Block block = isUpDir ? _blockArray[i, column] : _blockArray[row, i];
+                Cell cell = isUpDir ? _cellArray[i, column] : _cellArray[row, i];
+
+                //연출이 들어가야함. 추후 수정
+                // UniTask moveTask = activateCell.CellBehaviour.MoveAsync(block.Position);
+                UniTask moveTask = UniTask.WaitForSeconds(0.2f);
+                if (block.BlockType == BlockType.None || cell == null)
+                {
+                    await moveTask;
+                    continue;
+                }
+
+                switch (cell.CellType)
+                {
+                    case CellType.Normal:
+                        cell.RemoveCell();
+                        break;
+                    case CellType.Rocket:
+                    case CellType.Wand:
+                    case CellType.Bomb:
+                        if (activateCell == cell)
+                        {
+                            cell.RemoveCell();
+                        }
+                        else
+                        {
+                            cellTask = TryActivateCellProperty(cell);
+                        }                        
+                        break;
+                }
+                
+                if (isUpDir)
+                {
+                    _cellArray[i, column] = null;
+                }
+                else
+                {
+                    _cellArray[row, i] = null;
+                }
+
+                await moveTask;
+            }
+
+            await cellTask;
+        }
+
+        private async UniTask ActivateBombProcessAsync(int row, int column, Cell activateCell)
+        {
+            UniTask cellTask = UniTask.CompletedTask;
+            for (int i = row - 1; i <= row + 1; i++)
+            {
+                for (int j = column - 1; j <= column + 1; j++)
+                {
+                    if (IsOutOfBoardRange(i, j))
+                    {
+                        continue;
+                    }
+
+                    Block block = _blockArray[i, j];
+                    Cell cell = _cellArray[i, j];
+                    if (block.BlockType == BlockType.None || cell == null)
+                    {
+                        continue;
+                    }
+                    
+                    
+                    switch (cell.CellType)
+                    {
+                        case CellType.Normal:
+                            cell.RemoveCell();
+                            break;
+                        case CellType.Rocket:
+                        case CellType.Wand:
+                        case CellType.Bomb:
+                            if (activateCell == cell)
+                            {
+                                cell.RemoveCell();
+                            }
+                            else
+                            {
+                                cellTask = TryActivateCellProperty(cell);
+                            }                        
+                            break;
+                    }
+                    
+                    _cellArray[i, j] = null;
+                }
+            }
+
+            await UniTask.WaitForSeconds(0.5f);
+            await cellTask;
+        }
+
+        private async UniTask ActivateWandProcessAsync(Cell activateCell)
+        {
+            CellImageType cellImageType = activateCell.CellImageType;
+            Debug.Log($"ActivateWandProcessAsync {cellImageType}");
+            List<Cell> sameImageTypeCellList = new List<Cell>();
+            UniTask cellTask = UniTask.CompletedTask;
+            for (int i = 0; i < _row; i++)
+            {
+                for (int j = 0; j < _column; j++)
+                {
+                    Cell cell = _cellArray[i, j];
+                    if (cell == null || cell.CellType != CellType.Normal || cell.CellImageType != cellImageType)
+                    {
+                        continue;
+                    }
+                    
+                    sameImageTypeCellList.Add(cell);
+                }
+            }
+            
+            _cellArray[activateCell.Row, activateCell.Column] = null;
+            activateCell.RemoveCell();
+            foreach (Cell cell in sameImageTypeCellList)
+            {
+                _cellArray[cell.Row, cell.Column] = null;
+                switch (cell.CellType)
+                {
+                    case CellType.Normal:
+                        cell.RemoveCell();
+                        break;
+                    case CellType.Rocket:
+                    case CellType.Wand:
+                    case CellType.Bomb:
+                        if (activateCell == cell)
+                        {
+                            cell.RemoveCell();
+                        }
+                        else
+                        {
+                            cellTask = TryActivateCellProperty(cell);
+                        }
+                        break;
+                }
+            }
+            
+            await UniTask.WaitForSeconds(0.5f);
+            await cellTask;
+        }
+
+        private async UniTask<bool> TryActivateCellProperty(Cell activateCell)
+        {
+            int row = activateCell.Row;
+            int column = activateCell.Column;
+            switch (activateCell.CellType)
+            {
+                case CellType.Rocket:
+                    activateCell.ActivateRocket();
+                    switch (activateCell.CellMatchedType)
+                    {
+                        case CellMatchedType.Vertical_Four:
+                            UniTask upTask = ActivateRocketProcessAsync(row, column, row, _row, true, true, activateCell);
+                            UniTask downTask = ActivateRocketProcessAsync(row, column, row, -1, false, true, activateCell);
+                            await UniTask.WhenAll(upTask, downTask);
+                            break;
+                        case CellMatchedType.Horizontal_Four:
+                            UniTask rightTask = ActivateRocketProcessAsync(row, column, column, _column, true, false, activateCell);
+                            UniTask leftTask = ActivateRocketProcessAsync(row, column, column, -1, false, false, activateCell);
+                            await UniTask.WhenAll(rightTask, leftTask);
+                            break;
+                    }
+
+                    return true;
+                case CellType.Wand:
+                    await ActivateWandProcessAsync(activateCell);
+                    return true;
+                case CellType.Bomb:
+                    await ActivateBombProcessAsync(row, column, activateCell);
+                    return true;
+                case CellType.None:
+                case CellType.Normal:
+                default:
+                    return false;
+            }
+        }
+        
         private async UniTask<bool> TrySwap(Cell cellA, Cell cellB)
         {
             Swap(cellA, cellB);
 
             await UniTask.WaitForSeconds(Const.SwapAnimationDuration);
-            
-            List<Cell> cellANeighborSameImageCellList = GetNeighborSameImageCellList(cellA);
-            List<Cell> cellBNeighborSameImageCellList = GetNeighborSameImageCellList(cellB);
-            if (cellANeighborSameImageCellList.Count >= Const.RemovableMatchedCellCount)
+
+            Debug.Log($"cellA {cellA.CellType} / CellB {cellB.CellType}");
+            //두 개가 일반형인 경우
+            if (cellA.CellType == CellType.Normal && cellB.CellType == CellType.Normal)
             {
-                foreach (Cell cell in cellANeighborSameImageCellList)
-                {
-                    _cellArray[cell.Row, cell.Column] = null;
-                    cell.RemoveCell();
-                }
-            }
+                MatchedSameImageCellInfo? cellAMatchedSameImageCellInfo = GetMatchedSameImageCellInfo(cellA);
+                MatchedSameImageCellInfo? cellBMatchedSameImageCellInfo = GetMatchedSameImageCellInfo(cellB);
+
+                await UniTask.WhenAll(HandleMatchedCell(cellAMatchedSameImageCellInfo),
+                    HandleMatchedCell(cellBMatchedSameImageCellInfo));
             
-            if (cellBNeighborSameImageCellList.Count >= Const.RemovableMatchedCellCount)
-            {
-                foreach (Cell cell in cellBNeighborSameImageCellList)
+                if (!cellAMatchedSameImageCellInfo.HasValue && !cellBMatchedSameImageCellInfo.HasValue)
                 {
-                    _cellArray[cell.Row, cell.Column] = null;
-                    cell.RemoveCell();
+                    Swap(cellA, cellB);
+                    await UniTask.WaitForSeconds(Const.SwapAnimationDuration);
+                    return false; 
                 }
+
+                //모두 없는 경우
+                // if (cellAMatchedSameImageCellInfo != null &&
+                //     cellBMatchedSameImageCellInfo != null &&
+                //     cellAMatchedSameImageCellInfo.Value.cellList.Count < Const.RemovableMatchedCellCount &&
+                //     cellBMatchedSameImageCellInfo.Value.cellList.Count < Const.RemovableMatchedCellCount)
+                // {
+                //     Swap(cellA, cellB);
+                //     await UniTask.WaitForSeconds(Const.SwapAnimationDuration);
+                //     return false;
+                // }
+            
+                return true;
             }
 
-            //모두 없는 경우
-            if (cellBNeighborSameImageCellList.Count < Const.RemovableMatchedCellCount &&
-                cellANeighborSameImageCellList.Count < Const.RemovableMatchedCellCount)
+            //CellA는 특수 타입이고 CellB는 일반형
+            if (cellA.CellType != CellType.Normal && cellB.CellType == CellType.Normal)
             {
-                Swap(cellA, cellB);
-                await UniTask.WaitForSeconds(Const.SwapAnimationDuration);
-                return false;
+                MatchedSameImageCellInfo? cellBMatchedSameImageCellInfo = GetMatchedSameImageCellInfo(cellB);
+                await UniTask.WhenAll(TryActivateCellProperty(cellA), HandleMatchedCell(cellBMatchedSameImageCellInfo));
+                return true;
             }
-            
-            return true;
+
+            //CellB는 특수 타입이고 CellA는 일반형
+            if (cellA.CellType == CellType.Normal && cellB.CellType != CellType.Normal)
+            {
+                MatchedSameImageCellInfo? cellAMatchedSameImageCellInfo = GetMatchedSameImageCellInfo(cellA);
+                await UniTask.WhenAll(TryActivateCellProperty(cellB), HandleMatchedCell(cellAMatchedSameImageCellInfo));
+                return true;
+            }
+
+            Debug.LogError("Swap error");
+            Swap(cellA, cellB);
+            await UniTask.WaitForSeconds(Const.SwapAnimationDuration);
+            return false;
         }
 
         private void Swap(Cell cellA, Cell cellB)
@@ -271,7 +532,7 @@ namespace ThreeMatch.InGame
             cellB.Swap(cellAPosition, cellARow, cellAColumn);
         }
         
-        private List<Cell> GetNeighborSameImageCellList(Cell cell)
+        private MatchedSameImageCellInfo? GetMatchedSameImageCellInfo(Cell cell)
         {
             int removableMatchedCellCount = Const.RemovableMatchedCellCount;
             var verticalSameImageCellList = new List<Cell>(removableMatchedCellCount);
@@ -281,18 +542,67 @@ namespace ThreeMatch.InGame
             int column = cell.Column;
             AddSameImageCell(row, column, cell.CellImageType, ref verticalSameImageCellList, ref horizontalSameImageCellList);
 
-            var resultCellList = new List<Cell>();
-            if (verticalSameImageCellList.Count >= removableMatchedCellCount)
+            int verticalSameImageCellListCount = verticalSameImageCellList.Count;
+            int horizontalSameImageCellListCount = horizontalSameImageCellList.Count;
+            
+            // Debug.Log($"vertical {verticalSameImageCellListCount} / horizontal {horizontalSameImageCellListCount}");
+            //조합(T, L, 십자가.. 5)폭탄 형태인 경우
+            if (verticalSameImageCellListCount >= removableMatchedCellCount &&
+                horizontalSameImageCellListCount >= removableMatchedCellCount)
             {
-                resultCellList.AddRange(verticalSameImageCellList);
+                MatchedSameImageCellInfo matchedSameImageCellInfo = new MatchedSameImageCellInfo();
+                matchedSameImageCellInfo.cellMatchedType = CellMatchedType.Five_Shape;
+                matchedSameImageCellInfo.cellList = new List<Cell>(removableMatchedCellCount * 2);
+                matchedSameImageCellInfo.cellList.AddRange(verticalSameImageCellList);
+                matchedSameImageCellInfo.cellList.AddRange(horizontalSameImageCellList);
+                return matchedSameImageCellInfo;
+            }
+            
+            if (verticalSameImageCellListCount >= removableMatchedCellCount)
+            {
+                CellMatchedType cellMatchedType = CellMatchedType.None;
+                if (verticalSameImageCellListCount == (int)CellMatchedType.Three)
+                {
+                    cellMatchedType = CellMatchedType.Three;
+                }
+                else if (verticalSameImageCellListCount == (int)CellMatchedType.Four)
+                {
+                    cellMatchedType = CellMatchedType.Vertical_Four;
+                }
+                else if(verticalSameImageCellListCount == (int)CellMatchedType.Five)
+                {
+                    cellMatchedType = CellMatchedType.Five_OneLine;
+                }
+                
+                MatchedSameImageCellInfo matchedSameImageCellInfo = new MatchedSameImageCellInfo();
+                matchedSameImageCellInfo.cellMatchedType = cellMatchedType;
+                matchedSameImageCellInfo.cellList = verticalSameImageCellList;
+                return matchedSameImageCellInfo;
             }
 
-            if (horizontalSameImageCellList.Count >= removableMatchedCellCount)
+            if (horizontalSameImageCellListCount >= removableMatchedCellCount)
             {
-                resultCellList.AddRange(horizontalSameImageCellList);
+                CellMatchedType cellMatchedType = CellMatchedType.None;
+                if (horizontalSameImageCellListCount == (int)CellMatchedType.Three)
+                {
+                    cellMatchedType = CellMatchedType.Three;
+                }
+                else if (horizontalSameImageCellListCount == (int)CellMatchedType.Four)
+                {
+                    cellMatchedType = CellMatchedType.Horizontal_Four;
+                }
+                else if(horizontalSameImageCellListCount == (int)CellMatchedType.Five)
+                {
+                    cellMatchedType = CellMatchedType.Five_OneLine;
+                }
+                
+                MatchedSameImageCellInfo matchedSameImageCellInfo = new MatchedSameImageCellInfo();
+                matchedSameImageCellInfo.cellMatchedType = cellMatchedType;
+                matchedSameImageCellInfo.cellList = horizontalSameImageCellList;
+                return matchedSameImageCellInfo;
             }
 
-            return resultCellList;
+            return null;
         }
 
         private void AddSameImageCell(int row, int column, CellImageType cellImageType,
@@ -354,7 +664,7 @@ namespace ThreeMatch.InGame
                 return;
             }
 
-            if (cell == null)
+            if (cell == null || cell.CellType != CellType.Normal)
             {
                 Debug.LogWarning($"cell {currentRow} / {currentColumn}");
                 return;
@@ -580,7 +890,7 @@ namespace ThreeMatch.InGame
         {
             int length = Enum.GetNames(typeof(CellImageType)).Length - 1;
             int random = Random.Range(0, length);
-            Cell cell = new Cell(row, column, (CellImageType)random);
+            Cell cell = new Cell(row, column, (CellImageType)random, CellType.Normal);
 
             return cell;
         }
@@ -597,7 +907,7 @@ namespace ThreeMatch.InGame
 
         private async void BuildAfterProcess()
         {
-            while (CheckMatchingCell())
+            while (await CheckMatchingCell())
             {
                 await PostSwapProcess();
             }
@@ -605,14 +915,12 @@ namespace ThreeMatch.InGame
 
         private void CreateBlockBehaviour(Vector2 centerPosition, GameObject blockPrefab)
         {
-            int index = 0;
             for (int i = 0; i < _row; i++)
             {
                 for (int j = 0; j < _column; j++)
                 {
                     Block block = _blockArray[i, j];
-                    block.CreateBlockBehaviour(blockPrefab, centerPosition, _row, _column, index % 2 == 0);
-                    index++;
+                    block.CreateBlockBehaviour(blockPrefab, centerPosition, _row, _column, (i * _column + j) % 2 == 0);
                 }
             }
         }
@@ -637,7 +945,6 @@ namespace ThreeMatch.InGame
         }
     }
 }
-
 
 
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace ThreeMatch.InGame
             _cellImageType = (CellImageType) spriteImageIndex;
         }
 
-        public async UniTask Move(List<Vector3> movePositionList)
+        public async UniTask MoveAsync(List<Vector3> movePositionList)
         {
             transform.DOKill();
             List<Vector3> list = new List<Vector3>();
@@ -40,6 +41,15 @@ namespace ThreeMatch.InGame
             }
         }
 
+        public async UniTask MoveAsync(Vector3 movePosition)
+        {
+            var t = new UniTaskCompletionSource();
+            transform.DOKill();
+            transform.DOMove(movePosition, Const.CellMoveAnimationDuration).OnComplete(() => t.TrySetResult());
+
+            await t.Task;
+        }
+
         public void UpdatePosition(Vector3 position)
         {
             transform.position = position;
@@ -49,6 +59,31 @@ namespace ThreeMatch.InGame
         {
             transform.DOKill();
             transform.DOMove(position, Const.SwapAnimationDuration);
+        }
+
+        public void ChangeCellSprite(CellType cellType, CellMatchedType cellMatchedType)
+        {
+            switch (cellType)
+            {
+                case CellType.Normal:
+                    break;
+                case CellType.Rocket:
+                    if (cellMatchedType == CellMatchedType.Horizontal_Four)
+                    {
+                        _sprite.sprite = _data.HorizontalRocketSprite;
+                    }
+                    else if (cellMatchedType == CellMatchedType.Vertical_Four)
+                    {
+                        _sprite.sprite = _data.VerticalRocketSprite;
+                    }
+                    break;
+                case CellType.Wand:
+                    _sprite.sprite = _data.WandSprite;
+                    break;
+                case CellType.Bomb:
+                    _sprite.sprite = _data.BombSprite;
+                    break;
+            }
         }
 
         public void UpdateUI(int spriteIndex)
