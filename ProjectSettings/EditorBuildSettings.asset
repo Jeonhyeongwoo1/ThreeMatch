@@ -4,5 +4,14 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/DonutMatch/Scenes/0_Splash.unity
+    guid: f6bee41440b96274a855a34d52199417
+  - enabled: 1
+    path: Assets/DonutMatch/Scenes/1_StartMap_Simple.unity
+    guid: 28d9694067303d549bed533f056ad98b
+  - enabled: 1
+    path: Assets/DonutMatch/Scenes/2_Game.unity
+    guid: 8a9bf8f19efa4a6489d26fcc61d06881
   m_configObjects: {}

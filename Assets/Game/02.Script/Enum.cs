@@ -40,5 +40,19 @@ public enum CellMatchedType
 public enum CellCombinationType
 {
     None = 0,
-    
+    RocketAndBomb,
+    RocketAndWand,
+    RocketAndRocket,
+    BombAndWand,
+    BombAndBomb,
+    WandAndWand,
+}
+
+public enum InGameItemType
+{
+    None,
+    Shuffle,
+    Hammer,
+    VerticalRocket,
+    HorizontalRocket
 }
