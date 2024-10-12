@@ -1,6 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
+using ThreeMatch.InGame.Manager;
 using UnityEngine;
 
 namespace ThreeMatch.InGame
@@ -13,6 +11,8 @@ namespace ThreeMatch.InGame
         {
             Board board = new Board(boardInfoArray);
             _board = board;
+
+            GameManager.onInGameItemUsagePendingAction += OnItemUsagePendingAction;
         }
 
         public void Build(Vector2 centerPosition, GameObject blockPrefab, GameObject cellPrefab)
@@ -24,9 +24,9 @@ namespace ThreeMatch.InGame
         {
         }
 
-        public async UniTask UseInGameItem(InGameItemType inGameItemType)
+        public void OnItemUsagePendingAction(InGameItemType inGameItemType)
         {
-            await _board.ActivateInGameItemProcess(inGameItemType, true);
+            _board.SetPendingUseInGameItemType(inGameItemType);
         }
     }   
 }

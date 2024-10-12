@@ -10,13 +10,15 @@ namespace ThreeMatch.InGame.Manager
         [SerializeField] private int _stageLevel;
         [SerializeField] private GameObject _blockPrefab;
         [SerializeField] private GameObject _cellPrefab;
-
-        public static Action<bool> onUseInGameItem;
         
         private Stage _currentStage;
         
-        private void Start()
+        private IEnumerator Start()
         {
+            yield return null;
+            yield return null;
+            yield return null;
+            yield return null;
             LoadStage();
         }
 
@@ -24,20 +26,13 @@ namespace ThreeMatch.InGame.Manager
         {
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                _currentStage.UseInGameItem(InGameItemType.VerticalRocket);
+                _currentStage.OnItemUsagePendingAction(InGameItemType.VerticalRocket);
             }
             
             if (Input.GetKeyDown(KeyCode.Alpha2))
             {
-                _currentStage.UseInGameItem(InGameItemType.HorizontalRocket);
+                _currentStage.OnItemUsagePendingAction(InGameItemType.HorizontalRocket);
             }
-        }
-
-        private async void UseInGameItem()
-        {
-            // onUseInGameItem?.Invoke(true);
-            await _currentStage.UseInGameItem(InGameItemType.Hammer);
-            // onUseInGameItem?.Invoke(false);
         }
 
         private void LoadStage()

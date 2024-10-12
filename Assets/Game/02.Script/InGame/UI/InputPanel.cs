@@ -22,22 +22,7 @@ namespace ThreeMatch.InGame.Manager
         {
             _camera = Camera.main;
         }
-
-        private void OnEnable()
-        {
-            StageManager.onUseInGameItem += OnUseInGameItem;
-        }
-
-        private void OnDisable()
-        {
-            StageManager.onUseInGameItem -= OnUseInGameItem;
-        }
-
-        private void OnUseInGameItem(bool isOn)
-        {
-            _isBlocked = isOn;
-        }
-
+        
         public void OnPointerDown(PointerEventData eventData)
         {
             if (_isBlocked)

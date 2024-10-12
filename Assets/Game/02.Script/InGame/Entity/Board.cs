@@ -4,6 +4,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using ThreeMatch.Helper;
 using ThreeMatch.InGame.Manager;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -30,35 +31,31 @@ namespace ThreeMatch.InGame
         private Block[,] _blockArray;
         private int _row;
         private int _column;
+        private BoardState _boardState;
 
         private List<Cell> _neighborCellList = new ();
         private Cell _selectedCell;
-        private bool _isSwapping;
+        
         private GameObject _blockPrefab;
         private GameObject _cellPrefab;
-        
+        private UniTaskCompletionSource _executeInGameItemTaskCompletionSource;
+
         public Board(int[,] boardInfoArray)
         {
             _row = boardInfoArray.GetLength(0);
             _column = boardInfoArray.GetLength(1);
             CreateBlockArray(_row, _column, boardInfoArray);
             CreateCellArray(_row, _column);
-            
-            AddEvents();
-        }
-
-        private void AddEvents()
-        {
+         
             InputPanel.OnPointerDownAction += OnPointerDown;
-            // InputManager.OnBeginDragAction += OnBeginDrag;
             InputPanel.OnDragAction += OnDrag;
-            // InputManager.OnEndDragAction += OnEndDrag;
             InputPanel.OnPointerUpAction += OnPointerUp;
         }
 
-        private void OnPointerDown(Vector2 beginPosition)
+        private async void OnPointerDown(Vector2 beginPosition)
         {
-            if (_selectedCell != null || _isSwapping)
+            Debug.Log($"{_selectedCell} / {GetBoardState()}");
+            if (_selectedCell != null || IsBoardState(BoardState.Swapping))
             {
                 return;
             }
@@ -70,20 +67,17 @@ namespace ThreeMatch.InGame
             }
             
             _selectedCell = cell;
-            
-            if (_isActivateInGameItem)
-            {
-                ExecuteInGameItem();
-                return;
-            }
-            
             _neighborCellList = GetNeighborCellList(cell);
-            cell.CellBehaviour.OnPointerDown(beginPosition);
+            
+            if (IsBoardState(BoardState.PendingUseInGameItem))
+            {
+                await ExecuteInGameItem();
+            }
         }
 
         private async void OnDrag(Vector2 dragPosition)
         {
-            if (_selectedCell == null || _isSwapping)
+            if (_selectedCell == null || IsBoardState(BoardState.Swapping))
             {
                 return;
             }
@@ -94,7 +88,6 @@ namespace ThreeMatch.InGame
                 return;
             }
 
-            _isSwapping = true;
             bool isSuccess = await TrySwap(cell, _selectedCell);
             if (isSuccess)
             {
@@ -106,12 +99,14 @@ namespace ThreeMatch.InGame
 
             //살짝 딜레이를 줌
             await UniTask.WaitForSeconds(0.5f);
+            
+            UpdateBoardState(BoardState.Ready);
             ResetDrag();
         }
 
         private void OnPointerUp(Vector2 endPosition)
         {
-            if (_selectedCell != null && !_isSwapping)
+            if (_selectedCell != null && IsBoardState(BoardState.Ready))
             {
                 ResetDrag();
             }
@@ -119,9 +114,7 @@ namespace ThreeMatch.InGame
 
         private void ResetDrag()
         {
-            _isSwapping = false;
             _selectedCell = null;
-            _neighborCellList.Clear();
         }
 
         private async UniTask<bool> CheckMatchingCell()
@@ -436,8 +429,9 @@ namespace ThreeMatch.InGame
         //CellB가 selected cell
         private async UniTask<bool> TrySwap(Cell cellA, Cell cellB)
         {
+            UpdateBoardState(BoardState.Swapping);
             Swap(cellA, cellB);
-
+            
             await UniTask.WaitForSeconds(Const.SwapAnimationDuration);
             
             //두 개가 일반형인 경우
@@ -1008,6 +1002,7 @@ namespace ThreeMatch.InGame
 
         private List<Cell> GetNeighborCellList(Cell cell)
         {
+            _neighborCellList.Clear();
             int row = cell.Row;
             int column = cell.Column;
 
@@ -1082,17 +1077,22 @@ namespace ThreeMatch.InGame
             return cell;
         }
 
-        public void Build(Vector2 centerPosition, GameObject blockPrefab, GameObject cellPrefab)
+        public async UniTask Build(Vector2 centerPosition, GameObject blockPrefab, GameObject cellPrefab)
         {
+            UpdateBoardState(BoardState.Building);   
+            
             _blockPrefab = blockPrefab;
             _cellPrefab = cellPrefab;
             
             CreateBlockBehaviour(centerPosition, blockPrefab);
             CreateCellBehaviour(cellPrefab);
-            BuildAfterProcess();
+            
+            await BuildAfterProcess();
+            
+            UpdateBoardState(BoardState.CompleteBuild);
         }
 
-        private async void BuildAfterProcess()
+        private async UniTask BuildAfterProcess()
         {
             while (await CheckMatchingCell())
             {
@@ -1163,23 +1163,20 @@ namespace ThreeMatch.InGame
 
         #region Player_Item
 
-        private InGameItemType _inGameItemType; 
-        private bool _isActivateInGameItem;
+        private InGameItemType _pendingInGameItemType;
         
-        public async UniTask ActivateInGameItemProcess(InGameItemType inGameItemType, bool isActivateInGameItem)
+        public void SetPendingUseInGameItemType(InGameItemType inGameItemType)
         {
-            _inGameItemType = inGameItemType;
-            _isActivateInGameItem = isActivateInGameItem;
-            if (inGameItemType == InGameItemType.Shuffle)
-            {
-                await ExecuteInGameItem();
-            }
+            _pendingInGameItemType = inGameItemType;
+            UpdateBoardState(BoardState.PendingUseInGameItem);
         }
 
         private async UniTask ExecuteInGameItem()
         {
-            StageManager.onUseInGameItem.Invoke(true);
-            switch (_inGameItemType)
+            UpdateBoardState(BoardState.UseItem);
+            GameManager.onUsedInGameItemAction?.Invoke(_pendingInGameItemType);
+            
+            switch (_pendingInGameItemType)
             {
                 case InGameItemType.Shuffle:
                     await ExecuteShuffleCell();
@@ -1205,10 +1202,10 @@ namespace ThreeMatch.InGame
             {
                 await PostSwapProcess();
             } while (await CheckMatchingCell());
-
-            _isActivateInGameItem = false;
-            _inGameItemType = InGameItemType.None;
-            StageManager.onUseInGameItem.Invoke(false);
+            
+            _pendingInGameItemType = InGameItemType.None;
+            ResetDrag();
+            UpdateBoardState(BoardState.Ready);
         }
 
         private void ExecuteHammer()
@@ -1259,7 +1256,10 @@ namespace ThreeMatch.InGame
         }
 
         #endregion
-        
+
+        public void UpdateBoardState(BoardState state) => _boardState = state;
+        public BoardState GetBoardState() => _boardState;
+        public bool IsBoardState(BoardState state) => _boardState == state;
     }
 }
 

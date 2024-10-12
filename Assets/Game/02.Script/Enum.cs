@@ -56,3 +56,15 @@ public enum InGameItemType
     VerticalRocket,
     HorizontalRocket
 }
+
+public enum BoardState
+{
+    None,
+    Building,
+    CompleteBuild,
+    Ready,
+    Swapping,
+    SwapPostProcess,
+    PendingUseInGameItem,
+    UseItem,
+}
