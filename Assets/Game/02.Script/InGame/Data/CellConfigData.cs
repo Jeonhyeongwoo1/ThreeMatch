@@ -17,6 +17,8 @@ namespace ThreeMatch.InGame.Data
         public Sprite BoxSprite => _boxSprite;
         public Sprite[] IceBoxSpriteArray => _iceBoxSpriteArray;
         public Sprite CageSprite => _cageSprite;
+        public Sprite GeneratorSprite => _generatorSprite;
+        public GameObject StarPrefab => _starPrefab;
         
         [SerializeField] private Sprite[] _spriteArray;
         [SerializeField] private Sprite _bombSprite;
@@ -27,5 +29,8 @@ namespace ThreeMatch.InGame.Data
         [SerializeField] private Sprite _boxSprite;
         [SerializeField] private Sprite[] _iceBoxSpriteArray;
         [SerializeField] private Sprite _cageSprite;
+        [SerializeField] private Sprite _generatorSprite;
+
+        [SerializeField] private GameObject _starPrefab;
     }
 }

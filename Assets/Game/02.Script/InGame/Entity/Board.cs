@@ -32,7 +32,7 @@ namespace ThreeMatch.InGame
         private Block[,] _blockArray;
         private int _row;
         private int _column;
-        private BoardState _boardState;
+        private BoardState _boardState = BoardState.None;
 
         private List<Cell> _neighborObstacleCellList = new List<Cell>(4);
         private List<Cell> _neighborCellList = new ();
@@ -41,8 +41,10 @@ namespace ThreeMatch.InGame
         private GameObject _blockPrefab;
         private GameObject _cellPrefab;
         private UniTaskCompletionSource _executeInGameItemTaskCompletionSource;
+        private Action<CellType, int, CellImageType> _onCheckMissionAction;
+        private Action _onEndDragAction;
 
-        public Board(int[,] boardInfoArray, int[,] cellInfoArray)
+        public Board(int[,] boardInfoArray, int[,] cellInfoArray, Action<CellType, int, CellImageType> onCheckMissionAction, Action onEndDragAction)
         {
             _row = boardInfoArray.GetLength(0);
             _column = boardInfoArray.GetLength(1);
@@ -52,6 +54,8 @@ namespace ThreeMatch.InGame
             InputPanel.OnPointerDownAction += OnPointerDown;
             InputPanel.OnDragAction += OnDrag;
             InputPanel.OnPointerUpAction += OnPointerUp;
+            _onCheckMissionAction = onCheckMissionAction;
+            _onEndDragAction = onEndDragAction;
         }
 
         private async void OnPointerDown(Vector2 beginPosition)
@@ -85,8 +89,8 @@ namespace ThreeMatch.InGame
             }
 
             Cell cell = TryGetCell(_neighborCellList, dragPosition);
-            if (cell == null || _selectedCell == cell || IsObstacleCellType(cell.CellType) ||
-                IsObstacleCellType(_selectedCell.CellType))
+            if (cell == null || _selectedCell == cell || IsObstacleOrGeneratorCellType(cell.CellType) ||
+                IsObstacleOrGeneratorCellType(_selectedCell.CellType))
             {
                 return;
             }
@@ -105,6 +109,7 @@ namespace ThreeMatch.InGame
             
             UpdateBoardState(BoardState.Ready);
             ResetDrag();
+            _onEndDragAction.Invoke();
         }
 
         private void OnPointerUp(Vector2 endPosition)
@@ -308,6 +313,7 @@ namespace ThreeMatch.InGame
 
                 switch (cell.CellType)
                 {
+                    case CellType.Generator:
                     case CellType.Obstacle_IceBox:
                     case CellType.Obstacle_Box: 
                     case CellType.Obstacle_Cage:
@@ -348,6 +354,7 @@ namespace ThreeMatch.InGame
                     
                     switch (cell.CellType)
                     {
+                        case CellType.Generator:
                         case CellType.Obstacle_IceBox:
                         case CellType.Obstacle_Box: 
                         case CellType.Obstacle_Cage:
@@ -388,22 +395,24 @@ namespace ThreeMatch.InGame
 
         private bool RemoveCell(Cell cell)
         {
-            if (!cell.TryRemoveCell())
+            _onCheckMissionAction?.Invoke(cell.CellType, 1, cell.CellImageType);
+            bool isSuccess = cell.TryRemoveCell();
+            if (isSuccess)
             {
-                return false;
-            }
-            
-            if (cell.CellType == CellType.Obstacle_Cage)
-            {
-                //케이지는 부서지면 일반 셀로 변경
-                cell.ChangeCellType(CellType.Normal);
-            }
-            else
-            {
-                _cellArray[cell.Row, cell.Column] = null;
+                if (cell.CellType == CellType.Obstacle_Cage)
+                {
+                    //케이지는 부서지면 일반 셀로 변경
+                    cell.ChangeCellType(CellType.Normal);
+                }
+                else
+                {
+                    _cellArray[cell.Row, cell.Column] = null;
+                }
+
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         private void RemoveCellProcess(int row, int column)
@@ -415,12 +424,12 @@ namespace ThreeMatch.InGame
             }
 
             // 장애물 셀이 있는지 확인 후 부서질 수 있는지 체크
-            List<Cell> neighborObstacleCellList = GetNeighborObstacleCellList(cell);
+            List<Cell> neighborObstacleCellList = GetNeighborObstacleOrGeneratorCellList(cell);
             neighborObstacleCellList.ForEach(v => RemoveCell(v));
             RemoveCell(cell);
         }
 
-        private List<Cell> GetNeighborObstacleCellList(Cell cell)
+        private List<Cell> GetNeighborObstacleOrGeneratorCellList(Cell cell)
         {
             _neighborObstacleCellList.Clear();
             
@@ -438,7 +447,7 @@ namespace ThreeMatch.InGame
                 }
 
                 Cell neighborCell = _cellArray[row, column];
-                if (neighborCell == null || !IsObstacleCellType(neighborCell.CellType))
+                if (neighborCell == null || !IsObstacleOrGeneratorCellType(neighborCell.CellType))
                 {
                     continue;
                 }
@@ -449,10 +458,10 @@ namespace ThreeMatch.InGame
             return _neighborObstacleCellList;
         }
 
-        private bool IsObstacleCellType(CellType cellType)
+        private bool IsObstacleOrGeneratorCellType(CellType cellType)
         {
             return cellType == CellType.Obstacle_Box || cellType == CellType.Obstacle_Cage ||
-                   cellType == CellType.Obstacle_IceBox;
+                   cellType == CellType.Obstacle_IceBox || cellType == CellType.Generator;
         }
 
         private async UniTask<bool> TryActivateCellProperty(Cell activateCell)
@@ -463,6 +472,7 @@ namespace ThreeMatch.InGame
             List<UniTask> taskList = new();
             switch (activateCell.CellType)
             {
+                case CellType.Generator:
                 case CellType.Obstacle_IceBox:
                 case CellType.Obstacle_Box: 
                 case CellType.Obstacle_Cage:
@@ -764,6 +774,7 @@ namespace ThreeMatch.InGame
                     
                     switch(cell.CellType)
                     {
+                        case CellType.Generator:
                         case CellType.Obstacle_IceBox:
                         case CellType.Obstacle_Box: 
                         case CellType.Obstacle_Cage:
