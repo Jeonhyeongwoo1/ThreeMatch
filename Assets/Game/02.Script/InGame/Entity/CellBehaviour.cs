@@ -1,30 +1,43 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using ThreeMatch.InGame.Data;
 using UnityEngine;
+using Unity.VisualScripting;
 
-namespace ThreeMatch.InGame
+namespace ThreeMatch.InGame.Entity
 {
     public class CellBehaviour : MonoBehaviour
     {
-        public Vector2 Size => _sprite.bounds.size;
+        public Vector2 Size => _backgroundSprite.bounds.size;
 
-        [SerializeField] private SpriteRenderer _sprite;
+        [SerializeField] private SpriteRenderer _backgroundSprite;
+        [SerializeField] private SpriteRenderer _frontSprite;
         [SerializeField] private CellConfigData _data;
-        [SerializeField] private CellImageType _cellImageType;
-        
-        public void OnPointerDown(Vector3 position)
-        {
-            // transform.position = position;
-        }
 
-        public void Initialize(int spriteImageIndex)
+        public void Initialize(CellType cellType, CellImageType cellImageType = CellImageType.None)
         {
-            _sprite.sprite = _data.SpriteArray[spriteImageIndex];
-            _cellImageType = (CellImageType) spriteImageIndex;
+            switch (cellType)
+            {
+                case CellType.None:
+                    break;
+                case CellType.Normal:
+                    _backgroundSprite.sprite = _data.SpriteArray[(int)cellImageType];       
+                    break;
+               case CellType.Obstacle_Box:
+                   _backgroundSprite.sprite = _data.BoxSprite;
+                   break;
+               case CellType.Obstacle_Cage:
+                   _backgroundSprite.sprite = _data.SpriteArray[(int)cellImageType];
+                   _frontSprite.sprite = _data.CageSprite;
+                   transform.GetOrAddComponent<Health>().Initialize(Const.CageHP);
+                   break;
+               case CellType.Obstacle_IceBox:
+                   int hp = Const.IceBoxHP;
+                   _backgroundSprite.sprite = _data.IceBoxSpriteArray[hp - 1];
+                   transform.GetOrAddComponent<Health>().Initialize(hp);
+                   break;
+            }
         }
 
         public async UniTask MoveAsync(List<Vector3> movePositionList, bool isSpawn)
@@ -50,9 +63,9 @@ namespace ThreeMatch.InGame
 
         private void DoFade(bool isFadeOut)
         {
-            Color color = _sprite.color;
-            _sprite.color = new Color(color.r, color.g, color.b, isFadeOut ? 0 : 1);
-            _sprite.DOFade(isFadeOut ? 1 : 0, Const.CellAlphaAnimation);
+            Color color = _backgroundSprite.color;
+            _backgroundSprite.color = new Color(color.r, color.g, color.b, isFadeOut ? 0 : 1);
+            _backgroundSprite.DOFade(isFadeOut ? 1 : 0, Const.CellAlphaAnimation);
         }
 
         public async UniTask MoveAsync(Vector3 movePosition)
@@ -84,18 +97,18 @@ namespace ThreeMatch.InGame
                 case CellType.Rocket:
                     if (cellMatchedType == CellMatchedType.Horizontal_Four)
                     {
-                        _sprite.sprite = _data.HorizontalRocketSprite;
+                        _backgroundSprite.sprite = _data.HorizontalRocketSprite;
                     }
                     else if (cellMatchedType == CellMatchedType.Vertical_Four)
                     {
-                        _sprite.sprite = _data.VerticalRocketSprite;
+                        _backgroundSprite.sprite = _data.VerticalRocketSprite;
                     }
                     break;
                 case CellType.Wand:
-                    _sprite.sprite = _data.WandSprite;
+                    _backgroundSprite.sprite = _data.WandSprite;
                     break;
                 case CellType.Bomb:
-                    _sprite.sprite = _data.BombSprite;
+                    _backgroundSprite.sprite = _data.BombSprite;
                     break;
             }
         }
@@ -104,10 +117,41 @@ namespace ThreeMatch.InGame
         {
             gameObject.SetActive(isActivate);
         }
-
-        public void UpdateUI(int spriteIndex)
+        
+        public bool TakeDamage(CellType cellType)
         {
-            _sprite.sprite = _data.SpriteArray[spriteIndex];
+            if (!TryGetComponent(out Health health))
+            {
+                Debug.LogError($"failed get health component {transform.name}");
+                return false; 
+            }
+
+            int hp = health.TakeDamage(1);
+            if (hp > 0)
+            {
+                switch (cellType)
+                {
+                    case CellType.Obstacle_IceBox:
+                        _backgroundSprite.sprite = _data.IceBoxSpriteArray[hp - 1];
+                        break;
+                    case CellType.Obstacle_Cage:
+                        break;
+                }
+            }
+            else
+            {
+                switch (cellType)
+                {
+                    case CellType.Obstacle_IceBox:
+                        Activate(false);
+                        break;
+                    case CellType.Obstacle_Cage:
+                        _frontSprite.gameObject.SetActive(false);
+                        break;
+                }
+            }
+            
+            return health.IsDead();
         }
     }
 }

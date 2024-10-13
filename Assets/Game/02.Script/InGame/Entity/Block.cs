@@ -36,7 +36,7 @@ namespace ThreeMatch.InGame
                                         size.y * (row * 0.5f) - size.y * 0.5f);
             Vector2 position = startPosition + new Vector2(size.x * _column, size.y * _row);
             _blockBehaviour.UpdatePosition(position);
-            _blockBehaviour.UpdateUI(isOdd, _blockType != BlockType.None);
+            _blockBehaviour.UpdateUI(isOdd, _blockType);
         }
     }
 }

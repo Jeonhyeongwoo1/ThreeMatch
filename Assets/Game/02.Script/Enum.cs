@@ -2,9 +2,8 @@
 public enum BlockType
 {
     None,
-    Normal
+    Normal,
 }
-
 
 public enum CellType
 {
@@ -13,6 +12,9 @@ public enum CellType
     Rocket,
     Wand,
     Bomb,
+    Obstacle_Box,
+    Obstacle_IceBox,
+    Obstacle_Cage
 }
 
 public enum CellImageType

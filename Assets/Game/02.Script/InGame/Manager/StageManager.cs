@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using ThreeMatch.InGame.Entity;
 using UnityEngine;
 
 namespace ThreeMatch.InGame.Manager

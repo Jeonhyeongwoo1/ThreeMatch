@@ -1,12 +1,8 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace ThreeMatch.InGame
+namespace ThreeMatch.InGame.Entity
 {
     public class Cell
     {
@@ -16,7 +12,6 @@ namespace ThreeMatch.InGame
         public CellImageType CellImageType => _cellImageType;
         public CellType CellType => _cellType;
         public CellMatchedType CellMatchedType => _cellMatchedType;
-        public string Name => _cellBehaviour.name;
         public int Row => _row;
         public int Column => _column;
         
@@ -26,13 +21,13 @@ namespace ThreeMatch.InGame
         private CellImageType _cellImageType;
         private CellMatchedType _cellMatchedType;
         private CellType _cellType;
-        
-        public Cell(int row, int column, CellImageType cellImageType, CellType cellType)
+
+        public Cell(int row, int column, CellType cellType, CellImageType cellImageType = CellImageType.None)
         {
             _column = column;
             _row = row;
-            _cellImageType = cellImageType;
             _cellType = cellType;
+            _cellImageType = cellImageType;
             _cellMatchedType = CellMatchedType.None;
         }
 
@@ -41,7 +36,7 @@ namespace ThreeMatch.InGame
             var obj = Object.Instantiate(prefab);
             obj.name = $"Cell {_row} / {_column}";
             _cellBehaviour = obj.GetOrAddComponent<CellBehaviour>();
-            _cellBehaviour.Initialize((int)_cellImageType);
+            _cellBehaviour.Initialize(_cellType, _cellImageType);
         }
 
         public void Swap(Vector3 position, int row, int column)
@@ -92,9 +87,34 @@ namespace ThreeMatch.InGame
             
         }
 
-        public void RemoveCell()
+        public void ChangeCellType(CellType cellType)
         {
-            _cellBehaviour.gameObject.SetActive(false);
+            _cellType = cellType;
+        }
+
+        public bool TryRemoveCell()
+        {
+            switch (_cellType)
+            {
+                case CellType.Normal:
+                case CellType.Obstacle_Box:
+                case CellType.Rocket:
+                case CellType.Wand:
+                case CellType.Bomb:
+                    _cellBehaviour.Activate(false);
+                    return true;
+                case CellType.Obstacle_IceBox:
+                    bool isCracked = _cellBehaviour.TakeDamage(_cellType);
+                    return isCracked;
+                case CellType.Obstacle_Cage:
+                    isCracked = _cellBehaviour.TakeDamage(_cellType);
+                    return isCracked;
+                case CellType.None:
+                    break;
+            }
+            
+            Debug.Log($"failed remove cell {_cellType}");
+            return false;
         }
     }
 }

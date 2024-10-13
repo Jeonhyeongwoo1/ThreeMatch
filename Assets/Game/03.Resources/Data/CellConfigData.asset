@@ -19,6 +19,14 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 756671a57f367c24aa03a70b26914723, type: 3}
   - {fileID: 21300000, guid: 325e233bfedc8524196bc8ccc393c5dd, type: 3}
   _bombSprite: {fileID: 21300000, guid: 036719e208b8ed34b847a1b9919ac7dd, type: 3}
-  _verticalRocketSprite: {fileID: 21300000, guid: 02703e82034c5a040be2ef3bf074a874, type: 3}
-  _horizontalRocketSprite: {fileID: 21300000, guid: 488bf4646a2d083438450f9c37fbc1b5, type: 3}
+  _verticalRocketSprite: {fileID: 21300000, guid: 02703e82034c5a040be2ef3bf074a874,
+    type: 3}
+  _horizontalRocketSprite: {fileID: 21300000, guid: 488bf4646a2d083438450f9c37fbc1b5,
+    type: 3}
   _wandSprite: {fileID: 21300000, guid: 5ef1afd52d9c8214f8c6977e52bc48e9, type: 3}
+  _boxSprite: {fileID: 21300000, guid: 8caafde273f6ad540b1101ef1d1b623a, type: 3}
+  _iceBoxSpriteArray:
+  - {fileID: 21300000, guid: 18115346a3c21430aab838866ce5700b, type: 3}
+  - {fileID: 21300000, guid: ad12136f23e7f44408218cd573923406, type: 3}
+  - {fileID: 21300000, guid: 4bc49e56df9af4384b291993b3dba78d, type: 3}
+  _cageSprite: {fileID: 21300000, guid: ea73bd7bd46c8f249b57a4488a024c3f, type: 3}
