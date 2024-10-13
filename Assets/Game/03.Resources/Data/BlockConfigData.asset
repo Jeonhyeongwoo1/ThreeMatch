@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52f475bf627bf4bb3a2a3394a1c68ce0, type: 3}
   m_Name: BlockConfigData
   m_EditorClassIdentifier: 
-  _spriteArray:
+  _normalBlockTypeSpriteArray:
   - {fileID: 21300000, guid: 8c972dea7cebd8b4385f53887026679a, type: 3}
   - {fileID: 21300000, guid: bde45f67fb195a04d990f31263c3b942, type: 3}
+  _generatorSprite: {fileID: 21300000, guid: 8b4b95ef9fb30f54b96b9a23d73dfe96, type: 3}

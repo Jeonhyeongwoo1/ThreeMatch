@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using ThreeMatch.InGame.Data;
@@ -17,10 +18,19 @@ namespace ThreeMatch.InGame
             transform.position = position;
         }
 
-        public void UpdateUI(bool isOdd, bool isActive)
+        public void UpdateUI(bool isOdd, BlockType blockType)
         {
-            _sprite.sprite = _data.SpriteArray[isOdd ? 0 : 1];
-            gameObject.SetActive(isActive);
+            switch (blockType)
+            {
+                case BlockType.Normal:
+                    _sprite.sprite = _data.NormalBlockTypeSpriteArray[isOdd ? 0 : 1];
+                    break;
+                case BlockType.None:
+                    gameObject.SetActive(false);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }
