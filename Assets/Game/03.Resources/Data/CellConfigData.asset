@@ -30,3 +30,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: ad12136f23e7f44408218cd573923406, type: 3}
   - {fileID: 21300000, guid: 4bc49e56df9af4384b291993b3dba78d, type: 3}
   _cageSprite: {fileID: 21300000, guid: ea73bd7bd46c8f249b57a4488a024c3f, type: 3}
+  _generatorSprite: {fileID: 21300000, guid: 8b4b95ef9fb30f54b96b9a23d73dfe96, type: 3}
+  _starPrefab: {fileID: 3806657837486690068, guid: 87b267dbad91e4f69838e53295fee538,
+    type: 3}

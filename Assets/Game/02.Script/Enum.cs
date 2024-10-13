@@ -14,7 +14,22 @@ public enum CellType
     Bomb,
     Obstacle_Box,
     Obstacle_IceBox,
-    Obstacle_Cage
+    Obstacle_Cage,
+    Generator
+}
+
+public enum MissionType
+{
+    None,
+    RemoveNormalBlueCell,
+    RemoveNormalGreenCell,
+    RemoveNormalPinkCell,
+    RemoveNormalPurpleCell,
+    RemoveNormalRedCell,
+    RemoveObstacleBoxCell,
+    RemoveObstacleIceBoxCell,
+    RemoveObstacleCageCell,
+    RemoveGeneratorCell
 }
 
 public enum CellImageType

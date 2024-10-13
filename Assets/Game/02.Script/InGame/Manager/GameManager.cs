@@ -24,6 +24,9 @@ namespace ThreeMatch.InGame.Manager
         
         public static Action<InGameItemType> onInGameItemUsagePendingAction;
         public static Action<InGameItemType> onUsedInGameItemAction;
+        public static Action onAllSuccessMissionAction;
+        public static Action onGameClearAction;
+        public static Action onGameOverAction;
         
         private static GameManager _instance;
 

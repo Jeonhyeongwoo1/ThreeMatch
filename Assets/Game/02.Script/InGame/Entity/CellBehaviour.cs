@@ -22,7 +22,7 @@ namespace ThreeMatch.InGame.Entity
                 case CellType.None:
                     break;
                 case CellType.Normal:
-                    _backgroundSprite.sprite = _data.SpriteArray[(int)cellImageType];       
+                    _backgroundSprite.sprite = _data.SpriteArray[(int)cellImageType];
                     break;
                case CellType.Obstacle_Box:
                    _backgroundSprite.sprite = _data.BoxSprite;
@@ -37,7 +37,12 @@ namespace ThreeMatch.InGame.Entity
                    _backgroundSprite.sprite = _data.IceBoxSpriteArray[hp - 1];
                    transform.GetOrAddComponent<Health>().Initialize(hp);
                    break;
+               case CellType.Generator:
+                   _backgroundSprite.sprite = _data.GeneratorSprite;
+                   break;
             }
+            
+            _frontSprite.gameObject.SetActive(CellType.Obstacle_Cage == cellType);
         }
 
         public async UniTask MoveAsync(List<Vector3> movePositionList, bool isSpawn)
@@ -117,8 +122,17 @@ namespace ThreeMatch.InGame.Entity
         {
             gameObject.SetActive(isActivate);
         }
+
+        public void HitGenerator()
+        {
+            GameObject prefab = _data.StarPrefab;
+            GameObject obj = Instantiate(prefab);
+            obj.transform.position = transform.position;
+            obj.transform.DOMove(Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0.5f)), 1f)
+                .OnComplete(() => obj.SetActive(false));
+        }
         
-        public bool TakeDamage(CellType cellType)
+        public bool Hit(CellType cellType)
         {
             if (!TryGetComponent(out Health health))
             {

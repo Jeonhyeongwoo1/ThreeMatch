@@ -103,17 +103,19 @@ namespace ThreeMatch.InGame.Entity
                 case CellType.Bomb:
                     _cellBehaviour.Activate(false);
                     return true;
-                case CellType.Obstacle_IceBox:
-                    bool isCracked = _cellBehaviour.TakeDamage(_cellType);
-                    return isCracked;
                 case CellType.Obstacle_Cage:
-                    isCracked = _cellBehaviour.TakeDamage(_cellType);
+                case CellType.Obstacle_IceBox:
+                    bool isCracked = _cellBehaviour.Hit(_cellType);
                     return isCracked;
+                case CellType.Generator:
+                    _cellBehaviour.HitGenerator();
+                    return false;
+                default:
                 case CellType.None:
+                    Debug.Log($"failed remove cell {_cellType}");
                     break;
             }
             
-            Debug.Log($"failed remove cell {_cellType}");
             return false;
         }
     }
