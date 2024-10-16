@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 143085d0e207b4736b447fbc19a8f660
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - _bombSprite: {instanceID: 0}
+  - _verticalRocketSprite: {instanceID: 0}
+  - _horizontalRocketSprite: {instanceID: 0}
+  - _wandSprite: {instanceID: 0}
+  - _boxSprite: {instanceID: 0}
+  - _cageSprite: {instanceID: 0}
+  - _generatorSprite: {instanceID: 0}
+  - _starPrefab: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

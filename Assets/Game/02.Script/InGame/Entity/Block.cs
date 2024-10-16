@@ -25,9 +25,9 @@ namespace ThreeMatch.InGame
             _blockType = blockType;
         }
 
-        public void CreateBlockBehaviour(GameObject prefab, Vector2 centerPosition, int row, int column, bool isOdd)
+        public void CreateBlockBehaviour(GameObject prefab, Vector2 centerPosition, int row, int column, bool isOdd, Transform parent = null)
         {
-            var obj = Object.Instantiate(prefab);
+            var obj = Object.Instantiate(prefab, parent);
             obj.name = $"Block {_row} / {_column}";
             _blockBehaviour = obj.GetOrAddComponent<BlockBehaviour>();
             Vector2 size = _blockBehaviour.Size;
@@ -36,7 +36,7 @@ namespace ThreeMatch.InGame
                                         size.y * (row * 0.5f) - size.y * 0.5f);
             Vector2 position = startPosition + new Vector2(size.x * _column, size.y * _row);
             _blockBehaviour.UpdatePosition(position);
-            _blockBehaviour.UpdateUI(isOdd, _blockType);
+            _blockBehaviour.Initialize(isOdd, _blockType);
         }
     }
 }

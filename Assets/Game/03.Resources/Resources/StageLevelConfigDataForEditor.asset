@@ -1,0 +1,1201 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d44ea50de6c64142bfd7f78ac98bc04, type: 3}
+  m_Name: StageLevelConfigDataForEditor
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects:
+    - {fileID: 3209690187076415183, guid: 0f382c5c680a04c429da8f0fbb449d7a, type: 3}
+    - {fileID: 3209690187076415183, guid: 773a8a291ed2a46ba8596a392b067df0, type: 3}
+    - {fileID: 3209690187076415183, guid: 0e2c95d2d939b47008f8ff8533a97ae8, type: 3}
+    - {fileID: 3209690187076415183, guid: 1e1dbecf184d14626a83fa8b21988709, type: 3}
+    - {fileID: 3209690187076415183, guid: e33fb55ca76b842dd9b06899e905b2d9, type: 3}
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: boardInfoDataArray
+      Entry: 7
+      Data: 0|ThreeMatch.InGame.Data.BoardInfoData[,], Assembly-CSharp
+    - Name: 
+      Entry: 12
+      Data: 64
+    - Name: ranks
+      Entry: 1
+      Data: 8|8
+    - Name: 
+      Entry: 7
+      Data: 1|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 0
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 1
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 2|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 1
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 3
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 3|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 2
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 2
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 4|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 3
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 0
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 5|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 2
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 2
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 6|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 4
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 4
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 7|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 4
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 4
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 8|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 0
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 1
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 9|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 2
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 2
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 10|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 3
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 0
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 11|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 1
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 3
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 12|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 0
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 1
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 13|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 4
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 4
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 14|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 2
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 2
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 15|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 1
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 3
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 16|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 1
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 3
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 17|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 0
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 1
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 18|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 3
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 0
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 19|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 2
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 2
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 20|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 3
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 0
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 21|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 1
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 3
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 22|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 4
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 4
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 23|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 2
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 2
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 24|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 1
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 3
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 25|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 3
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 0
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 26|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 1
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 3
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 27|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 4
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 4
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 28|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 4
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 4
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 29|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 1
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 3
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 30|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 0
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 1
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 31|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 4
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 4
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 32|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 0
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 1
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 33|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 2
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 2
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 34|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 0
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 1
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 35|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 0
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 1
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 36|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 1
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 3
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 37|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 3
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 0
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 38|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 4
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 4
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 39|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 1
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 3
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 40|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 0
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 1
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 41|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 0
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 1
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 42|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 2
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 2
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 43|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 0
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 1
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 44|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 1
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 3
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 45|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 0
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 1
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 46|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 3
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 0
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 47|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 4
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 4
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 48|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 4
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 4
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 49|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 0
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 1
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 50|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 4
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 4
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 51|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 0
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 1
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 52|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 3
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 0
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 53|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 4
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 4
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 54|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 0
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 1
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 55|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 2
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 2
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 56|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 0
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 1
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 57|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 2
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 2
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 58|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 4
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 4
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 59|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 2
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 2
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 60|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 2
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 2
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 61|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 0
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 1
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 62|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 3
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 0
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 63|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 3
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 0
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 64|ThreeMatch.InGame.Data.BoardInfoData, Assembly-CSharp
+    - Name: _prefab
+      Entry: 10
+      Data: 2
+    - Name: _cellType
+      Entry: 3
+      Data: 1
+    - Name: _cellImageType
+      Entry: 3
+      Data: 2
+    - Name: _blockType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+  missionInfoDataList:
+  - missionType: 6
+    removeCount: 5
+  - missionType: 5
+    removeCount: 0
+  remainingMoveCount: 10

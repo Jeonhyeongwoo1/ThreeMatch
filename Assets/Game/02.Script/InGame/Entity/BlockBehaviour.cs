@@ -18,7 +18,7 @@ namespace ThreeMatch.InGame
             transform.position = position;
         }
 
-        public void UpdateUI(bool isOdd, BlockType blockType)
+        public void Initialize(bool isOdd, BlockType blockType)
         {
             switch (blockType)
             {

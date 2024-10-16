@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using ThreeMatch.InGame.Data;
 using ThreeMatch.InGame.Entity;
 using ThreeMatch.InGame.Interface;
 using UniRx;
@@ -9,6 +10,6 @@ namespace ThreeMatch.InGame.Model
 {
     public class MissionModel : IModel
     {
-        public ReactiveProperty<List<MissionData>> missionDataList = new();
+        public ReactiveProperty<List<MissionInfoData>> missionDataList = new();
     }
 }

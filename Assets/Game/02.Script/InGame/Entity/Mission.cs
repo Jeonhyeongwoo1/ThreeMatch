@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ThreeMatch.InGame.Core;
+using ThreeMatch.InGame.Data;
 using ThreeMatch.InGame.Manager;
 using ThreeMatch.InGame.Model;
 using ThreeMatch.InGame.UI;
@@ -12,7 +13,7 @@ namespace ThreeMatch.InGame.Entity
         private MissionModel _missionModel;
         private MissionView _missionView;
         
-        public Mission(List<MissionData> missionDataList)
+        public Mission(List<MissionInfoData> missionDataList)
         {
              _missionModel = ModelFactory.CreateOrGet<MissionModel>();
              _missionModel.missionDataList.Value = missionDataList;
@@ -30,20 +31,20 @@ namespace ThreeMatch.InGame.Entity
                 return false;
             }
 
-            MissionData missionData = _missionModel.missionDataList.Value.Find(v => v.missionType == missionType);
-            if (IsClearMission(missionData))
+            MissionInfoData missionInfoData = _missionModel.missionDataList.Value.Find(v => v.missionType == missionType);
+            if (IsClearMission(missionInfoData))
             {
                 return true;
             }
 
-            missionData.removeCount -= removeCount;
-            _missionView.UpdateUI(missionData.missionType, missionData.removeCount.ToString());
+            missionInfoData.removeCount -= removeCount;
+            _missionView.UpdateUI(missionInfoData.missionType, missionInfoData.removeCount.ToString());
             return true;
         }
 
         public bool IsAllSuccessMission()
         {
-            foreach (MissionData data in _missionModel.missionDataList.Value)
+            foreach (MissionInfoData data in _missionModel.missionDataList.Value)
             {
                 if (data.removeCount > 0)
                 {
@@ -54,9 +55,9 @@ namespace ThreeMatch.InGame.Entity
             return true;
         }
 
-        private bool IsClearMission(MissionData missionData)
+        private bool IsClearMission(MissionInfoData missionInfoData)
         {
-            return missionData.removeCount == 0;
+            return missionInfoData.removeCount == 0;
         }
 
         public bool IsContainMission(MissionType missionType)

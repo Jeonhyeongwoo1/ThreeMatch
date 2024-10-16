@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using ThreeMatch.Helper;
+using ThreeMatch.InGame.Data;
 using ThreeMatch.InGame.Entity;
 using ThreeMatch.InGame.Manager;
-using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -44,12 +43,12 @@ namespace ThreeMatch.InGame
         private Action<CellType, int, CellImageType> _onCheckMissionAction;
         private Action _onEndDragAction;
 
-        public Board(int[,] boardInfoArray, int[,] cellInfoArray, Action<CellType, int, CellImageType> onCheckMissionAction, Action onEndDragAction)
+        public Board(BoardInfoData[,] boardInfoDataArray, Action<CellType, int, CellImageType> onCheckMissionAction, Action onEndDragAction)
         {
-            _row = boardInfoArray.GetLength(0);
-            _column = boardInfoArray.GetLength(1);
-            CreateBlockArray(_row, _column, boardInfoArray);
-            CreateCellArray(_row, _column, cellInfoArray);
+            _row = boardInfoDataArray.GetLength(0);
+            _column = boardInfoDataArray.GetLength(1);
+            CreateBlockArray(_row, _column, boardInfoDataArray);
+            CreateCellArray(_row, _column, boardInfoDataArray);
          
             InputPanel.OnPointerDownAction += OnPointerDown;
             InputPanel.OnDragAction += OnDrag;
@@ -980,7 +979,9 @@ namespace ThreeMatch.InGame
                 // 마지막 행에 도달했을 경우 새 셀 생성 및 스폰
                 if (k == _row)
                 {
-                    Cell newCell = CreateCell(row, column, CellType.Normal);
+                    int length = Enum.GetNames(typeof(CellImageType)).Length - 1;
+                    int select = Random.Range(0, length);
+                    Cell newCell = CreateCell(row, column, CellType.Normal, (CellImageType) select);
                     newCell.CreateCellBehaviour(_cellPrefab);
                     Vector3 spawnPosition = _blockArray[k - 1, targetColumn].Position + new Vector3(0, 2.5f, 0);
                     newCell.CellBehaviour.UpdatePosition(spawnPosition);
@@ -1123,66 +1124,76 @@ namespace ThreeMatch.InGame
             return _neighborCellList;
         }
 
-        private void CreateBlockArray(int row, int column, int[,] blockInfoArray)
+        private void CreateBlockArray(int row, int column, BoardInfoData[,] boardInfoDataArray)
         {
             _blockArray = new Block[row, column];
             for (int i = 0; i < row; i++)
             {
                 for (int j = 0; j < column; j++)
                 {
-                    BlockType blockType = (BlockType) blockInfoArray[i, j];
+                    BoardInfoData boardInfoData = boardInfoDataArray[i, j];
+                    if (boardInfoData == null)
+                    {
+                        Debug.Log($"board {i} {j}");
+                        continue;
+                    }
+
+                    BlockType blockType = boardInfoData.BlockType;
                     Block block = new Block(i, j, blockType);
                     _blockArray[i, j] = block;
-                    // Debug.Log($"block row {i}, col {j}");
                 }
             }
         }
 
-        private void CreateCellArray(int row, int column, int[,] cellInfoArray)
+        private void CreateCellArray(int row, int column, BoardInfoData[,] boardInfoDataArray)
         {
             _cellArray = new Cell[row, column];
             for (int i = 0; i < row; i++)
             {
                 for (int j = 0; j < column; j++)
                 {
-                    Block block = _blockArray[i, j];
-                    if (block.BlockType == BlockType.None)
+                    BoardInfoData boardInfoData = boardInfoDataArray[i, j];
+                    if (boardInfoData == null)
                     {
                         continue;
                     }
 
-                    CellType cellType = (CellType)cellInfoArray[i, j];
-                    _cellArray[i, j] = CreateCell(i, j, cellType);
+                    _cellArray[i, j] = CreateCell(i, j, boardInfoData.CellType, boardInfoData.CellImageType);
                 }
             }
         }
 
-        private Cell CreateCell(int row, int column, CellType cellType)
+        private Cell CreateCell(int row, int column, CellType cellType, CellImageType cellImageType)
         {
-            int select = 0;
-            if (cellType == CellType.Normal || cellType == CellType.Obstacle_Cage)
+            if (cellType == CellType.Obstacle_Cage)
             {
                 int length = Enum.GetNames(typeof(CellImageType)).Length - 1;
-                select = Random.Range(0, length);
+                int select = Random.Range(0, length);
+                cellImageType = (CellImageType)select;
             }
             
-            Cell cell = new Cell(row, column, cellType, (CellImageType)select);
+            Cell cell = new Cell(row, column, cellType, cellImageType);
             return cell;
         }
 
-        public async UniTask Build(Vector2 centerPosition, GameObject blockPrefab, GameObject cellPrefab)
+        public async UniTask BuildAsync(Vector2 centerPosition, GameObject blockPrefab, GameObject cellPrefab, Transform container = null)
         {
             UpdateBoardState(BoardState.Building);   
             
             _blockPrefab = blockPrefab;
             _cellPrefab = cellPrefab;
             
-            CreateBlockBehaviour(centerPosition, blockPrefab);
-            CreateCellBehaviour(cellPrefab);
-            
+            CreateBlockBehaviour(centerPosition, blockPrefab, container);
+            CreateCellBehaviour(cellPrefab, container);
             await BuildAfterProcess();
             
             UpdateBoardState(BoardState.CompleteBuild);
+        }
+        
+        public void Build(Vector2 centerPosition, GameObject blockPrefab, GameObject cellPrefab, Transform parent = null)
+        {
+            CreateBlockBehaviour(centerPosition, blockPrefab, parent);
+            CreateCellBehaviour(cellPrefab, parent);
         }
 
         private async UniTask BuildAfterProcess()
@@ -1193,19 +1204,19 @@ namespace ThreeMatch.InGame
             }
         }
 
-        private void CreateBlockBehaviour(Vector2 centerPosition, GameObject blockPrefab)
+        private void CreateBlockBehaviour(Vector2 centerPosition, GameObject blockPrefab, Transform parent = null)
         {
             for (int i = 0; i < _row; i++)
             {
                 for (int j = 0; j < _column; j++)
                 {
                     Block block = _blockArray[i, j];
-                    block.CreateBlockBehaviour(blockPrefab, centerPosition, _row, _column, (i * _column + j) % 2 == 0);
+                    block.CreateBlockBehaviour(blockPrefab, centerPosition, _row, _column, (i * _column + j) % 2 == 0, parent);
                 }
             }
         }
 
-        private void CreateCellBehaviour(GameObject cellPrefab)
+        private void CreateCellBehaviour(GameObject cellPrefab, Transform parent = null)
         {
             for (int i = 0; i < _row; i++)
             {
@@ -1218,17 +1229,8 @@ namespace ThreeMatch.InGame
                     }
                     
                     Cell cell = _cellArray[i, j];
-                    cell?.CreateCellBehaviour(cellPrefab);
+                    cell?.CreateCellBehaviour(cellPrefab, parent);
                     cell?.CellBehaviour.UpdatePosition(block.Position);
-                    if (i == 3 && j == 3)
-                    {
-                        cell?.SetCellTypeFromMatch(CellMatchedType.Horizontal_Four);
-                    }
-
-                    if (i == 3 && j == 4)
-                    {
-                        cell?.SetCellTypeFromMatch(CellMatchedType.Horizontal_Four);
-                    }
                 }
             }
         }
