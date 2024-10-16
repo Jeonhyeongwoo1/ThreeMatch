@@ -106,11 +106,11 @@ namespace ThreeMatch.InGame.Entity
                 case CellType.Normal:
                     switch (cellImageType)
                     {
-                        case CellImageType.Blue:
+                        case CellImageType.Yellow:
                             return MissionType.RemoveNormalBlueCell;
                         case CellImageType.Green:
                             return MissionType.RemoveNormalGreenCell;
-                        case CellImageType.Pink:
+                        case CellImageType.Blue:
                             return MissionType.RemoveNormalPinkCell;
                         case CellImageType.Purple:
                             return MissionType.RemoveNormalPurpleCell;

@@ -35,11 +35,12 @@ public enum MissionType
 public enum CellImageType
 {
     None = -1,
-    Blue,
+    Red,
+    Yellow,
     Green,
-    Pink,
     Purple,
-    Red
+    Blue,
+    Orange
 }
 
 public enum CellMatchedType
@@ -84,4 +85,13 @@ public enum BoardState
     SwapPostProcess,
     PendingUseInGameItem,
     UseItem,
+}
+
+public enum PoolKeyType
+{
+    CellDisappearParticle,
+    CellDisappearLightEffect,
+    WandLightEffect,
+    RocketEffect,
+    BombEffect,
 }

@@ -291,19 +291,18 @@ namespace ThreeMatch.InGame
                     return false;
             }
         }
- 
-        private async UniTask ActivateRocketProcessAsync(int row, int column, int startIndex, int endIndex, bool isPositive,bool isUpDir)
+
+        private async UniTask ActivateRocketProcessAsync(int row, int column, int startIndex, int endIndex,
+            bool isPositive, bool isUpDir)
         {
             int step = isPositive ? 1 : -1;
-            UniTask cellTask = UniTask.CompletedTask;
+            List<UniTask> cellTask = new List<UniTask>();
             for (int i = startIndex; i != endIndex; i += step)
             {
                 Block block = isUpDir ? _blockArray[i, column] : _blockArray[row, i];
                 Cell cell = isUpDir ? _cellArray[i, column] : _cellArray[row, i];
 
-                //연출이 들어가야함. 추후 수정
-                // UniTask moveTask = activateCell.CellBehaviour.MoveAsync(block.Position);
-                UniTask moveTask = UniTask.WaitForSeconds(0.2f);
+                UniTask moveTask = UniTask.WaitForSeconds(0.05f);
                 if (block.BlockType == BlockType.None || cell == null)
                 {
                     await moveTask;
@@ -314,7 +313,7 @@ namespace ThreeMatch.InGame
                 {
                     case CellType.Generator:
                     case CellType.Obstacle_IceBox:
-                    case CellType.Obstacle_Box: 
+                    case CellType.Obstacle_Box:
                     case CellType.Obstacle_Cage:
                     case CellType.Normal:
                         RemoveCellProcess(cell.Row, cell.Column);
@@ -322,13 +321,13 @@ namespace ThreeMatch.InGame
                     case CellType.Rocket:
                     case CellType.Wand:
                     case CellType.Bomb:
-                        // RemoveCell(cell.Row, cell.Column);
-                        cellTask = TryActivateCellProperty(cell);
+                        cellTask.Add(TryActivateCellProperty(cell));
                         break;
                 }
 
                 await moveTask;
             }
+
             await cellTask;
         }
 
@@ -381,14 +380,25 @@ namespace ThreeMatch.InGame
             {
                 if (cell.CellType == CellType.Normal)
                 {
-                    RemoveCellProcess(cell.Row, cell.Column);
-                    continue;
+                    activateCell.CellBehaviour.ShowLighting(activateCell.CellType, cell);
+                    await UniTask.WaitForSeconds(0.05f);
                 }
-                
-                taskList.Add(TryActivateCellProperty(cell));
+                else
+                {
+                    taskList.Add(TryActivateCellProperty(cell));
+                }
             }
             
-            await UniTask.WaitForSeconds(0.5f);
+            await UniTask.WaitForSeconds(1f, cancelImmediately: true);
+            
+            sameImageTypeCellList.ForEach(cell =>
+            {
+                if (cell.CellType == CellType.Normal)
+                {
+                    RemoveCellProcess(cell.Row, cell.Column);
+                }
+            });
+            
             await UniTask.WhenAll(taskList);
         }
 
