@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using ThreeMatch.InGame.Data;
 using ThreeMatch.InGame.Manager;
 using UnityEngine;
 
@@ -7,6 +9,7 @@ namespace ThreeMatch.InGame.Entity
 {
     public class Stage
     {
+        public Board Board => _board;
         private Board _board;
         private Mission _mission;
         private int _remainingMoveCount;
@@ -14,11 +17,11 @@ namespace ThreeMatch.InGame.Entity
         private event Action<CellType, int, CellImageType> OnCheckMissionAction;
         private event Action OnEndDragAction;
 
-        public Stage(int[,] blockInfoArray, int[,] cellInfoArray, List<MissionData> missionDataList, int remainingMoveCount)
+        public Stage(BoardInfoData[,] boardInfoArray, List<MissionInfoData> missionDataList, int remainingMoveCount)
         {
             AddEvents();
             
-            Board board = new Board(blockInfoArray, cellInfoArray, OnCheckMissionAction, OnEndDragAction);
+            Board board = new Board(boardInfoArray, OnCheckMissionAction, OnEndDragAction);
             _board = board;
 
             Mission mission = new Mission(missionDataList);
@@ -34,9 +37,14 @@ namespace ThreeMatch.InGame.Entity
             GameManager.onInGameItemUsagePendingAction += OnItemUsagePendingAction;
         }
 
-        public void Build(Vector2 centerPosition, GameObject blockPrefab, GameObject cellPrefab)
+        public async UniTask BuildAsync(Vector2 centerPosition, GameObject blockPrefab, GameObject cellPrefab, Transform container = null)
         {
-            _board.Build(centerPosition, blockPrefab, cellPrefab);
+            await _board.BuildAsync(centerPosition, blockPrefab, cellPrefab, container);
+        }
+        
+        public void CustomBuild(Vector2 centerPosition, GameObject blockPrefab, GameObject cellPrefab, Transform parent = null)
+        {
+            _board.Build(centerPosition, blockPrefab, cellPrefab, parent);
         }
 
         private void OnEndDrag()

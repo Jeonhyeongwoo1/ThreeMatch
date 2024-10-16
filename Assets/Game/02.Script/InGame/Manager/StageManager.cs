@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using ThreeMatch.InGame.Entity;
 using UnityEngine;
 
@@ -11,7 +9,8 @@ namespace ThreeMatch.InGame.Manager
         [SerializeField] private int _stageLevel;
         [SerializeField] private GameObject _blockPrefab;
         [SerializeField] private GameObject _cellPrefab;
-        
+        [SerializeField] private GameObject _containerPrefab;
+        private GameObject _boardContainer;
         private Stage _currentStage;
         
         private IEnumerator Start()
@@ -39,17 +38,13 @@ namespace ThreeMatch.InGame.Manager
         private void LoadStage()
         {
             StageBuilder builder = new StageBuilder();
-            Stage stage = builder.LoadStage(_stageLevel);
+            Stage stage = builder.LoadStage();
             _currentStage = stage;
-
             Vector2 centerPosition =
                 Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.5f));
-            stage.Build(centerPosition, _blockPrefab, _cellPrefab);
-        }
 
-        public void ReadyStage()
-        {
-            // _currentStage.
+            _boardContainer = Instantiate(_containerPrefab);
+            stage.BuildAsync(centerPosition, _blockPrefab, _cellPrefab, _boardContainer.transform);
         }
     }
 }

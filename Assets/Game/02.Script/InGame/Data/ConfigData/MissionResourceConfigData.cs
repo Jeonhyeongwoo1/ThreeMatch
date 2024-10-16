@@ -1,12 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using ThreeMatch.InGame.UI;
 using UnityEngine;
 
 namespace ThreeMatch.InGame.Data
 {
-    
     [CreateAssetMenu(fileName = "MissionResourceConfigData", menuName = "ThreeMatch/MissionResourceConfigData", order = 1)]
     public class MissionResourceConfigData : ScriptableObject
     {

@@ -31,9 +31,9 @@ namespace ThreeMatch.InGame.Entity
             _cellMatchedType = CellMatchedType.None;
         }
 
-        public void CreateCellBehaviour(GameObject prefab)
+        public void CreateCellBehaviour(GameObject prefab, Transform parent = null)
         {
-            var obj = Object.Instantiate(prefab);
+            var obj = Object.Instantiate(prefab, parent);
             obj.name = $"Cell {_row} / {_column}";
             _cellBehaviour = obj.GetOrAddComponent<CellBehaviour>();
             _cellBehaviour.Initialize(_cellType, _cellImageType);
