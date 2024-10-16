@@ -12,18 +12,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 143085d0e207b4736b447fbc19a8f660, type: 3}
   m_Name: CellConfigData
   m_EditorClassIdentifier: 
-  _spriteArray:
-  - {fileID: 21300000, guid: 45eb661104efa094fa5b93cc1282bc56, type: 3}
-  - {fileID: 21300000, guid: 02abe709b5b1deb448b40b04dcac2a63, type: 3}
-  - {fileID: 21300000, guid: 5d043f0c5a5696c40a1dd4046f33d855, type: 3}
-  - {fileID: 21300000, guid: 756671a57f367c24aa03a70b26914723, type: 3}
-  - {fileID: 21300000, guid: 325e233bfedc8524196bc8ccc393c5dd, type: 3}
-  _bombSprite: {fileID: 21300000, guid: 036719e208b8ed34b847a1b9919ac7dd, type: 3}
-  _verticalRocketSprite: {fileID: 21300000, guid: 02703e82034c5a040be2ef3bf074a874,
-    type: 3}
-  _horizontalRocketSprite: {fileID: 21300000, guid: 488bf4646a2d083438450f9c37fbc1b5,
-    type: 3}
-  _wandSprite: {fileID: 21300000, guid: 5ef1afd52d9c8214f8c6977e52bc48e9, type: 3}
+  _cellImageTypeSpriteDataArray:
+  - cellImageType: 0
+    normalSprite: {fileID: 21300000, guid: 3dda22942cfed4603a1e236fa67c317c, type: 3}
+    verticalSprite: {fileID: 21300000, guid: 13093650104e244a5a2f80f6eaf02cd6, type: 3}
+    horizontalSprite: {fileID: 21300000, guid: d5d12238ac86e4a1aad2ad7b08a654ea, type: 3}
+  - cellImageType: 1
+    normalSprite: {fileID: 21300000, guid: 8604122af3f62472e95c261ef7b15478, type: 3}
+    verticalSprite: {fileID: 21300000, guid: 76484204c1ee945419d016f44240797b, type: 3}
+    horizontalSprite: {fileID: 21300000, guid: 37f6b4815822f472dbb6e1121d3ef560, type: 3}
+  - cellImageType: 2
+    normalSprite: {fileID: 21300000, guid: 0edf19301af4941ef8ab05726d03f78d, type: 3}
+    verticalSprite: {fileID: 21300000, guid: 80ad3bcfbfb8c4820888f9d27839f4c7, type: 3}
+    horizontalSprite: {fileID: 21300000, guid: e3932d0f07fcb49a89f5e7d89b16d1ee, type: 3}
+  - cellImageType: 3
+    normalSprite: {fileID: 21300000, guid: 184e1f54b83be4d56bd5262c7c2395ff, type: 3}
+    verticalSprite: {fileID: 21300000, guid: ed64c2a11ff36488d9cd29084bae6926, type: 3}
+    horizontalSprite: {fileID: 21300000, guid: ecb63978a2bb3412889e0abe385f7d7d, type: 3}
+  - cellImageType: 4
+    normalSprite: {fileID: 21300000, guid: 0f9770a23cda149a98876ec06ccb224c, type: 3}
+    verticalSprite: {fileID: 21300000, guid: 785653637a49447bd92900c47e139a3c, type: 3}
+    horizontalSprite: {fileID: 21300000, guid: 33773bc7a218749309b74aa85f7ce185, type: 3}
+  - cellImageType: 5
+    normalSprite: {fileID: 21300000, guid: 00609a7a5bb9f4a9b89633edcfd97d78, type: 3}
+    verticalSprite: {fileID: 21300000, guid: 007ac4fe437ad4ce2b163a6f1713b0b1, type: 3}
+    horizontalSprite: {fileID: 21300000, guid: 8bff9453e483b4a6ea2bc4713ce58542, type: 3}
+  _bombSprite: {fileID: 21300000, guid: 193adf08b4b954b25bf2a5132abb256e, type: 3}
+  _wandSprite: {fileID: 21300000, guid: 01954c4ea2b65488091af7570dad18f0, type: 3}
   _boxSprite: {fileID: 21300000, guid: 8caafde273f6ad540b1101ef1d1b623a, type: 3}
   _iceBoxSpriteArray:
   - {fileID: 21300000, guid: 18115346a3c21430aab838866ce5700b, type: 3}
@@ -32,4 +47,6 @@ MonoBehaviour:
   _cageSprite: {fileID: 21300000, guid: ea73bd7bd46c8f249b57a4488a024c3f, type: 3}
   _generatorSprite: {fileID: 21300000, guid: 8b4b95ef9fb30f54b96b9a23d73dfe96, type: 3}
   _starPrefab: {fileID: 3806657837486690068, guid: 87b267dbad91e4f69838e53295fee538,
+    type: 3}
+  _wandIdleParticlePrefab: {fileID: 3546987349025960633, guid: bc31c99c64e524a989a64ce254d096a1,
     type: 3}

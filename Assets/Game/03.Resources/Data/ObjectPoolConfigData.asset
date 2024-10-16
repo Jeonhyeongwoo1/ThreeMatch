@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1624c893b7e45beb29c30ea8b8e7e01, type: 3}
+  m_Name: ObjectPoolConfigData
+  m_EditorClassIdentifier: 
+  _objectPoolDataList:
+  - poolCount: 10
+    poolKeyType: 0
+    parentName: Effect
+    prefab: {fileID: 1987957617991102, guid: 5de682c6be87d4881b08bb93f5525b08, type: 3}
+  - poolCount: 10
+    poolKeyType: 1
+    parentName: Effect
+    prefab: {fileID: 189874, guid: 0ae13898dfaca49a398530c7902bcf16, type: 3}
+  - poolCount: 10
+    poolKeyType: 2
+    parentName: Effect
+    prefab: {fileID: 1281900193509586, guid: ad9338a87f6c542bfa233a98d5ae0568, type: 3}
+  - poolCount: 5
+    poolKeyType: 3
+    parentName: Effect
+    prefab: {fileID: 100804, guid: 57b3673ad90e447229d098d12f1b2fb3, type: 3}
+  - poolCount: 2
+    poolKeyType: 4
+    parentName: Effect
+    prefab: {fileID: 1362835522396494, guid: feca79ab20ac647adbff2cdeb2e23414, type: 3}

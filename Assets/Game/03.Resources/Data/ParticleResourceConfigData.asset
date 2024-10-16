@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74869f96918c4440a8c3952009fce269, type: 3}
+  m_Name: ParticleResourceConfigData
+  m_EditorClassIdentifier: 
+  _cellSpriteArray:
+  - {fileID: 21300000, guid: 3dda22942cfed4603a1e236fa67c317c, type: 3}
+  - {fileID: 21300000, guid: 8604122af3f62472e95c261ef7b15478, type: 3}
+  - {fileID: 21300000, guid: 0edf19301af4941ef8ab05726d03f78d, type: 3}
+  - {fileID: 21300000, guid: 184e1f54b83be4d56bd5262c7c2395ff, type: 3}
+  - {fileID: 21300000, guid: 0f9770a23cda149a98876ec06ccb224c, type: 3}
+  - {fileID: 21300000, guid: 00609a7a5bb9f4a9b89633edcfd97d78, type: 3}

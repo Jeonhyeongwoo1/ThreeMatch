@@ -65,7 +65,7 @@ namespace ThreeMatch.InGame.Entity
             // _cellImageType = CellImageType.None;
             _cellType = GetCellTypeByMatchedType(cellMatchedType);
             _cellMatchedType = cellMatchedType;
-            _cellBehaviour.ChangeCellSprite(_cellType, _cellMatchedType);
+            _cellBehaviour.ChangeCellSprite(_cellType, _cellMatchedType, _cellImageType);
         }
 
         private CellType GetCellTypeByMatchedType(CellMatchedType cellMatchedType)
@@ -96,12 +96,19 @@ namespace ThreeMatch.InGame.Entity
         {
             switch (_cellType)
             {
+                case CellType.Wand:
+                    return true;
+                case CellType.Rocket:
+                    _cellBehaviour.ShowRocketEffect(_cellMatchedType);
+                    _cellBehaviour.Disappear(_cellImageType);
+                    return true;
                 case CellType.Normal:
                 case CellType.Obstacle_Box:
-                case CellType.Rocket:
-                case CellType.Wand:
+                    _cellBehaviour.Disappear(_cellImageType);
+                    return true;
                 case CellType.Bomb:
-                    _cellBehaviour.Activate(false);
+                    _cellBehaviour.ShowBombEffect();
+                    _cellBehaviour.Disappear(_cellImageType);
                     return true;
                 case CellType.Obstacle_Cage:
                 case CellType.Obstacle_IceBox:

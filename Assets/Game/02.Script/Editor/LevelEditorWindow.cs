@@ -286,9 +286,9 @@ namespace ThreeMatch.InGame.Editor
                 for (int j = 0; j < row; j++)
                 {
                     var cellList = cellData.CellInfoList;
-                    var cellInfoList = cellList.FindAll(v => v.cellType == CellType.Normal && (v.cellImageType == CellImageType.Blue ||
+                    var cellInfoList = cellList.FindAll(v => v.cellType == CellType.Normal && (v.cellImageType == CellImageType.Yellow ||
                                                                          v.cellImageType == CellImageType.Green ||
-                                                                         v.cellImageType == CellImageType.Pink ||
+                                                                         v.cellImageType == CellImageType.Blue ||
                                                                          v.cellImageType == CellImageType.Purple ||
                                                                          v.cellImageType == CellImageType.Red));
                     int random = Random.Range(0, cellInfoList.Count);
