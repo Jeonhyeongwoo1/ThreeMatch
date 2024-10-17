@@ -5,6 +5,7 @@ using ThreeMatch.InGame.Data;
 using ThreeMatch.InGame.Manager;
 using ThreeMatch.InGame.Model;
 using ThreeMatch.InGame.UI;
+using UniRx;
 
 namespace ThreeMatch.InGame.Entity
 {
@@ -16,7 +17,16 @@ namespace ThreeMatch.InGame.Entity
         public Mission(List<MissionInfoData> missionDataList)
         {
              _missionModel = ModelFactory.CreateOrGet<MissionModel>();
-             _missionModel.missionDataList.Value = missionDataList;
+             var missionInfoDatas = new List<MissionInfoData>();
+             foreach (MissionInfoData missionInfoData in missionDataList)
+             {
+                 MissionInfoData data = new MissionInfoData();
+                 data.removeCount = missionInfoData.removeCount;
+                 data.missionType = missionInfoData.missionType;
+                 missionInfoDatas.Add(data);
+             }
+
+             _missionModel.missionDataList = new ReactiveProperty<List<MissionInfoData>>(missionInfoDatas);
              _missionView = UIManager.Instance.CreateOrGetView<MissionView>();
 
              var missionViewDataList = missionDataList.Select(missionData => new MissionView.Data

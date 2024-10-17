@@ -12,6 +12,6 @@ public static class Const
     public static int BombRange = 1;
     public static int BombAndBombCombinationRange = 2;
 
-    public static int CageHP = 3;
+    public static int CageHP = 1;
     public static int IceBoxHP = 3;
 }

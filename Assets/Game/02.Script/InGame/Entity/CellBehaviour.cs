@@ -18,7 +18,9 @@ namespace ThreeMatch.InGame.Entity
         [SerializeField] private SpriteRenderer _frontSprite;
         [SerializeField] private CellConfigData _data;
 
+        private GameObject _bombObj;
         private GameObject _wandIdleParticlePrefab;
+        private GameObject _rocketObj;
         
         public void Initialize(CellType cellType, CellImageType cellImageType = CellImageType.None)
         {
@@ -41,6 +43,7 @@ namespace ThreeMatch.InGame.Entity
                    int hp = Const.IceBoxHP;
                    _backgroundSprite.sprite = _data.IceBoxSpriteArray[hp - 1];
                    transform.GetOrAddComponent<Health>().Initialize(hp);
+                   Debug.Log("HP : " + hp);
                    break;
                case CellType.Generator:
                    _backgroundSprite.sprite = _data.GeneratorSprite;
@@ -106,17 +109,19 @@ namespace ThreeMatch.InGame.Entity
                     break;
                 case CellType.Rocket:
                     bool isVertical = cellMatchedType == CellMatchedType.Vertical_Four;
-                    _backgroundSprite.sprite = isVertical
-                        ? _data.GetCellImageTypeSpriteData(cellImageType).verticalSprite
-                        : _data.GetCellImageTypeSpriteData(cellImageType).horizontalSprite;
+                    // _backgroundSprite.sprite = isVertical
+                    //     ? _data.GetCellImageTypeSpriteData(cellImageType).verticalSprite
+                    //     : _data.GetCellImageTypeSpriteData(cellImageType).horizontalSprite;
+                    _rocketObj = Instantiate(_data.RocketPrefab, transform);
+                    _rocketObj.transform.localEulerAngles = new Vector3(0, 0, isVertical ? 90 : 0);
+                    _backgroundSprite.gameObject.SetActive(false);
                     break;
                 case CellType.Wand:
                     _backgroundSprite.sprite = _data.WandSprite;
                     _wandIdleParticlePrefab = Instantiate(_data.WandIdleParticlePrefab, transform);
                     break;
                 case CellType.Bomb:
-                    _frontSprite.sprite = _data.BombSprite;
-                    _frontSprite.gameObject.SetActive(true);
+                    _bombObj = Instantiate(_data.BombPrefab, transform);
                     break;
             }
         }
@@ -184,6 +189,16 @@ namespace ThreeMatch.InGame.Entity
             {
                 Destroy(_wandIdleParticlePrefab);
             }
+            
+            if (_bombObj)
+            {
+                Destroy(_bombObj.gameObject);
+            }
+
+            if (_rocketObj)
+            {
+                Destroy(_rocketObj);
+            }
         }
 
         public void HitGenerator()
@@ -209,6 +224,7 @@ namespace ThreeMatch.InGame.Entity
                 switch (cellType)
                 {
                     case CellType.Obstacle_IceBox:
+                        Debug.Log("HP : " + hp);
                         _backgroundSprite.sprite = _data.IceBoxSpriteArray[hp - 1];
                         break;
                     case CellType.Obstacle_Cage:

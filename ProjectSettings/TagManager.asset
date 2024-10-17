@@ -16,6 +16,7 @@ TagManager:
   - MarmaladeAnimation
   - Multicolor_firework
   - Simple_firework
+  - BoardContainer
   layers:
   - Default
   - TransparentFX
@@ -25,9 +26,6 @@ TagManager:
   - UI
   - 
   - 
-  - Item
-  - LevelPin
-  - Square
   - 
   - 
   - 
@@ -37,6 +35,9 @@ TagManager:
   - 
   - 
   - 
+  - 
+  - 
+  - UI
   - 
   - 
   - 
@@ -59,6 +60,9 @@ TagManager:
   - name: Item mask
     uniqueID: 1397149363
     locked: 0
-  - name: UI
-    uniqueID: 58496801
+  - name: Cell
+    uniqueID: 1590218657
+    locked: 0
+  - name: Particle
+    uniqueID: 648820259
     locked: 0

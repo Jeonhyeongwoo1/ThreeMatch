@@ -1451,7 +1451,7 @@ GameObject:
   - component: {fileID: 322051105}
   - component: {fileID: 322051104}
   m_Layer: 5
-  m_Name: Popup Canvas 1
+  m_Name: Popup Canvas 100
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1493,7 +1493,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 1847
+    m_Bits: 55
 --- !u!114 &322051105
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1537,8 +1537,8 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 58496801
-  m_SortingOrder: 1
+  m_SortingLayerID: 0
+  m_SortingOrder: 100
   m_TargetDisplay: 0
 --- !u!1 &368841631
 GameObject:
@@ -2101,7 +2101,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 42c88f570081d42b4b5a50939afff8e4, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5c4a26dc94fc1e84fb4aac30c56bf07c, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -6585,7 +6585,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 49dfa212e626344fcb96ee0ac5353a8d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ec2524f4d288e0049a3c3337c37a3710, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -6978,7 +6978,7 @@ GameObject:
   - component: {fileID: 1678964180}
   - component: {fileID: 1678964184}
   m_Layer: 5
-  m_Name: UI Camera Canvas
+  m_Name: UI Camera Canvas 90
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7000,7 +7000,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 1847
+    m_Bits: 55
 --- !u!114 &1678964181
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7044,8 +7044,8 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 58496801
-  m_SortingOrder: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 90
   m_TargetDisplay: 0
 --- !u!224 &1678964183
 RectTransform:
@@ -8395,7 +8395,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 1847
+    m_Bits: 55
 --- !u!114 &2031664707
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8721,7 +8721,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 83b436029e41c4909ba40e2251803713, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7396e0478390e164aba2f48093a5c971, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -11494,7 +11494,7 @@ ParticleSystemRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 58496801
-  m_SortingLayer: 3
+  m_SortingLayer: 0
   m_SortingOrder: 3
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -22357,7 +22357,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 58496801
-  m_SortingLayer: 3
+  m_SortingLayer: 0
   m_SortingOrder: 10
   m_Sprite: {fileID: 21300000, guid: 62fbc730cec8ce84bb1dc4d475f12def, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -24078,7 +24078,7 @@ ParticleSystemRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 58496801
-  m_SortingLayer: 3
+  m_SortingLayer: 0
   m_SortingOrder: 4
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -56167,7 +56167,7 @@ ParticleSystemRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 58496801
-  m_SortingLayer: 3
+  m_SortingLayer: 0
   m_SortingOrder: 10
   m_RenderMode: 0
   m_MeshDistribution: 0

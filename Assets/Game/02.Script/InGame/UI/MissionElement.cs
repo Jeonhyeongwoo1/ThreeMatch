@@ -36,7 +36,13 @@ namespace ThreeMatch.InGame.UI
             }
             
             _checkObj.SetActive(isClear);
-            _unCheckObj.SetActive(!isClear);
+        }
+
+        public void FailedMission()
+        {
+            _unCheckObj.SetActive(true);
+            _checkObj.SetActive(false);
+            _countText.gameObject.SetActive(false);
         }
 
         public void UpdateCountText(string count)
