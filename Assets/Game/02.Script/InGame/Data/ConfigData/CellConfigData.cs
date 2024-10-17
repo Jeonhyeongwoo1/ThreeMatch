@@ -6,7 +6,7 @@ namespace ThreeMatch.InGame.Data
     [CreateAssetMenu(fileName = "CellConfigData", menuName = "ThreeMatch/CellConfigData", order = 1)]
     public class CellConfigData : ScriptableObject
     {
-        public Sprite BombSprite => _bombSprite;
+        public GameObject BombPrefab => _bombPrefab;
         public Sprite WandSprite => _wandSprite;
         public Sprite BoxSprite => _boxSprite;
         public Sprite[] IceBoxSpriteArray => _iceBoxSpriteArray;
@@ -14,6 +14,7 @@ namespace ThreeMatch.InGame.Data
         public Sprite GeneratorSprite => _generatorSprite;
         public GameObject StarPrefab => _starPrefab;
         public GameObject WandIdleParticlePrefab => _wandIdleParticlePrefab;
+        public GameObject RocketPrefab => _rocketPrefab;
         
         [Serializable]
         public struct CellImageTypeSpriteData
@@ -34,7 +35,8 @@ namespace ThreeMatch.InGame.Data
         [SerializeField] private Sprite _generatorSprite;
 
         [SerializeField] private GameObject _starPrefab;
-
+        [SerializeField] private GameObject _bombPrefab;
+        [SerializeField] private GameObject _rocketPrefab;
         [SerializeField] private GameObject _wandIdleParticlePrefab;
 
         public CellImageTypeSpriteData GetCellImageTypeSpriteData(CellImageType cellImageType)

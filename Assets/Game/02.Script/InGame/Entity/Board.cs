@@ -439,12 +439,21 @@ namespace ThreeMatch.InGame
 
             // 장애물 셀이 있는지 확인 후 부서질 수 있는지 체크
             List<Cell> neighborObstacleCellList = GetNeighborObstacleOrGeneratorCellList(cell);
-            neighborObstacleCellList.ForEach(v => RemoveCell(v));
+            if (neighborObstacleCellList != null)
+            {
+                neighborObstacleCellList.ForEach(v => RemoveCell(v));
+            }
+            
             RemoveCell(cell);
         }
 
         private List<Cell> GetNeighborObstacleOrGeneratorCellList(Cell cell)
         {
+            if (cell.CellType != CellType.Normal)
+            {
+                return null;
+            }
+            
             _neighborObstacleCellList.Clear();
             
             int[,] dirArray = { { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } };
@@ -461,7 +470,7 @@ namespace ThreeMatch.InGame
                 }
 
                 Cell neighborCell = _cellArray[row, column];
-                if (neighborCell == null || !IsObstacleOrGeneratorCellType(neighborCell.CellType))
+                if (neighborCell == null || !IsObstacleOrGeneratorCellType(neighborCell.CellType) || cell == neighborCell)
                 {
                     continue;
                 }
