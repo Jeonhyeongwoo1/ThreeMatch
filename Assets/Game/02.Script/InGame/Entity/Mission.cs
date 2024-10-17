@@ -17,7 +17,7 @@ namespace ThreeMatch.InGame.Entity
         {
              _missionModel = ModelFactory.CreateOrGet<MissionModel>();
              _missionModel.missionDataList.Value = missionDataList;
-             _missionView = UIManager.Instance.CreateOrGet<MissionView>();
+             _missionView = UIManager.Instance.CreateOrGetView<MissionView>();
 
              var missionViewDataList = missionDataList.Select(missionData => new MissionView.Data
                  { missionType = missionData.missionType, count = missionData.removeCount }).ToList();

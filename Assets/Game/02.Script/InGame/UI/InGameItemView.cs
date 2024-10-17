@@ -14,7 +14,7 @@ namespace ThreeMatch.InGame.UI
         {
             public InGameItemType itemType;
             public Button button;
-            public Text amountText;
+            public TextMeshProUGUI amountText;
         }
 
         [SerializeField] private List<InGameItemElement> _inGameItemElemntList;

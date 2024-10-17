@@ -1,5 +1,10 @@
 using System.Collections;
+using System.Linq;
+using Cysharp.Threading.Tasks;
+using ThreeMatch.InGame.Core;
 using ThreeMatch.InGame.Entity;
+using ThreeMatch.InGame.Model;
+using ThreeMatch.InGame.UI;
 using UnityEngine;
 
 namespace ThreeMatch.InGame.Manager
@@ -13,12 +18,8 @@ namespace ThreeMatch.InGame.Manager
         private GameObject _boardContainer;
         private Stage _currentStage;
         
-        private IEnumerator Start()
+        private void Start()
         {
-            yield return null;
-            yield return null;
-            yield return null;
-            yield return null;
             LoadStage();
         }
 
@@ -35,8 +36,11 @@ namespace ThreeMatch.InGame.Manager
             }
         }
 
-        private void LoadStage()
+        private UniTaskCompletionSource _gameReadyCompletionSource;
+
+        private async UniTaskVoid LoadStage()
         {
+            GameManager.onGameReadyAction?.Invoke();
             StageBuilder builder = new StageBuilder();
             Stage stage = builder.LoadStage();
             _currentStage = stage;
@@ -44,7 +48,20 @@ namespace ThreeMatch.InGame.Manager
                 Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.5f));
 
             _boardContainer = Instantiate(_containerPrefab);
-            stage.BuildAsync(centerPosition, _blockPrefab, _cellPrefab, _boardContainer.transform);
+            await stage.BuildAsync(centerPosition, _blockPrefab, _cellPrefab, _boardContainer.transform);
+
+            _gameReadyCompletionSource = new();
+            var gameReadyView = UIManager.Instance.CreateOrGetView<GameReadyView>();
+            var missionModel = ModelFactory.CreateOrGet<MissionModel>();
+            var missionViewDataList = missionModel.missionDataList.Value.Select(missionData => new MissionView.Data
+                { missionType = missionData.missionType, count = missionData.removeCount }).ToList();
+            gameReadyView.Show(missionViewDataList, _gameReadyCompletionSource);
+
+            await _gameReadyCompletionSource.Task;
+            await UniTask.WaitForSeconds(0.5f);
+            await stage.BuildAfterProcessAsync();
+            
+            GameManager.onGameStartAction?.Invoke();
         }
     }
 }

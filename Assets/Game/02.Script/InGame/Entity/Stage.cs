@@ -9,7 +9,6 @@ namespace ThreeMatch.InGame.Entity
 {
     public class Stage
     {
-        public Board Board => _board;
         private Board _board;
         private Mission _mission;
         private int _remainingMoveCount;
@@ -28,6 +27,13 @@ namespace ThreeMatch.InGame.Entity
             _mission = mission;
 
             _remainingMoveCount = remainingMoveCount;
+            GameManager.onChangeRemainingMoveCountAction?.Invoke(_remainingMoveCount);
+        }
+
+        ~Stage()
+        {
+            OnEndDragAction = null;
+            OnCheckMissionAction = null;
         }
 
         private void AddEvents()
@@ -47,9 +53,16 @@ namespace ThreeMatch.InGame.Entity
             _board.Build(centerPosition, blockPrefab, cellPrefab, parent);
         }
 
+        public async UniTask BuildAfterProcessAsync()
+        {
+            await _board.BuildAfterProcess();
+        }
+
         private void OnEndDrag()
         {
             _remainingMoveCount--;
+            GameManager.onChangeRemainingMoveCountAction.Invoke(_remainingMoveCount);
+            
             if (_remainingMoveCount == 0)
             {
                 bool isAllSuccessMission = _mission.IsAllSuccessMission();
@@ -89,7 +102,7 @@ namespace ThreeMatch.InGame.Entity
                 {
                     Debug.Log("AllClear");
                     GameManager.onGameClearAction?.Invoke();
-                    GameManager.onAllSuccessMissionAction?.Invoke();
+                    // GameManager.onAllSuccessMissionAction?.Invoke();
                 }
                 else
                 {
