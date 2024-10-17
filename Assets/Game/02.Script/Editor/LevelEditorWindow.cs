@@ -639,7 +639,7 @@ namespace ThreeMatch.InGame.Editor
                 int removeCount = missionData.removeCount;
 
                 MissionElement missionElement = Instantiate(missionElementPrefab, _missionPanel.transform);
-                missionElement.Initialize(missionType, removeCount.ToString());
+                missionElement.Initialize(missionType, removeCount);
                 _missionElementList.Add(missionElement);
 
                 MissionData data = new MissionData()
@@ -664,7 +664,7 @@ namespace ThreeMatch.InGame.Editor
         private void OnChangeMissionRemoveCountValue(MissionInfoData missionInfoData)
         {
             MissionData missionData = _missionDataList.Find(v => v.missionInfoData == missionInfoData);
-            missionData.missionElement.Initialize(missionInfoData.missionType, missionInfoData.removeCount.ToString());
+            missionData.missionElement.Initialize(missionInfoData.missionType, missionInfoData.removeCount);
             
             _stageLevelConfigDataForEditorPath.missionInfoDataList = missionInfoDataList;
             EditorUtility.SetDirty(_stageLevelConfigDataForEditorPath);

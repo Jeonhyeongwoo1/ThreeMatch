@@ -22,10 +22,20 @@ namespace ThreeMatch.InGame.UI
 
         public void Initialize(List<Data> missionDataList)
         {
+            if (_missionElementList.Count > 0)
+            {
+                _missionElementList.Clear();
+                MissionElement[] childs = _missionContainer.GetComponentsInChildren<MissionElement>();
+                foreach (MissionElement element in childs)
+                {
+                    Destroy(element.gameObject);
+                }
+            }
+            
             missionDataList.ForEach(missionData =>
             {
                 MissionElement element = Instantiate(_missionElementPrefab, _missionContainer);
-                element.Initialize(missionData.missionType, missionData.count.ToString());
+                element.Initialize(missionData.missionType, missionData.count);
                 _missionElementList.Add(element);
             });
         }

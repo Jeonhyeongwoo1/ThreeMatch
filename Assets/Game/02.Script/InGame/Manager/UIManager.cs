@@ -25,14 +25,14 @@ namespace ThreeMatch.InGame.Manager
         
         private Dictionary<Type, IView> _viewDict = new();
 
-        public T CreateOrGet<T>() where T : IView, new ()
+        public T CreateOrGetView<T>() where T : IView, new ()
         {
             if (_viewDict.TryGetValue(typeof(T), out var view))
             {
                 return (T)view;
             }
             
-            view = GetComponentInChildren<T>();
+            view = GetComponentInChildren<T>(true);
             _viewDict.Add(typeof(T), view);
             return (T)view;
         }

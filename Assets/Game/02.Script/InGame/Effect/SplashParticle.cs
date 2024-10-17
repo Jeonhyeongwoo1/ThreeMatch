@@ -1,68 +1,70 @@
-using System;
 using ThreeMatch.InGame.Data;
 using ThreeMatch.InGame.Interface;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-public class SplashParticle : MonoBehaviour, IPoolable
+namespace ThreeMatch.InGame.Entity
 {
-    public PoolKeyType PoolKeyType { get; set; }
-    
-    private ParticleSystem Particle
+    public class SplashParticle : MonoBehaviour, IPoolable
     {
-        get
+        public PoolKeyType PoolKeyType { get; set; }
+
+        private ParticleSystem Particle
         {
-            if (_particle == null)
+            get
             {
-                TryGetComponent(out _particle);
+                if (_particle == null)
+                {
+                    TryGetComponent(out _particle);
+                }
+
+                return _particle;
+            }
+        }
+
+        [SerializeField] private float _lifeTime = 2f;
+        [SerializeField] private bool _useLifeCycle = true;
+        [SerializeField] private ParticleResourceConfigData _resourceConfig;
+
+        private ParticleSystem _particle;
+        private float _elapsed = 0;
+
+        private void Update()
+        {
+            if (!_useLifeCycle)
+            {
+                return;
             }
 
-            return _particle;
+            _elapsed += Time.deltaTime;
+            if (_elapsed > _lifeTime)
+            {
+                ((IPoolable)this).Enqueue();
+            }
         }
-    }
-    
-    [SerializeField] private float _lifeTime = 2f;
-    [SerializeField] private bool _useLifeCycle = true;
-    [SerializeField] private ParticleResourceConfigData _resourceConfig;
 
-    private ParticleSystem _particle;
-    private float elapsed = 0;
-    
-    private void Update()
-    {
-        if (!_useLifeCycle)
+        private void OnDisable()
         {
-            return;
+            _elapsed = 0;
         }
-        elapsed += Time.deltaTime;
-        if (elapsed > _lifeTime)
+
+        public void Spawn(Transform spawner)
         {
-            ((IPoolable)this).Enqueue();
+            transform.position = spawner.position;
+            gameObject.SetActive(true);
+
+            Particle.Play();
         }
-    }
 
-    private void OnDisable()
-    {
-        elapsed = 0;
-    }
+        public void SetParticle(CellImageType cellImageType)
+        {
+            int index = (int)cellImageType;
+            Sprite sprite = _resourceConfig.CellSpriteArray[index];
+            Particle.textureSheetAnimation.SetSprite(0, sprite);
+        }
 
-    public void Spawn(Transform spawner)
-    {
-        transform.position = spawner.position;
-        gameObject.SetActive(true);
-        
-        Particle.Play();
-    }
-
-    public void SetParticle(CellImageType cellImageType)
-    {
-        int index = (int) cellImageType;
-        Sprite sprite = _resourceConfig.CellSpriteArray[index];
-        Particle.textureSheetAnimation.SetSprite(0, sprite);
-    }
-    
-    public T Get<T>() where T : MonoBehaviour
-    {
-        return this as T;
+        public T Get<T>() where T : MonoBehaviour
+        {
+            return this as T;
+        }
     }
 }

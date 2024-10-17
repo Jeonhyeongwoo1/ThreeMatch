@@ -59,8 +59,13 @@ namespace ThreeMatch.InGame
 
         private async void OnPointerDown(Vector2 beginPosition)
         {
-            Debug.Log($"{_selectedCell} / {GetBoardState()}");
+            Debug.Log($"onPointerDown ---- {_selectedCell} / {GetBoardState()}");
             if (_selectedCell != null || IsBoardState(BoardState.Swapping))
+            {
+                return;
+            }
+
+            if (!IsOutOfBoardRange(beginPosition))
             {
                 return;
             }
@@ -966,6 +971,21 @@ namespace ThreeMatch.InGame
             }
         }
 
+        private bool IsOutOfBoardRange(Vector2 inputPosition)
+        {
+            Vector2 size = _blockArray[0, 0].BlockSize;
+            Vector2 leftTopPosition = _blockArray[0, 0].Position + new Vector3(-size.x * 0.5f, -size.y * 0.5f);
+            Vector2 rightBottomPosition = _blockArray[_row - 1, _column - 1].Position +
+                                          new Vector3(size.x * 0.5f, size.y * 0.5f);
+            if ((leftTopPosition.x <= inputPosition.x) && (rightBottomPosition.x >= inputPosition.x) &&
+                (leftTopPosition.y <= inputPosition.y) && (rightBottomPosition.y >= inputPosition.y))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         private bool IsOutOfBoardRange(int row, int column)
         {
             if (row < 0 || row >= _row || column < 0 || column >= _column)
@@ -1195,7 +1215,6 @@ namespace ThreeMatch.InGame
             
             CreateBlockBehaviour(centerPosition, blockPrefab, container);
             CreateCellBehaviour(cellPrefab, container);
-            await BuildAfterProcess();
             
             UpdateBoardState(BoardState.CompleteBuild);
         }
@@ -1206,7 +1225,7 @@ namespace ThreeMatch.InGame
             CreateCellBehaviour(cellPrefab, parent);
         }
 
-        private async UniTask BuildAfterProcess()
+        public async UniTask BuildAfterProcess()
         {
             while (await CheckMatchingCell())
             {
@@ -1272,6 +1291,7 @@ namespace ThreeMatch.InGame
         public void SetPendingUseInGameItemType(InGameItemType inGameItemType)
         {
             _pendingInGameItemType = inGameItemType;
+            Debug.Log(_pendingInGameItemType);
             UpdateBoardState(BoardState.PendingUseInGameItem);
         }
 
@@ -1279,7 +1299,8 @@ namespace ThreeMatch.InGame
         {
             UpdateBoardState(BoardState.UseItem);
             GameManager.onUsedInGameItemAction?.Invoke(_pendingInGameItemType);
-            
+
+            Debug.Log("ExecuteInGameItem : " + _pendingInGameItemType);
             switch (_pendingInGameItemType)
             {
                 case InGameItemType.Shuffle:

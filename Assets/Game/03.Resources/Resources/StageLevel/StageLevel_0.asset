@@ -909,6 +909,6 @@ MonoBehaviour:
       Entry: 8
       Data: 
   missionInfoDataList:
-  - missionType: 6
-    removeCount: 10
-  remainingMoveCount: 10
+  - missionType: 1
+    removeCount: 1
+  remainingMoveCount: 3
