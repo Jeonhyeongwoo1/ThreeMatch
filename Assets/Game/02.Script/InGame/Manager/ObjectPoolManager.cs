@@ -1,10 +1,10 @@
-using System;
-using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using ThreeMatch.InGame.Data;
 using ThreeMatch.InGame.Interface;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace ThreeMatch.InGame.Manager
 {
@@ -27,8 +27,9 @@ namespace ThreeMatch.InGame.Manager
 
         [SerializeField] private ObjectPoolConfigData _poolConfigData;
 
-        private Dictionary<PoolKeyType, Queue<IPoolable>> _poolDict = new();
+        private ConcurrentDictionary<PoolKeyType, ConcurrentQueue<IPoolable>> _poolDict = new();
         private List<Transform> poolParentList;
+        private readonly Object _lock = new();
 
         private void Awake()
         {
@@ -55,7 +56,6 @@ namespace ThreeMatch.InGame.Manager
             for (int i = 0; i < count; i++)
             {
                 GameObject obj = Instantiate(prefab, parent);
-                obj.gameObject.SetActive(false);
                 obj.name = prefab.name;
                     
                 if (!obj.TryGetComponent(out IPoolable poolable))
@@ -65,15 +65,20 @@ namespace ThreeMatch.InGame.Manager
                 }
 
                 poolable.PoolKeyType = poolKeyType;
-                if (_poolDict.TryGetValue(poolKeyType, out Queue<IPoolable> queue))
+                obj.gameObject.SetActive(false);
+                if (_poolDict.TryGetValue(poolKeyType, out ConcurrentQueue<IPoolable> list))
                 {
-                    queue.Enqueue(poolable);
+                    list.Enqueue(poolable);
+                    // list.Add(poolable);
                     continue;
                 }
-                
-                queue = new Queue<IPoolable>();
-                queue.Enqueue(poolable);
-                _poolDict.Add(poolKeyType, queue);
+
+                list = new ConcurrentQueue<IPoolable>();
+                list.Enqueue(poolable);
+                if (!_poolDict.TryAdd(poolKeyType, list))
+                {
+                    Debug.LogError("failed pool dict : " + poolKeyType);
+                }
             }
         }
 
@@ -95,43 +100,59 @@ namespace ThreeMatch.InGame.Manager
             return true;
         }
 
-        public bool Enqueue(IPoolable poolable)
+        public void Sleep(IPoolable poolable)
         {
-            if (!_poolDict.TryGetValue(poolable.PoolKeyType, out Queue<IPoolable> queue))
+            lock (_lock)
             {
-                return false;
+                _poolDict[poolable.PoolKeyType].TryDequeue(out poolable);
             }
-
-            queue.Enqueue(poolable);
-            return true;
         }
 
-        public IPoolable DequeuePool(PoolKeyType poolKeyType)
+        public IPoolable GetPool(PoolKeyType poolKeyType)
         {
-            if (!_poolDict.TryGetValue(poolKeyType, out Queue<IPoolable> queue))
+            lock (_lock)
             {
-                Debug.LogWarning("key is not setting" + poolKeyType);
+                IPoolable poolable = null;
+                if (!_poolDict.TryGetValue(poolKeyType, out ConcurrentQueue<IPoolable> queue))
+                {
+                    Debug.LogWarning("pool key is not setting" + poolKeyType);
+                    if (!TryCreatePoolItemData(poolKeyType))
+                    {
+                        Debug.LogError($"failed create pool {poolKeyType}");
+                        return null;
+                    }
+
+                    _poolDict[poolKeyType].TryDequeue(out poolable);
+                    if (poolable == null)
+                    {
+                        Debug.LogError($"failed get pool {poolKeyType}");
+                        return null;
+                    }
+
+                    return poolable;
+                }
+
+                queue.TryDequeue(out poolable);
+                if (poolable != null)
+                {
+                    return poolable;
+                }
+                
                 if (!TryCreatePoolItemData(poolKeyType))
                 {
+                    Debug.LogError($"failed create pool {poolKeyType}");
                     return null;
                 }
                 
-                return _poolDict[poolKeyType].Dequeue();
-            }
-
-            IPoolable iPoolable = null;
-            bool isSuccess = queue.TryDequeue(out iPoolable);
-            if (!isSuccess)
-            {
-                if (!TryCreatePoolItemData(poolKeyType))
+                queue.TryDequeue(out poolable);
+                if (poolable != null)
                 {
-                    return null;
+                    return poolable;
                 }
                 
-                return _poolDict[poolKeyType].Dequeue();
+                Debug.LogError($"failed get pool {poolKeyType}");
+                return null;
             }
-
-            return iPoolable;
         }
     }
 }

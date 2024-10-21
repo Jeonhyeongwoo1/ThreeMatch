@@ -1,11 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace ThreeMatch.InGame
 {
-    public class Block
+    public class Block: IDisposable
     {
         public Vector3 Position => _blockBehaviour.transform.position;
         public BlockType BlockType => _blockType;
@@ -38,6 +40,11 @@ namespace ThreeMatch.InGame
             Vector2 position = startPosition + new Vector2(size.x * _column, size.y * _row);
             _blockBehaviour.UpdatePosition(position);
             _blockBehaviour.Initialize(isOdd, _blockType);
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
         }
     }
 }

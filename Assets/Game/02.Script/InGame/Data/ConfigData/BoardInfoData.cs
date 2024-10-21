@@ -9,9 +9,9 @@ namespace ThreeMatch.InGame.Data
     public class BoardInfoData
     {
         public CellImageType CellImageType => _cellImageType == CellImageType.Blue ||
-                                              _cellImageType == CellImageType.Purple 
-            ? CellImageType.Green
-            : _cellImageType;
+                                              _cellImageType == CellImageType.Purple
+                                                    ? CellImageType.Green
+                                                    : _cellImageType;
         public CellType CellType => _cellType;
         public GameObject Prefab => _prefab;
         public BlockType BlockType => _blockType;

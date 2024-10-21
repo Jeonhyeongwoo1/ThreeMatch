@@ -28,7 +28,7 @@ namespace ThreeMatch.InGame.UI
                 MissionElement[] childs = _missionContainer.GetComponentsInChildren<MissionElement>();
                 foreach (MissionElement element in childs)
                 {
-                    Destroy(element.gameObject);
+                    DestroyImmediate(element.gameObject);
                 }
             }
             

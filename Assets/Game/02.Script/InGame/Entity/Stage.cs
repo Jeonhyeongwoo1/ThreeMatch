@@ -45,12 +45,12 @@ namespace ThreeMatch.InGame.Entity
 
         public async UniTask BuildAsync(Vector2 centerPosition, GameObject blockPrefab, GameObject cellPrefab, Transform container = null)
         {
-            await _board.BuildAsync(centerPosition, blockPrefab, cellPrefab, container);
+            await _board.BuildAsync(centerPosition, blockPrefab, container);
         }
         
         public void CustomBuild(Vector2 centerPosition, GameObject blockPrefab, GameObject cellPrefab, Transform parent = null)
         {
-            _board.Build(centerPosition, blockPrefab, cellPrefab, parent);
+            _board.Build(centerPosition, blockPrefab, parent);
         }
 
         public async UniTask BuildAfterProcessAsync()

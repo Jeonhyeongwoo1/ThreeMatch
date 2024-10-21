@@ -2,62 +2,64 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using ThreeMatch.InGame.Data;
-using ThreeMatch.InGame.Effect;
 using ThreeMatch.InGame.Manager;
 using UnityEngine;
-using Unity.VisualScripting;
+using IPoolable = ThreeMatch.InGame.Interface.IPoolable;
 using Sequence = DG.Tweening.Sequence;
 
 namespace ThreeMatch.InGame.Entity
 {
-    public class CellBehaviour : MonoBehaviour
+    public class CellBehaviour : MonoBehaviour, IPoolable
     {
-        public Vector2 Size => _backgroundSprite.bounds.size;
+        public Vector2 Size => _collider2D.bounds.size;
+        public PoolKeyType PoolKeyType { get; set; }
 
-        [SerializeField] private SpriteRenderer _backgroundSprite;
-        [SerializeField] private SpriteRenderer _frontSprite;
-        [SerializeField] private CellConfigData _data;
+        [SerializeField] protected SpriteRenderer _backgroundSprite;
+        [SerializeField] protected SpriteRenderer _frontSprite;
+        [SerializeField] protected CellConfigData _data;
 
-        private GameObject _bombObj;
-        private GameObject _wandIdleParticlePrefab;
-        private GameObject _rocketObj;
-        
-        public void Initialize(CellType cellType, CellImageType cellImageType = CellImageType.None)
+        private Collider2D _collider2D;
+
+        public T Get<T>() where T : MonoBehaviour
+        {
+            return this as T;
+        }
+
+        public void Spawn(Transform spawner = null)
+        {
+            Activate(true);
+        }
+
+        protected virtual void Start()
+        {
+            _collider2D = GetComponentInChildren<Collider2D>();
+        }
+
+        public virtual void Initialize(CellType cellType, Transform parent, Vector3 position,
+            CellImageType cellImageType = CellImageType.None, CellMatchedType cellMatchedType = CellMatchedType.None)
         {
             switch (cellType)
             {
-                case CellType.None:
-                    break;
                 case CellType.Normal:
                     _backgroundSprite.sprite = _data.GetCellImageTypeSpriteData(cellImageType).normalSprite;
                     break;
-               case CellType.Obstacle_Box:
-                   _backgroundSprite.sprite = _data.BoxSprite;
-                   break;
-               case CellType.Obstacle_Cage:
-                   _backgroundSprite.sprite = _data.GetCellImageTypeSpriteData(cellImageType).normalSprite;
-                   _frontSprite.sprite = _data.CageSprite;
-                   transform.GetOrAddComponent<Health>().Initialize(Const.CageHP);
-                   break;
-               case CellType.Obstacle_IceBox:
-                   int hp = Const.IceBoxHP;
-                   _backgroundSprite.sprite = _data.IceBoxSpriteArray[hp - 1];
-                   transform.GetOrAddComponent<Health>().Initialize(hp);
-                   Debug.Log("HP : " + hp);
-                   break;
-               case CellType.Generator:
-                   _backgroundSprite.sprite = _data.GeneratorSprite;
-                   break;
+            }
+
+            if (!_collider2D)
+            {
+                _collider2D = GetComponentInChildren<Collider2D>();
             }
             
-            _frontSprite.gameObject.SetActive(CellType.Obstacle_Cage == cellType);
+            transform.SetParent(parent);
+            transform.position = position;
+            Spawn();
         }
 
         public async UniTask MoveAsync(List<Vector3> movePositionList, bool isSpawn)
         {
             if (isSpawn)
             {
-                Activate(true);
+                Spawn();
                 DoFade(true);
             }
             
@@ -101,72 +103,11 @@ namespace ThreeMatch.InGame.Entity
             transform.DOMove(position, Const.SwapAnimationDuration);
         }
 
-        public void ChangeCellSprite(CellType cellType, CellMatchedType cellMatchedType, CellImageType cellImageType)
-        {
-            switch (cellType)
-            {
-                case CellType.Normal:
-                    break;
-                case CellType.Rocket:
-                    bool isVertical = cellMatchedType == CellMatchedType.Vertical_Four;
-                    // _backgroundSprite.sprite = isVertical
-                    //     ? _data.GetCellImageTypeSpriteData(cellImageType).verticalSprite
-                    //     : _data.GetCellImageTypeSpriteData(cellImageType).horizontalSprite;
-                    _rocketObj = Instantiate(_data.RocketPrefab, transform);
-                    _rocketObj.transform.localEulerAngles = new Vector3(0, 0, isVertical ? 90 : 0);
-                    _backgroundSprite.gameObject.SetActive(false);
-                    break;
-                case CellType.Wand:
-                    _backgroundSprite.sprite = _data.WandSprite;
-                    _wandIdleParticlePrefab = Instantiate(_data.WandIdleParticlePrefab, transform);
-                    break;
-                case CellType.Bomb:
-                    _bombObj = Instantiate(_data.BombPrefab, transform);
-                    break;
-            }
-        }
-        
-        public void ShowLighting(CellType cellType, Cell cell)
-        {
-            if (cellType == CellType.Wand)
-            {
-                var pool = ObjectPoolManager.Instance.DequeuePool(PoolKeyType.WandLightEffect);
-                var lighting = pool.Get<Lighting>();
-                lighting.SetPosition(transform.position, cell.Position);
-                lighting.Spawn(transform);
-
-                var lightPool = ObjectPoolManager.Instance.DequeuePool(PoolKeyType.CellDisappearLightEffect);
-                var pooledObject = lightPool.Get<PooledObject>();
-                pooledObject.Spawn(cell.CellBehaviour.transform);
-                cell.CellBehaviour.Activate(false);
-
-                Sequence sequence = DOTween.Sequence();
-                sequence.Append(transform.DOScale(Vector3.one * 1.5f, 0.3f));
-                sequence.AppendInterval(0.5f);
-                sequence.OnComplete(() => Activate(false));
-            }
-        }
-
-        public void ShowBombEffect()
-        {
-            var pool = ObjectPoolManager.Instance.DequeuePool(PoolKeyType.BombEffect);
-            var obj = pool.Get<BombEffect>();
-            obj.Spawn(transform);
-        }
-
-        public void ShowRocketEffect(CellMatchedType cellMatchedType)
-        {
-            var pool = ObjectPoolManager.Instance.DequeuePool(PoolKeyType.RocketEffect);
-            var effect = pool.Get<PooledObject>();
-            effect.Spawn(transform);
-            effect.transform.eulerAngles = new Vector3(0, 0, cellMatchedType == CellMatchedType.Vertical_Four ? 90 : 0);
-        }
-
-        public void Disappear(CellImageType cellImageType = CellImageType.None)
+        public virtual void Disappear(CellImageType cellImageType = CellImageType.None)
         {
             if (cellImageType != CellImageType.None)
             {
-                var pool = ObjectPoolManager.Instance.DequeuePool(PoolKeyType.CellDisappearParticle);
+                var pool = ObjectPoolManager.Instance.GetPool(PoolKeyType.CellDisappearParticle);
                 SplashParticle particle = pool.Get<SplashParticle>();
                 particle.SetParticle(cellImageType);
                 particle.Spawn(transform);
@@ -183,68 +124,16 @@ namespace ThreeMatch.InGame.Entity
 
         public void Activate(bool isActivate)
         {
-            gameObject.SetActive(isActivate);
-
-            if (_wandIdleParticlePrefab)
+            if (isActivate)
             {
-                Destroy(_wandIdleParticlePrefab);
-            }
-            
-            if (_bombObj)
-            {
-                Destroy(_bombObj.gameObject);
-            }
-
-            if (_rocketObj)
-            {
-                Destroy(_rocketObj);
-            }
-        }
-
-        public void HitGenerator()
-        {
-            GameObject prefab = _data.StarPrefab;
-            GameObject obj = Instantiate(prefab);
-            obj.transform.position = transform.position;
-            obj.transform.DOMove(Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0.5f)), 1f)
-                .OnComplete(() => obj.SetActive(false));
-        }
-        
-        public bool Hit(CellType cellType)
-        {
-            if (!TryGetComponent(out Health health))
-            {
-                Debug.LogError($"failed get health component {transform.name}");
-                return false; 
-            }
-
-            int hp = health.TakeDamage(1);
-            if (hp > 0)
-            {
-                switch (cellType)
-                {
-                    case CellType.Obstacle_IceBox:
-                        Debug.Log("HP : " + hp);
-                        _backgroundSprite.sprite = _data.IceBoxSpriteArray[hp - 1];
-                        break;
-                    case CellType.Obstacle_Cage:
-                        break;
-                }
+                gameObject.SetActive(true);
             }
             else
             {
-                switch (cellType)
-                {
-                    case CellType.Obstacle_IceBox:
-                        Activate(false);
-                        break;
-                    case CellType.Obstacle_Cage:
-                        _frontSprite.gameObject.SetActive(false);
-                        break;
-                }
+                transform.localScale = Vector3.one;
+                ((IPoolable)this).Sleep();
             }
-            
-            return health.IsDead();
         }
+
     }
 }

@@ -21,7 +21,6 @@ namespace ThreeMatch.InGame.UI
 
         public void OnFinishedAnimation()
         {
-            Debug.Log("SS" + _taskCompletionSource);
             if (_taskCompletionSource != null)
             {
                 _taskCompletionSource.TrySetResult();

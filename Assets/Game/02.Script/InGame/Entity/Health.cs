@@ -8,6 +8,7 @@ namespace ThreeMatch.InGame.Entity
     public class Health : MonoBehaviour
     {
         public int HP => _hp;
+        
         [SerializeField] private int _hp;
 
         public void Initialize(int hp)

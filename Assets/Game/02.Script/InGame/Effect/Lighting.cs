@@ -63,7 +63,7 @@ namespace ThreeMatch.InGame.Effect
                 await UniTask.Yield();
             }
             
-            ((IPoolable)this).Enqueue();
+            ((IPoolable)this).Sleep();
         }
     }
 }
