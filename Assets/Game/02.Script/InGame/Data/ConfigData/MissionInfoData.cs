@@ -7,23 +7,16 @@ namespace ThreeMatch.InGame.Data
     [Serializable]
     public class MissionInfoData
     {
-        [OnValueChanged(nameof(OnMissionTypeValueChanged))]
+        [OnValueChanged(nameof(OnMissionDataValueChanged))]
         public MissionType missionType;
 
-        [OnValueChanged(nameof(OnRemoveCountValueChanged))]
+        [OnValueChanged(nameof(OnMissionDataValueChanged))]
         public int removeCount;
 
         public Action<MissionInfoData> onChangeMissionInfoData;
         
-        private void OnRemoveCountValueChanged()
+        private void OnMissionDataValueChanged()
         {
-            Debug.Log(removeCount);
-            onChangeMissionInfoData?.Invoke(this);
-        }
-        
-        private void OnMissionTypeValueChanged()
-        {
-            Debug.Log("OnMissionTypeCahnge" + missionType);
             onChangeMissionInfoData?.Invoke(this);
         }
     }

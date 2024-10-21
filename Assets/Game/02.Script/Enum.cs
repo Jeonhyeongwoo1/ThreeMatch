@@ -13,9 +13,7 @@ namespace ThreeMatch
         Rocket,
         Wand,
         Bomb,
-        Obstacle_Box,
-        Obstacle_IceBox,
-        Obstacle_Cage,
+        Obstacle,
         Generator
     }
 
@@ -27,18 +25,24 @@ namespace ThreeMatch
         Cage
     }
 
+    public enum GeneratorType
+    {
+        None,
+        Star,
+    }
+
     public enum MissionType
     {
         None,
-        RemoveNormalBlueCell,
-        RemoveNormalGreenCell,
-        RemoveNormalPinkCell,
-        RemoveNormalPurpleCell,
         RemoveNormalRedCell,
-        RemoveObstacleBoxCell,
-        RemoveObstacleIceBoxCell,
+        RemoveNormalYellowCell,
+        RemoveNormalGreenCell,
+        RemoveNormalPurpleCell,
+        RemoveNormalBlueCell,
+        RemoveObstacleOneHitBoxCell,
+        RemoveObstacleHitableBoxCell,
         RemoveObstacleCageCell,
-        RemoveGeneratorCell
+        RemoveStarGeneratorCell
     }
 
     public enum CellImageType
@@ -104,14 +108,14 @@ namespace ThreeMatch
         WandLightEffect,
         RocketEffect,
         BombEffect,
-        Cell,
-        Bomb,
-        Rocket,
-        Wand,
-        Obstacle_IceBox,
-        Obstacle_Cage,
-        Obstacle_Box,
-        Generator,
+        Cell_Normal,
+        Cell_Bomb,
+        Cell_Rocket,
+        Cell_Wand,
+        Cell_Obstacle_HitableBox,
+        Cell_Obstacle_Cage,
+        Cell_Obstacle_OneHitBox,
+        Cell_Generator,
         StarObject,
     }
 

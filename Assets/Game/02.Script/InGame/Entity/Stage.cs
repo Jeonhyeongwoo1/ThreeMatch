@@ -13,7 +13,7 @@ namespace ThreeMatch.InGame.Entity
         private Mission _mission;
         private int _remainingMoveCount;
 
-        private event Action<CellType, int, CellImageType> OnCheckMissionAction;
+        private event Action<CellType, int, ObstacleCellType, CellImageType> OnCheckMissionAction;
         private event Action OnEndDragAction;
 
         public Stage(BoardInfoData[,] boardInfoArray, List<MissionInfoData> missionDataList, int remainingMoveCount)
@@ -81,9 +81,9 @@ namespace ThreeMatch.InGame.Entity
             }
         }
 
-        private void OnCheckMission(CellType cellType, int removeCount, CellImageType cellImageType = CellImageType.None)
+        private void OnCheckMission(CellType cellType, int removeCount, ObstacleCellType obstacleCellType = ObstacleCellType.None, CellImageType cellImageType = CellImageType.None)
         {
-            MissionType missionType = DetermineMissionTypeByCellTypeAndCellImageType(cellType, cellImageType);
+            MissionType missionType = DetermineMissionTypeByCellTypeAndCellImageType(cellType, obstacleCellType, cellImageType);
             if (missionType == MissionType.None)
             {
                 return;
@@ -111,7 +111,7 @@ namespace ThreeMatch.InGame.Entity
             }
         }
 
-        private MissionType DetermineMissionTypeByCellTypeAndCellImageType(CellType cellType,
+        private MissionType DetermineMissionTypeByCellTypeAndCellImageType(CellType cellType, ObstacleCellType obstacleCellType = ObstacleCellType.None,
             CellImageType cellImageType = CellImageType.None)
         {
             switch (cellType)
@@ -120,27 +120,38 @@ namespace ThreeMatch.InGame.Entity
                     switch (cellImageType)
                     {
                         case CellImageType.Yellow:
-                            return MissionType.RemoveNormalBlueCell;
+                            return MissionType.RemoveNormalYellowCell;
                         case CellImageType.Green:
                             return MissionType.RemoveNormalGreenCell;
                         case CellImageType.Blue:
-                            return MissionType.RemoveNormalPinkCell;
+                            return MissionType.RemoveNormalBlueCell;
                         case CellImageType.Purple:
                             return MissionType.RemoveNormalPurpleCell;
                         case CellImageType.Red:
                             return MissionType.RemoveNormalRedCell;
                         case CellImageType.None:
                         default:
+                            Debug.LogError(
+                                $"failed determine mission type : {cellType} / {obstacleCellType} / {cellImageType}");
                             return MissionType.None;
                     }
-                case CellType.Obstacle_Box:
-                    return MissionType.RemoveObstacleBoxCell;
-                case CellType.Obstacle_IceBox:
-                    return MissionType.RemoveObstacleIceBoxCell;
-                case CellType.Obstacle_Cage:
-                    return MissionType.RemoveObstacleCageCell;
+                case CellType.Obstacle:
+                    switch (obstacleCellType)
+                    {
+                        case ObstacleCellType.Box:
+                            return MissionType.RemoveObstacleOneHitBoxCell;
+                        case ObstacleCellType.IceBox:
+                            return MissionType.RemoveObstacleHitableBoxCell;
+                        case ObstacleCellType.Cage:
+                            return MissionType.RemoveObstacleCageCell;
+                        case ObstacleCellType.None:
+                        default:
+                            Debug.LogError(
+                                $"failed determine mission type : {cellType} / {obstacleCellType} / {cellImageType}");
+                            return MissionType.None;
+                    }
                 case CellType.Generator:
-                    return MissionType.RemoveGeneratorCell;
+                    return MissionType.RemoveStarGeneratorCell;
                 case CellType.Rocket:
                 case CellType.Wand:
                 case CellType.Bomb:

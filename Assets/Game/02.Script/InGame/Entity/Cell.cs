@@ -15,6 +15,7 @@ namespace ThreeMatch.InGame.Entity
         public CellImageType CellImageType => _cellImageType;
         public CellType CellType => _cellType;
         public CellMatchedType CellMatchedType => _cellMatchedType;
+        public ObstacleCellType ObstacleCellType => _obstacleCellType;
         public int Row => _row;
         public int Column => _column;
         
@@ -24,40 +25,48 @@ namespace ThreeMatch.InGame.Entity
         private CellImageType _cellImageType;
         private CellMatchedType _cellMatchedType;
         private CellType _cellType;
+        private ObstacleCellType _obstacleCellType;
 
-        public Cell(int row, int column, CellType cellType, CellImageType cellImageType = CellImageType.None)
+        public Cell(int row, int column, CellType cellType, ObstacleCellType obstacleCellType = ObstacleCellType.None, CellImageType cellImageType = CellImageType.None)
         {
             _column = column;
             _row = row;
             _cellType = cellType;
-            _cellImageType = cellImageType;
+            _obstacleCellType = obstacleCellType;
             _cellMatchedType = CellMatchedType.None;
+            
+            if (obstacleCellType == ObstacleCellType.Cage)
+            {
+                int length = Enum.GetNames(typeof(CellImageType)).Length - 1;
+                int select = UnityEngine.Random.Range(0, length);
+                _cellImageType = (CellImageType)select;
+            }
+            else
+            {
+                _cellImageType = cellImageType;
+            }
         }
         
         public void CreateCellBehaviour(Vector3 position, Transform parent = null)
         {
-            IPoolable pool = null;
+            IPoolable pool;
             PoolKeyType poolKeyType = PoolKeyType.None;
-            switch (_cellType)
+            poolKeyType = _cellType switch
             {
-                case CellType.Normal:
-                    poolKeyType = PoolKeyType.Cell;
-                    break;
-                case CellType.Obstacle_Box:
-                    poolKeyType = PoolKeyType.Obstacle_Box;
-                    break;
-                case CellType.Obstacle_IceBox:
-                    poolKeyType = PoolKeyType.Obstacle_IceBox;
-                    break;
-                case CellType.Obstacle_Cage:
-                    poolKeyType = PoolKeyType.Obstacle_Cage;
-                    break;
-                case CellType.Generator:
-                    poolKeyType = PoolKeyType.Generator;
-                    break;
-            }
-            
+                CellType.Normal => PoolKeyType.Cell_Normal,
+                CellType.Obstacle => _obstacleCellType switch
+                {
+                    ObstacleCellType.Box => PoolKeyType.Cell_Obstacle_OneHitBox,
+                    ObstacleCellType.IceBox => PoolKeyType.Cell_Obstacle_HitableBox,
+                    ObstacleCellType.Cage => PoolKeyType.Cell_Obstacle_Cage,
+                    _ => poolKeyType
+                },
+                CellType.Generator => PoolKeyType.Cell_Generator,
+                _ => poolKeyType
+            };
+
 #if UNITY_EDITOR
+            // Debug.Log($"{poolKeyType} /{_obstacleCellType}");
             var data =
                 ObjectPoolConfigData.Instance.ObjectPoolDataList.Find(v => v.poolKeyType == poolKeyType);
             var obj = Object.Instantiate(data.prefab);
@@ -67,7 +76,7 @@ namespace ThreeMatch.InGame.Entity
 #endif
             _cellBehaviour = pool.Get<CellBehaviour>();
             _cellBehaviour.name = $"{poolKeyType} {_row} / {_column}";
-            _cellBehaviour.Initialize(_cellType, parent, position, _cellImageType);
+            _cellBehaviour.Initialize(_cellType, parent, position, _obstacleCellType, _cellImageType);
         }
 
         public void Swap(Vector3 position, int row, int column)
@@ -94,37 +103,31 @@ namespace ThreeMatch.InGame.Entity
             _cellType = GetCellTypeByMatchedType(cellMatchedType);
             _cellMatchedType = cellMatchedType;
             Vector3 position;
-            
+            PoolKeyType poolKeyType = PoolKeyType.None;
             switch (_cellType)
             {
                 case CellType.Rocket:
-                    _cellBehaviour.Activate(false);
-                    position = Position;
-                    var rocket = ObjectPoolManager.Instance.GetPool(PoolKeyType.Rocket);
-                    _cellBehaviour = rocket.Get<CellBehaviour>();
-                    _cellBehaviour.Initialize(_cellType, parent, position, _cellImageType, _cellMatchedType);
+                    poolKeyType = PoolKeyType.Cell_Rocket;
                     break;
                 case CellType.Wand:
-                    _cellBehaviour.Activate(false);
-                    position = Position;
-                    var wand = ObjectPoolManager.Instance.GetPool(PoolKeyType.Wand);
-                    _cellBehaviour = wand.Get<CellBehaviour>();
-                    _cellBehaviour.Initialize(_cellType, parent, position, _cellImageType);
+                    poolKeyType = PoolKeyType.Cell_Wand;
                     break;
                 case CellType.Bomb:
-                    _cellBehaviour.Activate(false);
-                    position = Position;
-                    var bomb = ObjectPoolManager.Instance.GetPool(PoolKeyType.Bomb);
-                    _cellBehaviour = bomb.Get<CellBehaviour>();
-                    _cellBehaviour.Initialize(_cellType, parent, position, _cellImageType);
+                    poolKeyType = PoolKeyType.Cell_Bomb;
                     break;
                 case CellType.Normal:
-                case CellType.Obstacle_Box:
-                case CellType.Obstacle_IceBox:
-                case CellType.Obstacle_Cage:
+                case CellType.Obstacle:
                 case CellType.Generator:
+                    Debug.LogError($"failed change cell type from match  {cellMatchedType} {_cellType}");
+                    poolKeyType = PoolKeyType.Cell_Normal;
                     break;
             }
+            
+            _cellBehaviour.Activate(false);
+            position = Position;
+            var poolable = ObjectPoolManager.Instance.GetPool(poolKeyType);
+            _cellBehaviour = poolable.Get<CellBehaviour>();
+            _cellBehaviour.Initialize(_cellType, parent, position, _obstacleCellType, _cellImageType, _cellMatchedType);
         }
 
         private CellType GetCellTypeByMatchedType(CellMatchedType cellMatchedType)
@@ -163,18 +166,25 @@ namespace ThreeMatch.InGame.Entity
                     rocket.Disappear(_cellImageType);
                     return true;
                 case CellType.Normal:
-                case CellType.Obstacle_Box:
                     _cellBehaviour.Disappear(_cellImageType);
                     return true;
+                case CellType.Obstacle:
+                    switch (_obstacleCellType)
+                    {
+                        case ObstacleCellType.Box:
+                            _cellBehaviour.Disappear(_cellImageType);
+                            return true;
+                        case ObstacleCellType.IceBox:
+                        case ObstacleCellType.Cage: 
+                            var obstacle = _cellBehaviour as Obstacle;
+                            return obstacle.Hit(_obstacleCellType);
+                    }
+                    break;
                 case CellType.Bomb:
                     var bomb = _cellBehaviour as BombBehaviour;
                     bomb.ShowBombEffect();
                     bomb.Disappear(_cellImageType);
                     return true;
-                case CellType.Obstacle_Cage:
-                case CellType.Obstacle_IceBox:
-                    var obstacle = _cellBehaviour as Obstacle;
-                    return obstacle.Hit(_cellType);
                 case CellType.Generator:
                     var generator = _cellBehaviour as Generator;
                     generator.CreateStarObject();

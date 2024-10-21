@@ -12,6 +12,9 @@ public static class Const
     public static int BombRange = 1;
     public static int BombAndBombCombinationRange = 2;
 
-    public static int CageHP = 1;
-    public static int IceBoxHP = 3;
+    public static string ObjectPoolConfigDataPath =
+        "Assets/Game/03.Resources/Resources/Data/ObjectPoolConfigData.asset";
+    
+    public static string InGameResourcesConfigData =
+        "Assets/Game/03.Resources/Resources/Data/InGameResourcesConfigData.asset";
 }
