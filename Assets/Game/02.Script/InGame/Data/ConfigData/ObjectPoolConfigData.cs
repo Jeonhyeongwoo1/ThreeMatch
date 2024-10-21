@@ -26,9 +26,7 @@ namespace ThreeMatch.InGame.Data
                 if (!_instance)
                 {
                     ObjectPoolConfigData configData =
-                        AssetDatabase.LoadAssetAtPath<ObjectPoolConfigData>(
-                            "Assets/Game/03.Resources/Resources/Data/ObjectPoolConfigData.asset");
-                    Debug.Log(configData);
+                        AssetDatabase.LoadAssetAtPath<ObjectPoolConfigData>(Const.ObjectPoolConfigDataPath);
                     _instance = configData;
                 }
 

@@ -15,6 +15,7 @@ namespace ThreeMatch.InGame.Data
         public CellType CellType => _cellType;
         public GameObject Prefab => _prefab;
         public BlockType BlockType => _blockType;
+        public ObstacleCellType ObstacleCellType => _obstacleCellType;
             
         [PreviewField] [HorizontalGroup("Row", Width = 100)] [SerializeField]
         private GameObject _prefab;
@@ -22,12 +23,14 @@ namespace ThreeMatch.InGame.Data
         [SerializeField] private CellType _cellType;
         [SerializeField] private CellImageType _cellImageType;
         [SerializeField] private BlockType _blockType;
+        [SerializeField] private ObstacleCellType _obstacleCellType;
 
-        public BoardInfoData(GameObject prefab, CellType cellType, CellImageType cellImageType)
+        public BoardInfoData(GameObject prefab, CellType cellType, ObstacleCellType obstacleCellType, CellImageType cellImageType)
         {
             _prefab = prefab;
             _cellType = cellType;
             _cellImageType = cellImageType;
+            _obstacleCellType = obstacleCellType;
             _blockType = _cellType == CellType.None ? BlockType.None : BlockType.Normal;
         }
     }

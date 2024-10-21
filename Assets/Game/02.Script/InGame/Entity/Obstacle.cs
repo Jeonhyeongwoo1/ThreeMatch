@@ -1,3 +1,4 @@
+using System;
 using ThreeMatch.InGame.Interface;
 using UnityEngine;
 
@@ -20,53 +21,53 @@ namespace ThreeMatch.InGame.Entity
             }
         }
 
-        public override void Initialize(CellType cellType, Transform parent, Vector3 position, CellImageType cellImageType = CellImageType.None,
+        public override void Initialize(CellType cellType, Transform parent, Vector3 position,
+            ObstacleCellType obstacleCellType = ObstacleCellType.None, CellImageType cellImageType = CellImageType.None,
             CellMatchedType cellMatchedType = CellMatchedType.None)
         {
-            base.Initialize(cellType, parent, position, cellImageType, cellMatchedType);
+            base.Initialize(cellType, parent, position, obstacleCellType, cellImageType, cellMatchedType);
             
-            switch (cellType)
+            switch (obstacleCellType)
             {
-                case CellType.Obstacle_Cage:
+                case ObstacleCellType.Box:
+                    break;
+                case ObstacleCellType.IceBox:
+                    _backgroundSprite.sprite = _data.HitableBoxSpriteArray[Health.HP - 1];
+                    break;
+                case ObstacleCellType.Cage:
                     _backgroundSprite.sprite = _data.GetCellImageTypeSpriteData(cellImageType).normalSprite;
-                    break;
-                case CellType.Obstacle_IceBox:
-                    _backgroundSprite.sprite = _data.IceBoxSpriteArray[Health.HP - 1];
-                    break;
-                case CellType.Obstacle_Box:
                     break;
             }
         }
 
-        public bool Hit(CellType cellType)
+        public bool Hit(ObstacleCellType obstacleCellType)
         {
             if (Health.IsDead())
             {
                 return true;
             }
-            
+
             int hp = Health.TakeDamage(1);
             if (hp > 0)
             {
-                switch (cellType)
+                if (obstacleCellType == ObstacleCellType.IceBox)
                 {
-                    case CellType.Obstacle_IceBox:
-                        _backgroundSprite.sprite = _data.IceBoxSpriteArray[hp - 1];
-                        break;
+                    _backgroundSprite.sprite = _data.HitableBoxSpriteArray[hp - 1];
                 }
             }
             else
             {
-                switch (cellType)
+                switch (obstacleCellType)
                 {
-                    case CellType.Obstacle_IceBox:
+                    case ObstacleCellType.IceBox:
                         Activate(false);
                         break;
-                    case CellType.Obstacle_Cage:
+                    case ObstacleCellType.Cage:
                         _frontSprite.gameObject.SetActive(false);
                         break;
                 }
             }
+
             return Health.IsDead();
         }
     }

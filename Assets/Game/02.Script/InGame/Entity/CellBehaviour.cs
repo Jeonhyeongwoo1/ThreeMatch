@@ -16,7 +16,7 @@ namespace ThreeMatch.InGame.Entity
 
         [SerializeField] protected SpriteRenderer _backgroundSprite;
         [SerializeField] protected SpriteRenderer _frontSprite;
-        [SerializeField] protected CellConfigData _data;
+        [SerializeField] protected InGameResourcesConfigData _data;
 
         private Collider2D _collider2D;
 
@@ -36,7 +36,8 @@ namespace ThreeMatch.InGame.Entity
         }
 
         public virtual void Initialize(CellType cellType, Transform parent, Vector3 position,
-            CellImageType cellImageType = CellImageType.None, CellMatchedType cellMatchedType = CellMatchedType.None)
+            ObstacleCellType obstacleCellType = ObstacleCellType.None, CellImageType cellImageType = CellImageType.None,
+            CellMatchedType cellMatchedType = CellMatchedType.None)
         {
             switch (cellType)
             {
@@ -49,7 +50,7 @@ namespace ThreeMatch.InGame.Entity
             {
                 _collider2D = GetComponentInChildren<Collider2D>();
             }
-            
+
             transform.SetParent(parent);
             transform.position = position;
             Spawn();

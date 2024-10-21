@@ -8,6 +8,6 @@ namespace ThreeMatch.InGame.Interface
     public interface IHitable
     {
         public Health Health { get; }
-        bool Hit(CellType cellType);
+        bool Hit(ObstacleCellType obstacleCellType);
     }
 }

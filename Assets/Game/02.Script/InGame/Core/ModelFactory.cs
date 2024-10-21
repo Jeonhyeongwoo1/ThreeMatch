@@ -7,7 +7,7 @@ namespace ThreeMatch.InGame.Core
 {
     public static class ModelFactory
     {
-        private static Dictionary<Type, IModel> _modelDict = new();
+        private static readonly Dictionary<Type, IModel> _modelDict = new();
 
         public static T CreateOrGet<T>() where T : IModel, new()
         {

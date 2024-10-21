@@ -11,6 +11,7 @@ using ThreeMatch.InGame.Manager;
 using ThreeMatch.InGame.UI;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 using Stage = ThreeMatch.InGame.Entity.Stage;
@@ -23,7 +24,7 @@ namespace ThreeMatch.InGame.Editor
         private const string BoardContainerPrefabPath = "Assets/Game/04.Prefab/Board/BoardContainer.prefab";
         private const string CellPrefabPath = "Assets/Game/04.Prefab/Board/Cell.prefab";
         private const string BlockPrefabPath = "Assets/Game/04.Prefab/Board/Block.prefab";
-        private const string CellDataPath = "Assets/Game/03.Resources/Resources/Data/Cell Data.asset";
+        private const string CellDataPath = "Assets/Game/03.Resources/Resources/Data/CellDataForEditorConfigData.asset";
         private const string MissionResourceConfigDataPath = "Assets/Game/03.Resources/Resources/Data/MissionResourceConfigData.asset";
         private const string StageLevelConfigDataForEditorPath = "Assets/Game/03.Resources/Resources/StageLevelConfigDataForEditor.asset";
         private const string MissionElementPrefabPath = "Assets/Game/04.Prefab/UI/MissionElement.prefab";
@@ -88,7 +89,7 @@ namespace ThreeMatch.InGame.Editor
         private MissionResourceConfigData _missionResourceConfigData;
         private BoardInfoData _draggingBoardInfoData;
 
-        [SerializeField] private StageLevelConfigDataForEditor _stageLevelConfigDataForEditorPath;
+        [SerializeField] private StageLevelConfigDataForEditor _stageLevelConfigDataForEditor;
         
         public void OnBoardInfoValueChanged()
         {
@@ -126,7 +127,10 @@ namespace ThreeMatch.InGame.Editor
             {
                 Texture2D texture2D = AssetPreview.GetAssetPreview(value.Prefab);
                 // GUI.Label(rect, value.name); // Prefab 이름을 셀에 그리기
-                GUI.DrawTexture(rect, texture2D, ScaleMode.ScaleToFit);
+                if (texture2D != null)
+                {
+                    GUI.DrawTexture(rect, texture2D, ScaleMode.ScaleToFit);
+                }
             }
             else
             {
@@ -147,7 +151,8 @@ namespace ThreeMatch.InGame.Editor
             {
                 // boardInfoDataArray[_dragStartValue.x, _dragStartValue.y] = null;
                 BoardInfoData boardInfoData = new BoardInfoData(_draggingBoardInfoData.Prefab,
-                    _draggingBoardInfoData.CellType, _draggingBoardInfoData.CellImageType);
+                    _draggingBoardInfoData.CellType, _draggingBoardInfoData.ObstacleCellType,
+                    _draggingBoardInfoData.CellImageType);
                 boardInfoDataArray[x, y] = boardInfoData;
                 GUI.changed = true;
                 Event.current.Use();
@@ -158,7 +163,10 @@ namespace ThreeMatch.InGame.Editor
             if (value != null && value.Prefab != null)
             {
                 Texture2D texture2D = AssetPreview.GetAssetPreview(value.Prefab);
-                GUI.DrawTexture(rect, texture2D, ScaleMode.ScaleToFit);
+                if (texture2D != null)
+                {
+                    GUI.DrawTexture(rect, texture2D, ScaleMode.ScaleToFit);
+                }
             }
             else
             {
@@ -188,7 +196,8 @@ namespace ThreeMatch.InGame.Editor
         
         private BoardInfoData OnClickCellRemoveButton(int x, int y)
         {
-            boardInfoDataArray[x, y] = new BoardInfoData(null, CellType.None, CellImageType.None);
+            boardInfoDataArray[x, y] =
+                new BoardInfoData(null, CellType.None, ObstacleCellType.None, CellImageType.None);
             Debug.Log($"Removed BoardInfoData at position ({x}, {y})");
             // EditorUtility.SetDirty(this); // 에디터에 변경 사항 알림
             return boardInfoDataArray[x, y];
@@ -240,7 +249,7 @@ namespace ThreeMatch.InGame.Editor
             missionElementPrefab = AssetDatabase.LoadAssetAtPath<MissionElement>(MissionElementPrefabPath);
             
             _missionResourceConfigData = AssetDatabase.LoadAssetAtPath<MissionResourceConfigData>(MissionResourceConfigDataPath);
-            _stageLevelConfigDataForEditorPath =
+            _stageLevelConfigDataForEditor =
                 AssetDatabase.LoadAssetAtPath<StageLevelConfigDataForEditor>(StageLevelConfigDataForEditorPath);
             _missionPanel = GameObject.Find("MissionPanel");
 
@@ -273,7 +282,7 @@ namespace ThreeMatch.InGame.Editor
 
         private void InitializeBoardInfoDataArray()
         {
-            CellData cellData = AssetDatabase.LoadAssetAtPath<CellData>(CellDataPath);
+            CellDataForEditorConfigData cellDataForEditorConfigData = AssetDatabase.LoadAssetAtPath<CellDataForEditorConfigData>(CellDataPath);
             //매트릭스 기준
             boardInfoDataArray = new BoardInfoData[column, row];
 
@@ -281,7 +290,7 @@ namespace ThreeMatch.InGame.Editor
             {
                 for (int j = 0; j < row; j++)
                 {
-                    var cellList = cellData.CellInfoList;
+                    var cellList = cellDataForEditorConfigData.CellInfoList;
                     var cellInfoList = cellList.FindAll(v => v.cellType == CellType.Normal && (v.cellImageType == CellImageType.Yellow ||
                                                                          v.cellImageType == CellImageType.Green ||
                                                                          v.cellImageType == CellImageType.Blue ||
@@ -289,7 +298,8 @@ namespace ThreeMatch.InGame.Editor
                                                                          v.cellImageType == CellImageType.Red));
                     int random = Random.Range(0, cellInfoList.Count);
                     var cellInfo = cellInfoList[random];
-                    BoardInfoData data = new BoardInfoData(cellInfo.prefab, cellInfo.cellType, cellInfo.cellImageType);
+                    BoardInfoData data = new BoardInfoData(cellInfo.prefab, cellInfo.cellType,
+                        cellInfo.obstacleCellType, cellInfo.cellImageType);
                     boardInfoDataArray[j, i] = data;
                 }
             }
@@ -302,8 +312,8 @@ namespace ThreeMatch.InGame.Editor
 
         private void AddAvailableBoardAssetArray()
         {
-            CellData cellData = AssetDatabase.LoadAssetAtPath<CellData>(CellDataPath);
-            var cellInfoList = cellData.CellInfoList;
+            CellDataForEditorConfigData cellDataForEditorConfigData = AssetDatabase.LoadAssetAtPath<CellDataForEditorConfigData>(CellDataPath);
+            var cellInfoList = cellDataForEditorConfigData.CellInfoList;
 
             int count = cellInfoList.Count;
             int maxColumn = 7;
@@ -313,10 +323,11 @@ namespace ThreeMatch.InGame.Editor
 
             int rowIndex = 0;
             int columnIndex = 0;
-            for (int i = 0; i < cellInfoList.Count; i++)
+            for (int i = 0; i < count; i++)
             {
-                CellData.CellInfo info = cellInfoList[i];
-                BoardInfoData data = new BoardInfoData(info.prefab, info.cellType, info.cellImageType);
+                CellDataForEditorConfigData.CellInfo info = cellInfoList[i];
+                BoardInfoData data = new BoardInfoData(info.prefab, info.cellType, info.obstacleCellType,
+                    info.cellImageType);
                 availableBoardAssetArray[columnIndex, rowIndex] = data;
 
                 if (i != 0 && i % maxColumn == 0)
@@ -362,8 +373,8 @@ namespace ThreeMatch.InGame.Editor
                 Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.5f));
             _stage.CustomBuild(centerPosition, blockPrefab, cellPrefab, _boardContainer);
             _isShowBoardCellTypeMatrix = true;
-            _stageLevelConfigDataForEditorPath.boardInfoDataArray = boardInfoDataArray;
-            EditorUtility.SetDirty(_stageLevelConfigDataForEditorPath);
+            _stageLevelConfigDataForEditor.boardInfoDataArray = boardInfoDataArray;
+            EditorUtility.SetDirty(_stageLevelConfigDataForEditor);
         }
 
         [PropertyOrder(1)]
@@ -469,7 +480,7 @@ namespace ThreeMatch.InGame.Editor
             AssetDatabase.SaveAssets();
             EditorUtility.FocusProjectWindow();
             EditorUtility.SetDirty(stageLevel); // 에디터에 변경 사항 알림
-            EditorUtility.SetDirty(_stageLevelConfigDataForEditorPath);
+            EditorUtility.SetDirty(_stageLevelConfigDataForEditor);
         }
         
         [PropertyOrder(4)]
@@ -497,7 +508,7 @@ namespace ThreeMatch.InGame.Editor
             
             var stageLevel = CreateInstance<StageLevel>();
             stageLevel.Initialize(boardInfoDataArray, missionInfoDataList, remainingMoveCount);
-            _stageLevelConfigDataForEditorPath.Initialize(boardInfoDataArray,
+            _stageLevelConfigDataForEditor.Initialize(boardInfoDataArray,
                 missionInfoDataList, stageLevel.remainingMoveCount);
             int count = stageLevelList.Count;
             AssetDatabase.CreateAsset(stageLevel, $"{StageLevelPath}StageLevel_{count}.asset");
@@ -508,7 +519,7 @@ namespace ThreeMatch.InGame.Editor
             this.stageLevel = stageLevel;
            
             EditorUtility.SetDirty(stageLevel); // 에디터에 변경 사항 알림
-            EditorUtility.SetDirty(_stageLevelConfigDataForEditorPath);
+            EditorUtility.SetDirty(_stageLevelConfigDataForEditor);
         }
         
         [PropertyOrder(5)]
@@ -555,7 +566,7 @@ namespace ThreeMatch.InGame.Editor
                 for (int j = 0; j < column; j++)
                 {
                     BoardInfoData infoData = stageLevel.boardInfoDataArray[i, j];
-                    boardInfoDataArray[i, j] = new BoardInfoData(infoData.Prefab, infoData.CellType, infoData.CellImageType);
+                    boardInfoDataArray[i, j] = new BoardInfoData(infoData.Prefab, infoData.CellType, infoData.ObstacleCellType, infoData.CellImageType);
                 }
             }
 
@@ -570,9 +581,9 @@ namespace ThreeMatch.InGame.Editor
             }
 
             remainingMoveCount = stageLevel.remainingMoveCount;
-            _stageLevelConfigDataForEditorPath.remainingMoveCount = remainingMoveCount;
-            _stageLevelConfigDataForEditorPath.missionInfoDataList = missionInfoDataList;
-            EditorUtility.SetDirty(_stageLevelConfigDataForEditorPath);
+            _stageLevelConfigDataForEditor.remainingMoveCount = remainingMoveCount;
+            _stageLevelConfigDataForEditor.missionInfoDataList = missionInfoDataList;
+            EditorUtility.SetDirty(_stageLevelConfigDataForEditor);
             CreateCustomStage();                
         }
 
@@ -592,8 +603,8 @@ namespace ThreeMatch.InGame.Editor
 
         private void OnChangeRemainingMoveCountValue()
         {
-            _stageLevelConfigDataForEditorPath.remainingMoveCount = remainingMoveCount;
-            EditorUtility.SetDirty(_stageLevelConfigDataForEditorPath);
+            _stageLevelConfigDataForEditor.remainingMoveCount = remainingMoveCount;
+            EditorUtility.SetDirty(_stageLevelConfigDataForEditor);
         }
         
         [Serializable]
@@ -623,14 +634,14 @@ namespace ThreeMatch.InGame.Editor
             }
         }
         
-        private void AddOrRemoveMission()
+        private void OnMissionDataValueChanged()
         {
             DestroyMission();
             _missionDataList.Clear();
             _missionElementList.Clear();
             foreach (MissionInfoData missionData in missionInfoDataList)
             {
-                missionData.onChangeMissionInfoData += OnChangeMissionRemoveCountValue;
+                missionData.onChangeMissionInfoData = OnChangedMissionDataValue;
                 MissionType missionType = missionData.missionType;
                 int removeCount = missionData.removeCount;
 
@@ -647,24 +658,16 @@ namespace ThreeMatch.InGame.Editor
                 _missionDataList.Add(data);
             }
             
-            _stageLevelConfigDataForEditorPath.missionInfoDataList = missionInfoDataList;
-            EditorUtility.SetDirty(_stageLevelConfigDataForEditorPath);
-            // EditorUtility.SetDirty(stageLevel);
-        }
-        
-        private void OnMissionDataValueChanged()
-        {
-            AddOrRemoveMission();
+            _stageLevelConfigDataForEditor.missionInfoDataList = missionInfoDataList;
+            EditorUtility.SetDirty(_stageLevelConfigDataForEditor);
         }
 
-        private void OnChangeMissionRemoveCountValue(MissionInfoData missionInfoData)
+        private void OnChangedMissionDataValue(MissionInfoData missionInfoData)
         {
             MissionData missionData = _missionDataList.Find(v => v.missionInfoData == missionInfoData);
             missionData.missionElement.Initialize(missionInfoData.missionType, missionInfoData.removeCount);
-            
-            _stageLevelConfigDataForEditorPath.missionInfoDataList = missionInfoDataList;
-            EditorUtility.SetDirty(_stageLevelConfigDataForEditorPath);
-            // EditorUtility.SetDirty(stageLevel);
+            _stageLevelConfigDataForEditor.missionInfoDataList = missionInfoDataList;
+            EditorUtility.SetDirty(_stageLevelConfigDataForEditor);
         }
         
         private void AddStageLevelAssetData()

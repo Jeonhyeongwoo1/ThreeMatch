@@ -17,9 +17,10 @@ namespace ThreeMatch.InGame.Entity
         }
 
         public override void Initialize(CellType cellType, Transform parent, Vector3 position,
-            CellImageType cellImageType = CellImageType.None, CellMatchedType cellMatchedType = CellMatchedType.None)
+            ObstacleCellType obstacleCellType = ObstacleCellType.None, CellImageType cellImageType = CellImageType.None,
+            CellMatchedType cellMatchedType = CellMatchedType.None)
         {
-            base.Initialize(cellType, parent, position, cellImageType);
+            base.Initialize(cellType, parent, position, obstacleCellType, cellImageType, cellMatchedType);
             
             bool isVertical = cellMatchedType == CellMatchedType.Vertical_Four;
             transform.localEulerAngles = new Vector3(0, 0, isVertical ? 90 : 0);

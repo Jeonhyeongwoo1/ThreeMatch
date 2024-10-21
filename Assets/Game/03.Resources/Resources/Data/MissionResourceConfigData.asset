@@ -14,15 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _missionResourceDataList:
   - missionType: 1
-    sprite: {fileID: 21300000, guid: 45eb661104efa094fa5b93cc1282bc56, type: 3}
+    sprite: {fileID: 21300000, guid: 0f9770a23cda149a98876ec06ccb224c, type: 3}
   - missionType: 2
-    sprite: {fileID: 21300000, guid: 02abe709b5b1deb448b40b04dcac2a63, type: 3}
+    sprite: {fileID: 21300000, guid: 8604122af3f62472e95c261ef7b15478, type: 3}
   - missionType: 3
-    sprite: {fileID: 21300000, guid: 5d043f0c5a5696c40a1dd4046f33d855, type: 3}
+    sprite: {fileID: 21300000, guid: 0edf19301af4941ef8ab05726d03f78d, type: 3}
   - missionType: 4
-    sprite: {fileID: 21300000, guid: 756671a57f367c24aa03a70b26914723, type: 3}
+    sprite: {fileID: 21300000, guid: 184e1f54b83be4d56bd5262c7c2395ff, type: 3}
   - missionType: 5
-    sprite: {fileID: 21300000, guid: 325e233bfedc8524196bc8ccc393c5dd, type: 3}
+    sprite: {fileID: 21300000, guid: 0f9770a23cda149a98876ec06ccb224c, type: 3}
   - missionType: 6
     sprite: {fileID: 21300000, guid: 8caafde273f6ad540b1101ef1d1b623a, type: 3}
   - missionType: 7

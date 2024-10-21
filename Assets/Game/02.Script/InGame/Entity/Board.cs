@@ -29,8 +29,8 @@ namespace ThreeMatch.InGame
         
         private Cell[,] _cellArray;
         private Block[,] _blockArray;
-        private int _row;
-        private int _column;
+        private readonly int _row;
+        private readonly int _column;
         private BoardState _boardState = BoardState.None;
 
         private List<Cell> _neighborObstacleCellList = new(4);
@@ -39,10 +39,10 @@ namespace ThreeMatch.InGame
         
         private Transform _boardContainerTransform;
         private UniTaskCompletionSource _executeInGameItemTaskCompletionSource;
-        private Action<CellType, int, CellImageType> _onCheckMissionAction;
-        private Action _onEndDragAction;
+        private readonly Action<CellType, int, ObstacleCellType, CellImageType> _onCheckMissionAction;
+        private readonly Action _onEndDragAction;
 
-        public Board(BoardInfoData[,] boardInfoDataArray, Action<CellType, int, CellImageType> onCheckMissionAction, Action onEndDragAction)
+        public Board(BoardInfoData[,] boardInfoDataArray, Action<CellType, int, ObstacleCellType, CellImageType> onCheckMissionAction, Action onEndDragAction)
         {
             _row = boardInfoDataArray.GetLength(0);
             _column = boardInfoDataArray.GetLength(1);
@@ -310,9 +310,7 @@ namespace ThreeMatch.InGame
                 switch (cell.CellType)
                 {
                     case CellType.Generator:
-                    case CellType.Obstacle_IceBox:
-                    case CellType.Obstacle_Box:
-                    case CellType.Obstacle_Cage:
+                    case CellType.Obstacle:
                     case CellType.Normal:
                         RemoveCellProcess(cell.Row, cell.Column);
                         break;
@@ -351,9 +349,7 @@ namespace ThreeMatch.InGame
                     switch (cell.CellType)
                     {
                         case CellType.Generator:
-                        case CellType.Obstacle_IceBox:
-                        case CellType.Obstacle_Box: 
-                        case CellType.Obstacle_Cage:
+                        case CellType.Obstacle:
                         case CellType.Normal:
                             RemoveCellProcess(cell.Row, cell.Column);
                             break;
@@ -403,11 +399,11 @@ namespace ThreeMatch.InGame
 
         private bool RemoveCell(Cell cell)
         {
-            _onCheckMissionAction?.Invoke(cell.CellType, 1, cell.CellImageType);
+            _onCheckMissionAction?.Invoke(cell.CellType, 1, cell.ObstacleCellType, cell.CellImageType);
             bool isSuccess = cell.TryRemoveCell();
             if (isSuccess)
             {
-                if (cell.CellType == CellType.Obstacle_Cage)
+                if (cell.CellType == CellType.Obstacle)
                 {
                     //케이지는 부서지면 일반 셀로 변경
                     cell.ChangeCellType(CellType.Normal);
@@ -477,8 +473,7 @@ namespace ThreeMatch.InGame
 
         private bool IsObstacleOrGeneratorCellType(CellType cellType)
         {
-            return cellType == CellType.Obstacle_Box || cellType == CellType.Obstacle_Cage ||
-                   cellType == CellType.Obstacle_IceBox || cellType == CellType.Generator;
+            return cellType == CellType.Obstacle || cellType == CellType.Generator;
         }
 
         private async UniTask<bool> TryActivateCellProperty(Cell activateCell)
@@ -490,9 +485,7 @@ namespace ThreeMatch.InGame
             switch (activateCell.CellType)
             {
                 case CellType.Generator:
-                case CellType.Obstacle_IceBox:
-                case CellType.Obstacle_Box: 
-                case CellType.Obstacle_Cage:
+                case CellType.Obstacle:
                 case CellType.None:
                 case CellType.Normal:
                 default:
@@ -792,9 +785,7 @@ namespace ThreeMatch.InGame
                     switch(cell.CellType)
                     {
                         case CellType.Generator:
-                        case CellType.Obstacle_IceBox:
-                        case CellType.Obstacle_Box: 
-                        case CellType.Obstacle_Cage:
+                        case CellType.Obstacle:
                         case CellType.Normal:
                             RemoveCellProcess(cell.Row, cell.Column);
                             break;
@@ -1015,7 +1006,8 @@ namespace ThreeMatch.InGame
                     int length = Enum.GetNames(typeof(CellImageType)).Length - 1;
                     int select = Random.Range(0, length);
                     Vector3 spawnPosition = _blockArray[k - 1, targetColumn].Position + new Vector3(0, 2.5f, 0);
-                    Cell newCell = CreateCell(row, column, CellType.Normal, (CellImageType) select);
+                    Cell newCell = CreateCell(row, column, CellType.Normal, ObstacleCellType.None,
+                        (CellImageType)select);
                     newCell.CreateCellBehaviour(spawnPosition, _boardContainerTransform);
                     newCell.CellBehaviour.UpdatePosition(spawnPosition);
                     cell = newCell;
@@ -1194,21 +1186,15 @@ namespace ThreeMatch.InGame
                         continue;
                     }
 
-                    _cellArray[i, j] = CreateCell(i, j, boardInfoData.CellType, boardInfoData.CellImageType);
+                    _cellArray[i, j] = CreateCell(i, j, boardInfoData.CellType, boardInfoData.ObstacleCellType,
+                        boardInfoData.CellImageType);
                 }
             }
         }
 
-        private Cell CreateCell(int row, int column, CellType cellType, CellImageType cellImageType)
+        private Cell CreateCell(int row, int column, CellType cellType, ObstacleCellType obstacleCellType, CellImageType cellImageType)
         {
-            if (cellType == CellType.Obstacle_Cage)
-            {
-                int length = Enum.GetNames(typeof(CellImageType)).Length - 1;
-                int select = Random.Range(0, length);
-                cellImageType = (CellImageType)select;
-            }
-            
-            Cell cell = new Cell(row, column, cellType, cellImageType);
+            Cell cell = new Cell(row, column, cellType, obstacleCellType, cellImageType);
             return cell;
         }
 
