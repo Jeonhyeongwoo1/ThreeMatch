@@ -9,15 +9,16 @@ namespace ThreeMatch.InGame.Interface
     {
         PoolKeyType PoolKeyType { get; set; }
         T Get<T>() where T : MonoBehaviour;
-        public void Enqueue()
+        
+        public void Sleep()
         {
             var mono = Get<MonoBehaviour>();
             if (mono.gameObject.activeSelf)
             {
                 mono.gameObject.SetActive(false);
             }
-            
-            ObjectPoolManager.Instance.Enqueue(this);
+
+            ObjectPoolManager.Instance.Sleep(this);
         }
 
         public void Spawn(Transform spawner);

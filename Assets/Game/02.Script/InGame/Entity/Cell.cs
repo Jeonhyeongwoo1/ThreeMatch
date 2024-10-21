@@ -1,10 +1,13 @@
-using Unity.VisualScripting;
+using System;
+using ThreeMatch.InGame.Data;
+using ThreeMatch.InGame.Interface;
+using ThreeMatch.InGame.Manager;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace ThreeMatch.InGame.Entity
 {
-    public class Cell
+    public class Cell : IDisposable
     {
         public Vector2 Size => _cellBehaviour.Size;
         public Vector2 Position => _cellBehaviour.transform.position;
@@ -30,21 +33,47 @@ namespace ThreeMatch.InGame.Entity
             _cellImageType = cellImageType;
             _cellMatchedType = CellMatchedType.None;
         }
-
-        public void CreateCellBehaviour(GameObject prefab, Transform parent = null)
+        
+        public void CreateCellBehaviour(Vector3 position, Transform parent = null)
         {
-            var obj = Object.Instantiate(prefab, parent);
-            obj.name = $"Cell {_row} / {_column}";
-            _cellBehaviour = obj.GetOrAddComponent<CellBehaviour>();
-            _cellBehaviour.Initialize(_cellType, _cellImageType);
+            IPoolable pool = null;
+            PoolKeyType poolKeyType = PoolKeyType.None;
+            switch (_cellType)
+            {
+                case CellType.Normal:
+                    poolKeyType = PoolKeyType.Cell;
+                    break;
+                case CellType.Obstacle_Box:
+                    poolKeyType = PoolKeyType.Obstacle_Box;
+                    break;
+                case CellType.Obstacle_IceBox:
+                    poolKeyType = PoolKeyType.Obstacle_IceBox;
+                    break;
+                case CellType.Obstacle_Cage:
+                    poolKeyType = PoolKeyType.Obstacle_Cage;
+                    break;
+                case CellType.Generator:
+                    poolKeyType = PoolKeyType.Generator;
+                    break;
+            }
+            
+#if UNITY_EDITOR
+            var data =
+                ObjectPoolConfigData.Instance.ObjectPoolDataList.Find(v => v.poolKeyType == poolKeyType);
+            var obj = Object.Instantiate(data.prefab);
+            pool = obj.GetComponent<IPoolable>();
+#else
+            pool = ObjectPoolManager.Instance.GetPool(PoolKeyType.Cell);
+#endif
+            _cellBehaviour = pool.Get<CellBehaviour>();
+            _cellBehaviour.name = $"{poolKeyType} {_row} / {_column}";
+            _cellBehaviour.Initialize(_cellType, parent, position, _cellImageType);
         }
 
         public void Swap(Vector3 position, int row, int column)
         {
-            // Debug.Log($"Swap {_cellBehaviour.name} . {position} / {row} / {column}");
             _row = row;
             _column = column;
-            CellBehaviour.name = $"Cell {_row} / {_column}";
             _cellBehaviour.Swap(position);
         }
 
@@ -60,12 +89,42 @@ namespace ThreeMatch.InGame.Entity
             return cellImageType == _cellImageType;
         }
 
-        public void SetCellTypeFromMatch(CellMatchedType cellMatchedType)
+        public void SetCellTypeFromMatch(CellMatchedType cellMatchedType, Transform parent = null)
         {
-            // _cellImageType = CellImageType.None;
             _cellType = GetCellTypeByMatchedType(cellMatchedType);
             _cellMatchedType = cellMatchedType;
-            _cellBehaviour.ChangeCellSprite(_cellType, _cellMatchedType, _cellImageType);
+            Vector3 position;
+            
+            switch (_cellType)
+            {
+                case CellType.Rocket:
+                    _cellBehaviour.Activate(false);
+                    position = Position;
+                    var rocket = ObjectPoolManager.Instance.GetPool(PoolKeyType.Rocket);
+                    _cellBehaviour = rocket.Get<CellBehaviour>();
+                    _cellBehaviour.Initialize(_cellType, parent, position, _cellImageType, _cellMatchedType);
+                    break;
+                case CellType.Wand:
+                    _cellBehaviour.Activate(false);
+                    position = Position;
+                    var wand = ObjectPoolManager.Instance.GetPool(PoolKeyType.Wand);
+                    _cellBehaviour = wand.Get<CellBehaviour>();
+                    _cellBehaviour.Initialize(_cellType, parent, position, _cellImageType);
+                    break;
+                case CellType.Bomb:
+                    _cellBehaviour.Activate(false);
+                    position = Position;
+                    var bomb = ObjectPoolManager.Instance.GetPool(PoolKeyType.Bomb);
+                    _cellBehaviour = bomb.Get<CellBehaviour>();
+                    _cellBehaviour.Initialize(_cellType, parent, position, _cellImageType);
+                    break;
+                case CellType.Normal:
+                case CellType.Obstacle_Box:
+                case CellType.Obstacle_IceBox:
+                case CellType.Obstacle_Cage:
+                case CellType.Generator:
+                    break;
+            }
         }
 
         private CellType GetCellTypeByMatchedType(CellMatchedType cellMatchedType)
@@ -99,23 +158,26 @@ namespace ThreeMatch.InGame.Entity
                 case CellType.Wand:
                     return true;
                 case CellType.Rocket:
-                    _cellBehaviour.ShowRocketEffect(_cellMatchedType);
-                    _cellBehaviour.Disappear(_cellImageType);
+                    var rocket = _cellBehaviour as RocketBehaviour;
+                    rocket.ShowRocketEffect(_cellMatchedType);
+                    rocket.Disappear(_cellImageType);
                     return true;
                 case CellType.Normal:
                 case CellType.Obstacle_Box:
                     _cellBehaviour.Disappear(_cellImageType);
                     return true;
                 case CellType.Bomb:
-                    _cellBehaviour.ShowBombEffect();
-                    _cellBehaviour.Disappear(_cellImageType);
+                    var bomb = _cellBehaviour as BombBehaviour;
+                    bomb.ShowBombEffect();
+                    bomb.Disappear(_cellImageType);
                     return true;
                 case CellType.Obstacle_Cage:
                 case CellType.Obstacle_IceBox:
-                    bool isCracked = _cellBehaviour.Hit(_cellType);
-                    return isCracked;
+                    var obstacle = _cellBehaviour as Obstacle;
+                    return obstacle.Hit(_cellType);
                 case CellType.Generator:
-                    _cellBehaviour.HitGenerator();
+                    var generator = _cellBehaviour as Generator;
+                    generator.CreateStarObject();
                     return false;
                 default:
                 case CellType.None:
@@ -124,6 +186,10 @@ namespace ThreeMatch.InGame.Entity
             }
             
             return false;
+        }
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
         }
     }
 }

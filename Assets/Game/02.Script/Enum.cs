@@ -19,6 +19,14 @@ namespace ThreeMatch
         Generator
     }
 
+    public enum ObstacleCellType
+    {
+        None,
+        Box,
+        IceBox,
+        Cage
+    }
+
     public enum MissionType
     {
         None,
@@ -90,11 +98,21 @@ namespace ThreeMatch
 
     public enum PoolKeyType
     {
+        None = -1,
         CellDisappearParticle,
         CellDisappearLightEffect,
         WandLightEffect,
         RocketEffect,
         BombEffect,
+        Cell,
+        Bomb,
+        Rocket,
+        Wand,
+        Obstacle_IceBox,
+        Obstacle_Cage,
+        Obstacle_Box,
+        Generator,
+        StarObject,
     }
 
     public enum GameState

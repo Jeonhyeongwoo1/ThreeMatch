@@ -38,7 +38,7 @@ namespace ThreeMatch.InGame.Entity
             _elapsed += Time.deltaTime;
             if (_elapsed > _lifeTime)
             {
-                ((IPoolable)this).Enqueue();
+                ((IPoolable)this).Sleep();
             }
         }
 

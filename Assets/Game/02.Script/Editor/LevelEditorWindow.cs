@@ -23,8 +23,8 @@ namespace ThreeMatch.InGame.Editor
         private const string BoardContainerPrefabPath = "Assets/Game/04.Prefab/Board/BoardContainer.prefab";
         private const string CellPrefabPath = "Assets/Game/04.Prefab/Board/Cell.prefab";
         private const string BlockPrefabPath = "Assets/Game/04.Prefab/Board/Block.prefab";
-        private const string CellDataPath = "Assets/Game/03.Resources/Data/Cell Data.asset";
-        private const string MissionResourceConfigDataPath = "Assets/Game/03.Resources/Data/MissionResourceConfigData.asset";
+        private const string CellDataPath = "Assets/Game/03.Resources/Resources/Data/Cell Data.asset";
+        private const string MissionResourceConfigDataPath = "Assets/Game/03.Resources/Resources/Data/MissionResourceConfigData.asset";
         private const string StageLevelConfigDataForEditorPath = "Assets/Game/03.Resources/Resources/StageLevelConfigDataForEditor.asset";
         private const string MissionElementPrefabPath = "Assets/Game/04.Prefab/UI/MissionElement.prefab";
         private const string StageLevelListPath = "Assets/Game/03.Resources/Resources/StageLevel";
@@ -244,11 +244,7 @@ namespace ThreeMatch.InGame.Editor
                 AssetDatabase.LoadAssetAtPath<StageLevelConfigDataForEditor>(StageLevelConfigDataForEditorPath);
             _missionPanel = GameObject.Find("MissionPanel");
 
-            if (stageLevelList.Count > 0)
-            {
-                stageLevelList.Clear();
-            }
-            
+            stageLevelList = new List<StageLevel>();
             var guids = AssetDatabase.FindAssets("", new[] { StageLevelListPath });
             foreach (string guid in guids)
             {

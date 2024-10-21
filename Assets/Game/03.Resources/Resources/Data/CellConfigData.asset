@@ -39,11 +39,11 @@ MonoBehaviour:
     horizontalSprite: {fileID: 21300000, guid: 8bff9453e483b4a6ea2bc4713ce58542, type: 3}
   _bombSprite: {fileID: 21300000, guid: 193adf08b4b954b25bf2a5132abb256e, type: 3}
   _wandSprite: {fileID: 21300000, guid: 01954c4ea2b65488091af7570dad18f0, type: 3}
-  _boxSprite: {fileID: 21300000, guid: 29d30d2a560750e439e143c47670bc76, type: 3}
+  _boxSprite: {fileID: 21300000, guid: 1232f9fd124c9448c99813f3ade688bf, type: 3}
   _iceBoxSpriteArray:
-  - {fileID: 21300000, guid: 18115346a3c21430aab838866ce5700b, type: 3}
-  - {fileID: 21300000, guid: ad12136f23e7f44408218cd573923406, type: 3}
-  - {fileID: 21300000, guid: 4bc49e56df9af4384b291993b3dba78d, type: 3}
+  - {fileID: 21300000, guid: b8cc82eb87b3d4696b8d1c904048a751, type: 3}
+  - {fileID: 21300000, guid: 37ae4fde7591847e4a078c72e64c27c5, type: 3}
+  - {fileID: 21300000, guid: 0687c131a807044db9027e03ac01e977, type: 3}
   _cageSprite: {fileID: 21300000, guid: faed6bf7fb1044a6aaee6aa60652bd5b, type: 3}
   _generatorSprite: {fileID: 21300000, guid: 8b4b95ef9fb30f54b96b9a23d73dfe96, type: 3}
   _starPrefab: {fileID: 3806657837486690068, guid: 87b267dbad91e4f69838e53295fee538,

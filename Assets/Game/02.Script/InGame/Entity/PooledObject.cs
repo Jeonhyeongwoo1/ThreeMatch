@@ -27,7 +27,7 @@ namespace ThreeMatch.InGame.Entity
                 _elapsed += Time.deltaTime;
                 if (_elapsed > _lifeCycle)
                 {
-                    ((IPoolable)this).Enqueue();
+                    ((IPoolable)this).Sleep();
                 }
             }
         }
@@ -39,9 +39,13 @@ namespace ThreeMatch.InGame.Entity
 
         public void Spawn(Transform spawner)
         {
-            Debug.Log("Spawn");
             transform.position = spawner.position;
             gameObject.SetActive(true);
+        }
+
+        public void ForceSleep()
+        {
+            ((IPoolable)this).Sleep();
         }
     }
 }
