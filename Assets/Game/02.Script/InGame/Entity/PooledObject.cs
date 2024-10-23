@@ -37,7 +37,7 @@ namespace ThreeMatch.InGame.Entity
             return this as T;
         }
 
-        public void Spawn(Transform spawner)
+        public void Spawn(Transform spawner, Action callback = null)
         {
             transform.position = spawner.position;
             gameObject.SetActive(true);

@@ -10,6 +10,8 @@ namespace ThreeMatch.InGame.Data
     {
         public int poolCount;
         public PoolKeyType poolKeyType;
+        public SceneType sceneType;
+        public bool isInit = true;
         public string parentName;
         public GameObject prefab;
     }

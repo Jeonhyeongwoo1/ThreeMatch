@@ -78,7 +78,7 @@ namespace ThreeMatch.InGame.Manager
             UIManager uiManager = UIManager.Instance;
 
             var inGameItemPresenter = PresenterFactory.CreateOrGet<InGameItemPresenter>();
-            inGameItemPresenter.Initialize(uiManager.CreateOrGetView<InGameItemView>());
+            inGameItemPresenter.Initialize(uiManager.GetView<InGameItemView>());
         }
 
         public void UpdateUserInGameItem()
@@ -99,7 +99,7 @@ namespace ThreeMatch.InGame.Manager
             
             UpdateState(GameState.End);
             var gameFailPresenter = PresenterFactory.CreateOrGet<GameFailPresenter>();
-            var gameFailedView = UIManager.Instance.CreateOrGetView<GameFailedView>();
+            var gameFailedView = UIManager.Instance.GetView<GameFailedView>();
             gameFailPresenter.Initialize(gameFailedView, ModelFactory.CreateOrGet<MissionModel>());
             await gameFailPresenter.GameFailProcess();
         }
@@ -113,7 +113,7 @@ namespace ThreeMatch.InGame.Manager
             
             UpdateState(GameState.End);
             var gameWinPresenter = PresenterFactory.CreateOrGet<GameWinPresenter>();
-            var gameWinView = UIManager.Instance.CreateOrGetView<GameWinView>();
+            var gameWinView = UIManager.Instance.GetView<GameWinView>();
             var missionModel = ModelFactory.CreateOrGet<MissionModel>();
             gameWinPresenter.Initialize(gameWinView, missionModel);
 

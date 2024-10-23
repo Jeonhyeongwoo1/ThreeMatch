@@ -65,15 +65,17 @@ namespace ThreeMatch.InGame.Entity
                 _ => poolKeyType
             };
 
-#if UNITY_EDITOR
-            // Debug.Log($"{poolKeyType} /{_obstacleCellType}");
-            var data =
-                ObjectPoolConfigData.Instance.ObjectPoolDataList.Find(v => v.poolKeyType == poolKeyType);
-            var obj = Object.Instantiate(data.prefab);
-            pool = obj.GetComponent<IPoolable>();
-#else
-            pool = ObjectPoolManager.Instance.GetPool(PoolKeyType.Cell);
-#endif
+            if (Application.isPlaying)
+            {
+                pool = ObjectPoolManager.Instance.GetPool(poolKeyType);
+            }
+            else
+            {
+                var data =
+                    ObjectPoolConfigData.Instance.ObjectPoolDataList.Find(v => v.poolKeyType == poolKeyType);
+                var obj = Object.Instantiate(data.prefab);
+                pool = obj.GetComponent<IPoolable>();
+            }
             _cellBehaviour = pool.Get<CellBehaviour>();
             _cellBehaviour.name = $"{poolKeyType} {_row} / {_column}";
             _cellBehaviour.Initialize(_cellType, parent, position, _obstacleCellType, _cellImageType);

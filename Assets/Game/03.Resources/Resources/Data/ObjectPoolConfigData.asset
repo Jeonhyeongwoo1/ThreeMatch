@@ -15,65 +15,100 @@ MonoBehaviour:
   _objectPoolDataList:
   - poolCount: 10
     poolKeyType: 0
+    sceneType: 3
+    isInit: 1
     parentName: Effect
     prefab: {fileID: 1987957617991102, guid: 5de682c6be87d4881b08bb93f5525b08, type: 3}
   - poolCount: 10
     poolKeyType: 1
+    sceneType: 3
+    isInit: 1
     parentName: Effect
     prefab: {fileID: 189874, guid: 0ae13898dfaca49a398530c7902bcf16, type: 3}
   - poolCount: 10
     poolKeyType: 2
+    sceneType: 3
+    isInit: 1
     parentName: Effect
     prefab: {fileID: 1281900193509586, guid: ad9338a87f6c542bfa233a98d5ae0568, type: 3}
   - poolCount: 5
     poolKeyType: 3
+    sceneType: 3
+    isInit: 1
     parentName: Effect
     prefab: {fileID: 100804, guid: 57b3673ad90e447229d098d12f1b2fb3, type: 3}
   - poolCount: 2
     poolKeyType: 4
+    sceneType: 3
+    isInit: 1
     parentName: Effect
     prefab: {fileID: 1362835522396494, guid: feca79ab20ac647adbff2cdeb2e23414, type: 3}
   - poolCount: 50
     poolKeyType: 5
+    sceneType: 3
+    isInit: 1
     parentName: Cell
     prefab: {fileID: 3209690187076415183, guid: 752d8055501ab4d278f5708429777c3f,
       type: 3}
   - poolCount: 5
     poolKeyType: 6
+    sceneType: 3
+    isInit: 1
     parentName: Cell
     prefab: {fileID: 1624151227741853138, guid: 8fb9ad386960544daafdd3636bc4546b,
       type: 3}
   - poolCount: 5
     poolKeyType: 7
+    sceneType: 3
+    isInit: 1
     parentName: Cell
     prefab: {fileID: 3640192097045036810, guid: 72af74e1e7ce545d5aaa2b6286147a3a,
       type: 3}
   - poolCount: 5
     poolKeyType: 8
+    sceneType: 3
+    isInit: 1
     parentName: Cell
     prefab: {fileID: 5904761518105837272, guid: 2d28ebd3e6ef14dea9d9468770e1433c,
       type: 3}
   - poolCount: 1
     poolKeyType: 9
+    sceneType: 3
+    isInit: 1
     parentName: Cell
     prefab: {fileID: 3790604537146919893, guid: 0dc1f32f0591441f4a5ee5448f1d53b3,
       type: 3}
   - poolCount: 1
     poolKeyType: 10
+    sceneType: 3
+    isInit: 1
     parentName: Cell
     prefab: {fileID: 3286703807666384582, guid: 1fad7d9dc4fa94be9aa9c69a023406a5,
       type: 3}
   - poolCount: 1
     poolKeyType: 11
+    sceneType: 3
+    isInit: 1
     parentName: Cell
     prefab: {fileID: 758782727074448930, guid: aa87c867de53a4ce6af22b7217396294, type: 3}
   - poolCount: 1
     poolKeyType: 12
+    sceneType: 3
+    isInit: 1
     parentName: Cell
     prefab: {fileID: 3209690187076415183, guid: 68a9f11d3f1cb4b68806bec7a198b1c2,
       type: 3}
   - poolCount: 5
     poolKeyType: 13
+    sceneType: 3
+    isInit: 1
     parentName: Star
     prefab: {fileID: 3806657837486690068, guid: 87b267dbad91e4f69838e53295fee538,
+      type: 3}
+  - poolCount: 10
+    poolKeyType: 14
+    sceneType: 2
+    isInit: 1
+    parentName: UI
+    prefab: {fileID: 3464840296838899836, guid: e9516572427c64cf5bba48a858f87ea3,
       type: 3}

@@ -525,9 +525,7 @@ namespace ThreeMatch.InGame
         private async UniTask<bool> TrySwap(Cell cellA, Cell cellB)
         {
             UpdateBoardState(BoardState.Swapping);
-            Swap(cellA, cellB);
-            
-            await UniTask.WaitForSeconds(Const.SwapAnimationDuration);
+            await Swap(cellA, cellB);
             
             //두 개가 일반형인 경우
             if (cellA.CellType == CellType.Normal && cellB.CellType == CellType.Normal)
@@ -543,8 +541,7 @@ namespace ThreeMatch.InGame
                     return true;
                 }
 
-                Swap(cellA, cellB);
-                await UniTask.WaitForSeconds(Const.SwapAnimationDuration);
+                await Swap(cellA, cellB);
                 return false;
             }
 
@@ -570,8 +567,7 @@ namespace ThreeMatch.InGame
             }
 
             Debug.LogWarning($"Swap error cellA {cellA.CellType} / CellB {cellB.CellType}");
-            Swap(cellA, cellB);
-            await UniTask.WaitForSeconds(Const.SwapAnimationDuration);
+            // await Swap(cellA, cellB);
             return false;
         }
 
@@ -800,7 +796,7 @@ namespace ThreeMatch.InGame
             }
         }
 
-        private void Swap(Cell cellA, Cell cellB)
+        private async UniTask Swap(Cell cellA, Cell cellB)
         {
             int cellARow = cellA.Row;
             int cellAColumn = cellA.Column;
@@ -815,6 +811,7 @@ namespace ThreeMatch.InGame
          
             cellA.Swap(cellBPosition, cellBRow, cellBColumn);
             cellB.Swap(cellAPosition, cellARow, cellAColumn);
+            await UniTask.WaitForSeconds(Const.SwapAnimationDuration);
         }
         
         private MatchedSameImageCellInfo? GetMatchedSameImageCellInfo(Cell cell)
