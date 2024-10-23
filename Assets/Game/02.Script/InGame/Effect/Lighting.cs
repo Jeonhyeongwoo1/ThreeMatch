@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using ThreeMatch.InGame.Interface;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace ThreeMatch.InGame.Effect
 {
@@ -27,7 +29,7 @@ namespace ThreeMatch.InGame.Effect
             _pos2 = to;
         }
 
-        public void Spawn(Transform spawner)
+        public void Spawn(Transform spawner, Action callback = null)
         {
             transform.position = Vector3.zero;
             gameObject.SetActive(true);

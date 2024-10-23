@@ -1,3 +1,4 @@
+using System;
 using ThreeMatch.InGame.Data;
 using ThreeMatch.InGame.Interface;
 using UnityEngine;
@@ -47,7 +48,7 @@ namespace ThreeMatch.InGame.Entity
             _elapsed = 0;
         }
 
-        public void Spawn(Transform spawner)
+        public void Spawn(Transform spawner, Action callback = null)
         {
             transform.position = spawner.position;
             gameObject.SetActive(true);

@@ -12,7 +12,7 @@
 
 using UnityEngine;
 
-namespace SweetSugar.Scripts.MapScripts
+namespace ThreeMatch.Utils
 {
     public class SplineCurve
     {

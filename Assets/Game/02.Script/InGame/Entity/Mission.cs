@@ -27,7 +27,7 @@ namespace ThreeMatch.InGame.Entity
              }
 
              _missionModel.missionDataList = new ReactiveProperty<List<MissionInfoData>>(missionInfoDatas);
-             _missionView = UIManager.Instance.CreateOrGetView<MissionView>();
+             _missionView = UIManager.Instance.GetView<MissionView>();
 
              var missionViewDataList = missionDataList.Select(missionData => new MissionView.Data
                  { missionType = missionData.missionType, count = missionData.removeCount }).ToList();

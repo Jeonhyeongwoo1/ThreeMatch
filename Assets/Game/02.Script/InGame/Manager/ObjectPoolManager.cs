@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using ThreeMatch.InGame.Data;
 using ThreeMatch.InGame.Interface;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
 namespace ThreeMatch.InGame.Manager
@@ -53,8 +55,15 @@ namespace ThreeMatch.InGame.Manager
             Transform parent = poolParentList.Find(v => v.name == parentName);
             int count = itemData.poolCount;
             PoolKeyType poolKeyType = itemData.poolKeyType;
+            string itemType = itemData.sceneType.ToString();
+            Scene scene = SceneManager.GetActiveScene();
             for (int i = 0; i < count; i++)
             {
+                if (!itemData.isInit || String.Compare(itemType, scene.name, StringComparison.Ordinal) != 0)
+                {
+                    break;
+                }
+
                 GameObject obj = Instantiate(prefab, parent);
                 obj.name = prefab.name;
                     
@@ -78,6 +87,7 @@ namespace ThreeMatch.InGame.Manager
                 if (!_poolDict.TryAdd(poolKeyType, list))
                 {
                     Debug.LogError("failed pool dict : " + poolKeyType);
+                    break;
                 }
             }
         }
@@ -104,7 +114,7 @@ namespace ThreeMatch.InGame.Manager
         {
             lock (_lock)
             {
-                _poolDict[poolable.PoolKeyType].TryDequeue(out poolable);
+                // _poolDict[poolable.PoolKeyType].Enqueue(poolable);
             }
         }
 
@@ -144,7 +154,7 @@ namespace ThreeMatch.InGame.Manager
                     return null;
                 }
                 
-                queue.TryDequeue(out poolable);
+                _poolDict[poolKeyType].TryDequeue(out poolable);
                 if (poolable != null)
                 {
                     return poolable;

@@ -25,7 +25,7 @@ namespace ThreeMatch.InGame.Manager
         
         private Dictionary<Type, IView> _viewDict = new();
 
-        public T CreateOrGetView<T>() where T : IView, new ()
+        public T GetView<T>() where T : IView, new ()
         {
             if (_viewDict.TryGetValue(typeof(T), out var view))
             {

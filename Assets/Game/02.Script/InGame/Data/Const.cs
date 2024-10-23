@@ -17,4 +17,9 @@ public static class Const
     
     public static string InGameResourcesConfigData =
         "Assets/Game/03.Resources/Resources/Data/InGameResourcesConfigData.asset";
+
+    public static int MaxStageLevelCount = 100;
+    public static int MaxUserHeartCount = 5;
+    public static int HeartChargeMinute = 1;
+    public static int HeartPurchaseCost = 250;
 }

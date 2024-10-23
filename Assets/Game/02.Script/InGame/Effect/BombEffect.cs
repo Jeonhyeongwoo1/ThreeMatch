@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -17,7 +18,7 @@ namespace ThreeMatch.InGame.Effect
             return this as T;
         }
 
-        public void Spawn(Transform spawner)
+        public void Spawn(Transform spawner, Action callback = null)
         {
             transform.position = spawner.position;
             gameObject.SetActive(true);

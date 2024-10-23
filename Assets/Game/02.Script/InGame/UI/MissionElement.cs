@@ -21,10 +21,10 @@ namespace ThreeMatch.InGame.UI
         public void Initialize(MissionType missionType, int count)
         {
             bool isClear = count == 0;
+            _missionType = missionType;
             var sprite = GetMissionSprite();
             Debug.Log($"mission : {missionType} / sprite {sprite}");
             _missionIconImage.sprite = sprite;
-            _missionType = missionType;
             
             if (missionType == MissionType.RemoveStarGeneratorCell)
             {

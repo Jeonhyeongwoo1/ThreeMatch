@@ -117,6 +117,7 @@ namespace ThreeMatch
         Cell_Obstacle_OneHitBox,
         Cell_Generator,
         StarObject,
+        StageLevelText
     }
 
     public enum GameState
@@ -125,5 +126,13 @@ namespace ThreeMatch
         Ready,
         Start,
         End
+    }
+
+    public enum SceneType
+    {
+        None,
+        Title,
+        StageLevel,
+        InGame
     }
 }

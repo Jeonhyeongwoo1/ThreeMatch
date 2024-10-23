@@ -51,7 +51,7 @@ namespace ThreeMatch.InGame.Manager
             await stage.BuildAsync(centerPosition, _blockPrefab, _cellPrefab, _boardContainer.transform);
 
             _gameReadyCompletionSource = new();
-            var gameReadyView = UIManager.Instance.CreateOrGetView<GameReadyView>();
+            var gameReadyView = UIManager.Instance.GetView<GameReadyView>();
             var missionModel = ModelFactory.CreateOrGet<MissionModel>();
             var missionViewDataList = missionModel.missionDataList.Value.Select(missionData => new MissionView.Data
                 { missionType = missionData.missionType, count = missionData.removeCount }).ToList();
