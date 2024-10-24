@@ -621,6 +621,11 @@ namespace ThreeMatch.InGame.Editor
 
         private void DestroyMission()
         {
+            if (!_missionPanel)
+            {
+                _missionPanel = GameObject.Find("MissionPanel");
+            }
+            
             MissionElement[] childs = _missionPanel.GetComponentsInChildren<MissionElement>();
             for (int i = 0; i < childs.Length; i++)
             {

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using FastFoodRush.Utils;
 using Sirenix.OdinInspector;
 using ThreeMatch.InGame.Core;
 using ThreeMatch.InGame.Manager;
@@ -9,6 +11,7 @@ using ThreeMatch.OutGame.Presenter;
 using ThreeMatch.OutGame.View;
 using UniRx;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace ThreeMatch.OutGame.Manager
 {
@@ -17,6 +20,7 @@ namespace ThreeMatch.OutGame.Manager
         [SerializeField] private StageLevelListView _stageLevelListView;
         [SerializeField] private WaypointsMover _waypointsMover;
         [SerializeField] private GameObject _idleParticleObj;
+        [SerializeField] private ScreenFader _screenFader;
         
         [SerializeField] private List<StageLevelModel> _dummyStageLevelModelList;
         [SerializeField] private int _dummyCurrentIndex;
@@ -26,6 +30,7 @@ namespace ThreeMatch.OutGame.Manager
 
         public static Action<int, Vector3> onArrivedWayPointAction;
         public static Action onStartMoveWayPointAction;
+        public static Action onSelectedStageAction;
         
         private void Start()
         {
@@ -51,9 +56,30 @@ namespace ThreeMatch.OutGame.Manager
         private void Initialize()
         {
             UIManager uiManager = UIManager.Instance;
-            var userHeartPresenter = PresenterFactory.CreateOrGet<UserHeartPresenter>();
-            userHeartPresenter.Initialize(uiManager.GetView<UserHeartView>(), ModelFactory.CreateOrGet<UserModel>());
+            var userHeartPresenter = PresenterFactory.CreateOrGet<UserInfoPresenter>();
+            userHeartPresenter.Initialize(uiManager.GetView<UserInfoView>(), ModelFactory.CreateOrGet<UserModel>());
             userHeartPresenter.UpdateUserHeart();
+        }
+
+        private async void OnSelectStage(int level)
+        {
+            var userModel = ModelFactory.CreateOrGet<UserModel>();
+            if (userModel.heart.Value == 0)
+            {
+                return;
+            }
+            
+            onSelectedStageAction?.Invoke();
+            await _screenFader.FadeOut();
+
+            var operation = SceneManager.LoadSceneAsync(SceneType.InGame.ToString());
+            while (!operation.isDone)
+            {
+                await UniTask.Yield();
+            }
+
+            userModel.heart.Value--;
+            PlayerPrefs.SetInt(PlayerPrefsKeys.selectedStageLevel, level);            
         }
         
         private void LoadStageLevel()
@@ -81,7 +107,7 @@ namespace ThreeMatch.OutGame.Manager
 
             listModel.stageLevelModelList.Value = modelList;
             _stageLevelListPresenter = PresenterFactory.CreateOrGet<StageLevelListPresenter>();
-            _stageLevelListPresenter.Initialize(_stageLevelListView, listModel);
+            _stageLevelListPresenter.Initialize(_stageLevelListView, listModel, OnSelectStage);
         }
     }
 }

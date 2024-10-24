@@ -1,10 +1,11 @@
 using DG.Tweening;
 using ThreeMatch.InGame.Interface;
+using ThreeMatch.Interface;
 using UnityEngine;
 
 namespace ThreeMatch.InGame.UI
 {
-    public class GameFailedView : MonoBehaviour, IView
+    public class GameFailedPopup : MonoBehaviour, IPopup
     {
         [SerializeField] private GameObject _failAlarmTextObj;
         [SerializeField] private InGameMenuPopup _inGameMenuPopup;

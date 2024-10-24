@@ -68,7 +68,7 @@ namespace ThreeMatch.OutGame.Presenter
             }
             
             CheckIfNeedToChargeHeart(heartCount);
-            var userHeartPresenter = PresenterFactory.CreateOrGet<UserHeartPresenter>();
+            var userHeartPresenter = PresenterFactory.CreateOrGet<UserInfoPresenter>();
             userHeartPresenter.UpdateUserHeart();
         }
 

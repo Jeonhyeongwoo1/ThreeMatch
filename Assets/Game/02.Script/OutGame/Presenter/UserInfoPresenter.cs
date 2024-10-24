@@ -10,16 +10,26 @@ using ThreeMatch.OutGame.View;
 
 namespace ThreeMatch.OutGame.Presenter
 {
-    public class UserHeartPresenter : BasePresenter
+    public class UserInfoPresenter : BasePresenter
     {
         private UserModel _model;
-        private UserHeartView _view;
+        private UserInfoView _view;
 
-        public void Initialize(UserHeartView view, UserModel model)
+        public void Initialize(UserInfoView view, UserModel model)
         {
             _model = model;
             _view = view;
-            _view.Initialize(OpenHeartShopPopup, Const.MaxUserHeartCount <= _model.heart.Value);
+            _view.Initialize(OpenHeartShopPopup, OpenGoldShopPopup, Const.MaxUserHeartCount <= _model.heart.Value);
+            UpdateUserHeart();
+            _view.UpdateGold(_model.money.Value.ToString());
+        }
+
+        private void OpenGoldShopPopup()
+        {
+            var goldShopPresenter = PresenterFactory.CreateOrGet<GoldShopPresenter>();
+            var goldShopPopup = PopupManager.Instance.GetPopup<GoldShopPopup>();
+            goldShopPresenter.Initialize(_model, goldShopPopup);
+            goldShopPresenter.OpenGoldShopPopup();
         }
 
         private void OpenHeartShopPopup()

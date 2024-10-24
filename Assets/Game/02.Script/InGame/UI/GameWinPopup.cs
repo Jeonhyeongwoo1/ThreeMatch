@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using ThreeMatch.InGame.Interface;
+using ThreeMatch.Interface;
 using UnityEngine;
 
 namespace ThreeMatch.InGame.UI
 {
-    public class GameWinView : MonoBehaviour, IView
+    public class GameWinPopup : MonoBehaviour, IPopup
     {
         [SerializeField] private GameObject _completeLevelObj;
         [SerializeField] private GameObject _preCompletedMissionPopupObj;

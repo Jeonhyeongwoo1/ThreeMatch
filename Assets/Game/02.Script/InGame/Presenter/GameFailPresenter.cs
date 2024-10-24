@@ -7,24 +7,24 @@ namespace ThreeMatch.InGame.Presenter
 {
     public class GameFailPresenter : BasePresenter
     {
-        private GameFailedView _gameFailedView;
+        private GameFailedPopup _gameFailedPopup;
         private MissionModel _missionModel;
         
-        public void Initialize(GameFailedView view, MissionModel missionModel)
+        public void Initialize(GameFailedPopup popup, MissionModel missionModel)
         {
-            _gameFailedView = view;
+            _gameFailedPopup = popup;
             _missionModel = missionModel;
         }
 
         public async UniTask GameFailProcess()
         {
-            _gameFailedView.ShowAndHideFailTextObj(true);
+            _gameFailedPopup.ShowAndHideFailTextObj(true);
 
             await UniTask.WaitForSeconds(2f, cancelImmediately: true);
             
             bool isShowAds = false;
-            _gameFailedView.ShowAndHideFailTextObj(false);
-            _gameFailedView.ShowAndHideFailPopupObj(true, isShowAds);
+            _gameFailedPopup.ShowAndHideFailTextObj(false);
+            _gameFailedPopup.ShowAndHideFailPopupObj(true, isShowAds);
         }
     }
 }

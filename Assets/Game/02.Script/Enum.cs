@@ -42,7 +42,8 @@ namespace ThreeMatch
         RemoveObstacleOneHitBoxCell,
         RemoveObstacleHitableBoxCell,
         RemoveObstacleCageCell,
-        RemoveStarGeneratorCell
+        RemoveStarGeneratorCell,
+        RemoveNormalOrangeCell,
     }
 
     public enum CellImageType
@@ -134,5 +135,15 @@ namespace ThreeMatch
         Title,
         StageLevel,
         InGame
+    }
+    
+    public enum InGameMenuPopupButtonType
+    {
+        NextStage,
+        Share,
+        MoveToStageLevelScene,
+        RestartGame,
+        ClosePopup,
+        ShowAd
     }
 }

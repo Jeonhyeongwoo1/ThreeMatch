@@ -10,12 +10,12 @@ namespace ThreeMatch.InGame.Presenter
 {
     public class GameWinPresenter : BasePresenter
     {
-        private GameWinView _gameWinView;
+        private GameWinPopup _gameWinPopup;
         private MissionModel _missionModel;
 
-        public void Initialize(GameWinView gameWinView, MissionModel missionModel)
+        public void Initialize(GameWinPopup gameWinPopup, MissionModel missionModel)
         {
-            _gameWinView = gameWinView;
+            _gameWinPopup = gameWinPopup;
             _missionModel = missionModel;
         }
 
@@ -23,19 +23,19 @@ namespace ThreeMatch.InGame.Presenter
         {
             UniTaskCompletionSource task = new UniTaskCompletionSource();
 
-            _gameWinView.ShowAndHideCompleteLevelObj(true);
+            _gameWinPopup.ShowAndHideCompleteLevelObj(true);
             await UniTask.WaitForSeconds(2f);
             
-            _gameWinView.ShowAndHideCompleteLevelObj(false);
+            _gameWinPopup.ShowAndHideCompleteLevelObj(false);
             
             var missionViewDataList = _missionModel.missionDataList.Value.Select(missionData => new MissionView.Data
                 { missionType = missionData.missionType, count = missionData.removeCount }).ToList();
-            _gameWinView.ShowPreCompletedMissionPopupObj(task, missionViewDataList);
+            _gameWinPopup.ShowPreCompletedMissionPopupObj(task, missionViewDataList);
 
             await task.Task;
 
-            _gameWinView.gameObject.SetActive(false);
-            _gameWinView.ShowAndHideInGameWinMenuPopup(true);
+            // _gameWinPopup.gameObject.SetActive(false);
+            _gameWinPopup.ShowAndHideInGameWinMenuPopup(true);
         }
     }
 }

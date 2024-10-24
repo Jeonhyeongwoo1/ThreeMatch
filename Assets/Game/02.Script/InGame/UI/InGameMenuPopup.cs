@@ -1,94 +1,19 @@
 using System;
 using System.Collections.Generic;
 using ThreeMatch.InGame.Core;
-using ThreeMatch.InGame.Interface;
+using ThreeMatch.InGame.Model;
 using TMPro;
-using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace ThreeMatch.InGame.UI
 {
-    public enum ButtonType
-    {
-        NextStage,
-        Share,
-        MoveToMap,
-        RestartGame,
-        ClosePopup,
-        ShowAd
-    }
-    
-    public class InGameMenuModel : IModel
-    {
-        [Serializable]
-        public struct MenuButtonData
-        {
-            public ButtonType buttonType;
-            public Action callback;
-        }
-        
-        public ReactiveProperty<List<MenuButtonData>> _menuButtonDataList = new();
-    
-        public InGameMenuModel()
-        {
-            int length = Enum.GetValues(typeof(ButtonType)).Length;
-            for (int i = 0; i < length; i++)
-            {
-                MenuButtonData data = new MenuButtonData();
-                data.buttonType = (ButtonType)i;
-                data.callback = null;
-            }
-        }
-
-        public Action GetCallback(ButtonType buttonType)
-        {
-            if (!_menuButtonDataList.HasValue)
-            {
-                Debug.LogError("menu button data list is null");
-                return null;
-            }
-
-            var data = _menuButtonDataList.Value;
-            if (data == null)
-            {
-                Debug.LogError("menu button data list is null");
-                return null;
-            }
-
-            return data.Find(v => v.buttonType == buttonType).callback;
-        }
-
-        public void AddCallback(ButtonType buttonType, Action callback)
-        {
-            if (!_menuButtonDataList.HasValue)
-            {
-                _menuButtonDataList = new ReactiveProperty<List<MenuButtonData>>();
-                MenuButtonData buttonData = new MenuButtonData();
-                buttonData.buttonType = buttonType;
-                buttonData.callback = callback;
-                _menuButtonDataList.Value.Add(buttonData);
-            }
-            else
-            {
-                _menuButtonDataList.Value.ForEach(v =>
-                {
-                    if (v.buttonType == buttonType)
-                    {
-                        v.callback = callback;
-                    }
-                });
-            }
-        }
-    }
-    
     public class InGameMenuPopup : MonoBehaviour
     {
-        
         [Serializable]
         public struct ButtonData
         {
-            public ButtonType buttonType;
+            public InGameMenuPopupButtonType inGameMenuPopupButtonType;
             public Button button;
         }
 
@@ -98,23 +23,23 @@ namespace ThreeMatch.InGame.UI
 
         private void Start()
         {
-            var menuButtonModel = ModelFactory.CreateOrGet<InGameMenuModel>();
+            var menuButtonModel = ModelFactory.CreateOrGet<InGameMenuButtonModel>();
             foreach (ButtonData data in _buttonDataList)
             {
-                var callback = menuButtonModel.GetCallback(data.buttonType);
+                var callback = menuButtonModel.GetCallback(data.inGameMenuPopupButtonType);
                 data.button.onClick.AddListener(() =>
                 {
-                    callback?.Invoke();
-                    switch (data.buttonType)
+                    callback.Invoke();
+                    switch (data.inGameMenuPopupButtonType)
                     {
-                        case ButtonType.ClosePopup:
+                        case InGameMenuPopupButtonType.MoveToStageLevelScene:
+                        case InGameMenuPopupButtonType.NextStage:
+                        case InGameMenuPopupButtonType.RestartGame:
+                        case InGameMenuPopupButtonType.ClosePopup:
                             gameObject.SetActive(false);
                             break;
-                        case ButtonType.NextStage:
-                        case ButtonType.Share:
-                        case ButtonType.MoveToMap:
-                        case ButtonType.RestartGame:
-                        case ButtonType.ShowAd:
+                        case InGameMenuPopupButtonType.Share:
+                        case InGameMenuPopupButtonType.ShowAd:
                         default:
                             break;
                     }
@@ -124,11 +49,13 @@ namespace ThreeMatch.InGame.UI
 
         public void Show()
         {
+            Debug.Log("Show");
             gameObject.SetActive(true);
         }
 
         public void Hide()
         {
+            Debug.Log("Hide");
             gameObject.SetActive(false);
         }
 
