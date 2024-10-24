@@ -1,20 +1,25 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using ThreeMatch.InGame.Interface;
 using ThreeMatch.InGame.Manager;
 using ThreeMatch.OutGame.Entity;
-using UnityEditor;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace ThreeMatch.OutGame.View
 {
-    public class StageLevelView : MonoBehaviour, IView
+    public class StageLevelView : MonoBehaviour, IView, IPointerClickHandler
     {
         [SerializeField] private GameObject _lockObj;
         [SerializeField] private GameObject[] _starObjArray;
         [SerializeField] private GameObject _pathPivotObj;
 
+        private Action _onClickStageLevel;
+        
+        public void Initialize(Action onClickStageLevel)
+        {
+            _onClickStageLevel = onClickStageLevel;
+        }
+        
         public void UpdateUI(bool isLock, int starCount, int level)
         {
             _lockObj.SetActive(isLock);
@@ -30,6 +35,11 @@ namespace ThreeMatch.OutGame.View
                 stageLevelUI.Spawn(transform);
                 stageLevelUI.UpdateLevelText(level.ToString());
             }
+        }
+        
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            _onClickStageLevel?.Invoke();
         }
         
         // private void OnValidate()

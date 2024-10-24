@@ -14,17 +14,7 @@ namespace ThreeMatch.InGame.Entity
     {
         public Vector2 Size => _collider2D.bounds.size;
 
-        public PoolKeyType PoolKeyType
-        {
-            get => _poolKeyType;
-            set
-            {
-                _poolKeyType = value;
-                Debug.Log($"cell {_poolKeyType} {value} / {transform.name}");
-            }
-        }
-
-        [SerializeField] private PoolKeyType _poolKeyType;
+        public PoolKeyType PoolKeyType { get; set; }
         [SerializeField] protected SpriteRenderer _backgroundSprite;
         [SerializeField] protected SpriteRenderer _frontSprite;
         [SerializeField] protected InGameResourcesConfigData _data;
@@ -38,7 +28,6 @@ namespace ThreeMatch.InGame.Entity
 
         public void Spawn(Transform spawner = null, Action callback = null)
         {
-            Debug.Log($"spawn {PoolKeyType} / {_poolKeyType} / {transform.name}");
             Activate(true);
         }
 
@@ -122,7 +111,6 @@ namespace ThreeMatch.InGame.Entity
             {
                 var pool = ObjectPoolManager.Instance.GetPool(PoolKeyType.CellDisappearParticle);
                 SplashParticle particle = pool.Get<SplashParticle>();
-                Debug.Log($"{pool} / {particle}");
                 particle.SetParticle(cellImageType);
                 particle.Spawn(transform);
             }

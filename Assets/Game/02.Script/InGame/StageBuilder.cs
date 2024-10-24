@@ -8,9 +8,18 @@ namespace ThreeMatch.InGame
 {
     public class StageBuilder
     {
-        public Stage LoadStage()
+        public Stage LoadStage(int level)
         {
-            StageLevel stageLevel = Resources.Load<StageLevel>("StageLevel/StageLevel_0");
+            string path = $"StageLevel_{level}";
+            StageLevel stageLevel = Resources.Load<StageLevel>($"StageLevel/{path}");
+            if (stageLevel == null)
+            {
+                Debug.LogError($"failed get stage {path}");
+                path = $"StageLevel_{0}";
+                stageLevel = Resources.Load<StageLevel>($"StageLevel/{path}");
+                Debug.Log("Load stage level 0");
+            }
+            
             return new Stage(stageLevel.GetBoardInfoDataArray(), stageLevel.missionInfoDataList, stageLevel.remainingMoveCount);
         }
 

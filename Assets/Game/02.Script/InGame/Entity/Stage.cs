@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace ThreeMatch.InGame.Entity
 {
-    public class Stage
+    public class Stage : IDisposable
     {
         private Board _board;
         private Mission _mission;
@@ -29,11 +29,14 @@ namespace ThreeMatch.InGame.Entity
             _remainingMoveCount = remainingMoveCount;
             GameManager.onChangeRemainingMoveCountAction?.Invoke(_remainingMoveCount);
         }
-
-        ~Stage()
+        
+        public void Dispose()
         {
-            OnEndDragAction = null;
-            OnCheckMissionAction = null;
+            OnEndDragAction -= OnEndDrag;
+            OnCheckMissionAction -= OnCheckMission;
+            GameManager.onInGameItemUsagePendingAction -= OnItemUsagePendingAction;
+            _board?.Dispose();
+            GC.SuppressFinalize(this);
         }
 
         private void AddEvents()
@@ -129,6 +132,8 @@ namespace ThreeMatch.InGame.Entity
                             return MissionType.RemoveNormalPurpleCell;
                         case CellImageType.Red:
                             return MissionType.RemoveNormalRedCell;
+                        case CellImageType.Orange:
+                            return MissionType.RemoveNormalOrangeCell;
                         case CellImageType.None:
                         default:
                             Debug.LogError(

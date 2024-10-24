@@ -1,4 +1,4 @@
-using ThreeMatch.InGame.Presenter;
+using System;
 using ThreeMatch.OutGame.Data;
 using ThreeMatch.OutGame.View;
 
@@ -9,10 +9,21 @@ namespace ThreeMatch.OutGame.Presenter
         private StageLevelModel _model;
         private StageLevelView _view;
 
-        public StageLevelPresenter(StageLevelModel model, StageLevelView view)
+        public StageLevelPresenter(StageLevelModel model, StageLevelView view, Action<int> onSelectStageLevel)
         {
+            void OnClickStageLevel()
+            {
+                if (_model.isLock)
+                {
+                    return;
+                }
+                
+                onSelectStageLevel.Invoke(_model.level);
+            }
+            
             _model = model;
             _view = view;
+            _view.Initialize(OnClickStageLevel);
         }
 
         public void Initialize()

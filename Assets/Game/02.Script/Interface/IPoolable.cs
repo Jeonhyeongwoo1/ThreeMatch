@@ -18,7 +18,6 @@ namespace ThreeMatch.InGame.Interface
                 mono.gameObject.SetActive(false);
             }
 
-            Debug.Log($"pool {PoolKeyType} / {mono.transform.name}");
             ObjectPoolManager.Instance.Sleep(this);
         }
 

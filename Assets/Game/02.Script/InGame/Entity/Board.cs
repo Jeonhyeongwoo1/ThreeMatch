@@ -10,7 +10,7 @@ using Random = UnityEngine.Random;
 
 namespace ThreeMatch.InGame
 {
-    public class Board
+    public class Board : IDisposable
     {
         [Serializable]
         public struct CellMovementInfo
@@ -55,7 +55,27 @@ namespace ThreeMatch.InGame
             _onCheckMissionAction = onCheckMissionAction;
             _onEndDragAction = onEndDragAction;
         }
-
+        
+        public void Dispose()
+        {
+            _selectedCell?.Dispose();
+            for (int i = 0; i < _row; i++)
+            {
+                for (int j = 0; j < _column; j++)
+                {
+                    _blockArray[i, j].Dispose();
+                    _cellArray[i, j].Dispose();
+                }
+            }
+            
+            _blockArray = null;
+            _cellArray = null;
+            
+            InputPanel.OnPointerDownAction -= OnPointerDown;
+            InputPanel.OnDragAction -= OnDrag;
+            InputPanel.OnPointerUpAction -= OnPointerUp;
+        }
+        
         private async void OnPointerDown(Vector2 beginPosition)
         {
             Debug.Log($"onPointerDown ---- {_selectedCell} / {GetBoardState()}");
