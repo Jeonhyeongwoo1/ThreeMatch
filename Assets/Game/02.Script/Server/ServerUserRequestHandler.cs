@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Firebase.Firestore;
 using ThreeMatch.Firebase;
+using ThreeMatch.Firebase.Data;
 using ThreeMatch.Interface;
 using ThreeMatch.Keys;
 using ThreeMatch.Shared;
 using UnityEngine;
+using Object = System.Object;
 
 namespace ThreeMatch.Server
 {
@@ -73,6 +76,8 @@ namespace ThreeMatch.Server
             
             DocumentReference docRef = db.Collection(DBKeys.UserDB).Document(userID);
             UserData userData = null;
+            List<InGameItemData> inGameItemDataList = null;
+            
             try
             {
                 var snapshot =  await docRef.GetSnapshotAsync();
@@ -92,15 +97,37 @@ namespace ThreeMatch.Server
                     userData.LastLoginTime = DateTime.UtcNow;
                 }
 
-                Dictionary<string, UserData> userDict = new Dictionary<string, UserData>()
+                Dictionary<string, object> userDict = new Dictionary<string, object>();
+                userDict.Add(nameof(UserData), userData);
+                
+                if (!snapshot.TryGetValue(DBFields.InGameItemDataList, out inGameItemDataList))
                 {
-                    { nameof(UserData), userData }
-                };
+                    int length = Enum.GetValues(typeof(InGameItemType)).Length;
+                    inGameItemDataList = new List<InGameItemData>();
+                    for (int i = 0; i < length; i++)
+                    {
+                        if (i == (int)InGameItemType.None)
+                        {
+                            continue;
+                        }
+                        
+                        var data = new InGameItemData
+                        {
+                            ItemId = i,
+                            ItemCount = Const.DefaultInGameItemCount
+                        };
+                
+                        inGameItemDataList.Add(data);
+                    }
+                
+                    userDict.Add(DBFields.InGameItemDataList, inGameItemDataList);
+                }
                 
                 await docRef.SetAsync(userDict, SetOptions.MergeAll);
             }
             catch (Exception e)
             {
+                Debug.LogError("failed get data :" + e);
                 return new UserResponse()
                 {
                     responseCode = ServerErrorCode.FailedGetData
@@ -110,7 +137,8 @@ namespace ThreeMatch.Server
             return new UserResponse()
             {
                 responseCode = ServerErrorCode.Success,
-                userData = userData
+                userData = userData,
+                inGameItemDataList = inGameItemDataList
             };
         }
 
@@ -142,7 +170,6 @@ namespace ThreeMatch.Server
                 }
 
                 userData.Heart += chargedCount;
-                Debug.Log($" {userData.Heart} / {chargedCount}");
                 Dictionary<string, UserData> userDict = new Dictionary<string, UserData>()
                 {
                     { nameof(UserData), userData }

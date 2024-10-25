@@ -1,10 +1,10 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Firebase.Auth;
 using ThreeMatch.Core;
 using ThreeMatch.Firebase;
+using ThreeMatch.Firebase.Data;
+using ThreeMatch.InGame.Model;
 using ThreeMatch.OutGame.Data;
 using ThreeMatch.Server;
 using UnityEngine;
@@ -47,6 +47,12 @@ namespace ThreeMatch.Title.Controller
             userModel.userId = response.userData.UserId;
             userModel.heart.Value = response.userData.Heart;
             userModel.money.Value = response.userData.Money;
+
+            var ingameItemModel = ModelFactory.CreateOrGet<InGameItemModel>();
+            foreach (InGameItemData itemData in response.inGameItemDataList)
+            {
+                ingameItemModel.SetInGameItemValue((InGameItemType) itemData.ItemId, itemData.ItemCount);
+            }
         }
 
         public void MoveToMemu()

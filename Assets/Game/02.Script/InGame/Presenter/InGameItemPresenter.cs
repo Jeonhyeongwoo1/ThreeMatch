@@ -4,7 +4,7 @@ using ThreeMatch.InGame.Manager;
 using ThreeMatch.InGame.Model;
 using ThreeMatch.InGame.UI;
 using UnityEngine;
-using UnityEngine.Events;
+using UniRx;
 
 namespace ThreeMatch.InGame.Presenter
 {
@@ -14,6 +14,8 @@ namespace ThreeMatch.InGame.Presenter
         private InGameItemModel _inGameItemModel;
         private Action<InGameItemType> _onItemUsagePendingAction;
         
+        private readonly CompositeDisposable _disposables = new CompositeDisposable();
+
         public void Initialize(InGameItemView itemView)
         {
             _inGameItemModel = ModelFactory.CreateOrGet<InGameItemModel>();
@@ -21,6 +23,13 @@ namespace ThreeMatch.InGame.Presenter
 
             _inGameItemView.onPendingUseInGameItem += OnUseInGameItem;
             GameManager.onUsedInGameItemAction += OnUsedInGameItem;
+
+            foreach (var ingameItem in _inGameItemModel.inGameItemDict)
+            {
+                ingameItem.Value.Subscribe(value =>
+                        _inGameItemView.UpdateInGameItemAmount(ingameItem.Key, value.ToString()))
+                                .AddTo(_disposables);
+            }
         }
 
         private void OnUsedInGameItem(InGameItemType inGameItemType)
@@ -48,6 +57,7 @@ namespace ThreeMatch.InGame.Presenter
         public void AddInGameItemData(InGameItemType inGameItemType, int value)
         {
             int result = _inGameItemModel.AddOrRemoveInGameItemValue(inGameItemType, value);
+            Debug.Log($"{inGameItemType} / {result}");
             _inGameItemView.UpdateInGameItemAmount(inGameItemType, result.ToString());
         }
     }

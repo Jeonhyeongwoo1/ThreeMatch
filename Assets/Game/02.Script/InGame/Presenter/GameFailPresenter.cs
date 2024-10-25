@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using ThreeMatch.InGame.Model;
 using ThreeMatch.InGame.UI;
-using System.Linq;
 
 namespace ThreeMatch.InGame.Presenter
 {

@@ -25,4 +25,5 @@ public static class Const
     public static int DefaultHeartCount = 5;
     public static int DefaultMoney = 0;
     public static int MaxStageLevel = 100;
+    public static int DefaultInGameItemCount = 3;
 }

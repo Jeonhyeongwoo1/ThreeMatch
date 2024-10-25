@@ -29,7 +29,6 @@ namespace ThreeMatch.InGame.Manager
         {
             LoadStage();
         }
-
         private void LoadStage()
         {
             RemoveDummyObj();

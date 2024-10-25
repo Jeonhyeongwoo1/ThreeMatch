@@ -32,14 +32,14 @@ namespace ThreeMatch.Core
             return null;
         }
         
-        public static void Clear()
+        public static void ClearDict()
         {
             ServerRequestHandlerDict.Clear();
         }
 
         public static void InitializeServerHandlerRequest(FirebaseController firebaseController)
         {
-            Clear();
+            ClearDict();
             Create<ServerUserRequestHandler>(firebaseController);
             Create<ServerStageRequestHandler>(firebaseController);
         }

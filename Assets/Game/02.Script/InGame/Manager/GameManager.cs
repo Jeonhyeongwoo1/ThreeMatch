@@ -13,20 +13,6 @@ namespace ThreeMatch.InGame.Manager
 {
     public class GameManager : MonoBehaviour
     {
-        public static GameManager Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = FindObjectOfType<GameManager>();
-                    Initialized();
-                }
-
-                return _instance;
-            }
-        }
-        
         public static Action<InGameItemType> onInGameItemUsagePendingAction;
         public static Action<InGameItemType> onUsedInGameItemAction;
         public static Action onAllSuccessMissionAction;
@@ -36,14 +22,14 @@ namespace ThreeMatch.InGame.Manager
         public static Action onGameOverAction;
         public static Action<int> onChangeRemainingMoveCountAction;
         
-        private static GameManager _instance;
-
+        private InGameItemPresenter _inGameItemPresenter;
+        private GameFailPresenter _gameFailPresenter;
+        private GameWinPresenter _gameWinPresenter;
         private GameState _gameState;
 
         private void Awake()
         {
             Initialized();
-            UpdateUserInGameItem();
             InGameMenuButtonCallbackInitialize();
         }
 
@@ -61,6 +47,8 @@ namespace ThreeMatch.InGame.Manager
             onGameStartAction -= OnGameStart;
             onGameOverAction -= OnGameOver;
             onGameClearAction -= OnGameClear;
+            
+            
         }
 
         private void OnGameStart()
@@ -73,26 +61,21 @@ namespace ThreeMatch.InGame.Manager
             UpdateState(GameState.Ready);
         }
 
-        private static void Initialized()
+        private void Initialized()
         {
-            if (_instance)
-            {
-                return;
-            }
-            
             UIManager uiManager = UIManager.Instance;
 
-            var inGameItemPresenter = PresenterFactory.CreateOrGet<InGameItemPresenter>();
-            inGameItemPresenter.Initialize(uiManager.GetView<InGameItemView>());
-        }
-
-        public void UpdateUserInGameItem()
-        {
-            var inGameItemPresenter = PresenterFactory.CreateOrGet<InGameItemPresenter>();
-            inGameItemPresenter.AddInGameItemData(InGameItemType.Hammer, 10);
-            inGameItemPresenter.AddInGameItemData(InGameItemType.Shuffle, 10);
-            inGameItemPresenter.AddInGameItemData(InGameItemType.VerticalRocket, 10);
-            inGameItemPresenter.AddInGameItemData(InGameItemType.HorizontalRocket, 10);
+            _inGameItemPresenter = PresenterFactory.CreateOrGet<InGameItemPresenter>();
+            _inGameItemPresenter.Initialize(uiManager.GetView<InGameItemView>());
+            
+            _gameFailPresenter = PresenterFactory.CreateOrGet<GameFailPresenter>();
+            var gameFailedView = PopupManager.Instance.GetPopup<GameFailedPopup>();
+            _gameFailPresenter.Initialize(gameFailedView, ModelFactory.CreateOrGet<MissionModel>());
+            
+            _gameWinPresenter = PresenterFactory.CreateOrGet<GameWinPresenter>();
+            var gameWinPopup = PopupManager.Instance.GetPopup<GameWinPopup>();
+            var missionModel = ModelFactory.CreateOrGet<MissionModel>();
+            _gameWinPresenter.Initialize(gameWinPopup, missionModel);
         }
 
         private async void OnGameOver()
@@ -103,10 +86,21 @@ namespace ThreeMatch.InGame.Manager
             }
             
             UpdateState(GameState.End);
-            var gameFailPresenter = PresenterFactory.CreateOrGet<GameFailPresenter>();
-            var gameFailedView = PopupManager.Instance.GetPopup<GameFailedPopup>();
-            gameFailPresenter.Initialize(gameFailedView, ModelFactory.CreateOrGet<MissionModel>());
-            await gameFailPresenter.GameFailProcess();
+            var ingameItemModel = ModelFactory.CreateOrGet<InGameItemModel>();
+            var response = await ServerHandlerFactory.Get<ServerStageRequestHandler>()
+                .StageFailedRequest(ingameItemModel.ConvertToInGameItemDataList());
+
+            if (response.responseCode != ServerErrorCode.Success)
+            {
+                switch (response.responseCode)
+                {
+                    case ServerErrorCode.FailedGetData:
+                        SceneManager.LoadScene(SceneType.Title.ToString());
+                        return;
+                }
+            }
+
+            await _gameFailPresenter.GameFailProcess();
         }
 
         private async void OnGameClear()
@@ -117,15 +111,13 @@ namespace ThreeMatch.InGame.Manager
             }
             
             UpdateState(GameState.End);
-            var gameWinPresenter = PresenterFactory.CreateOrGet<GameWinPresenter>();
-            var gameWinPopup = PopupManager.Instance.GetPopup<GameWinPopup>();
-            var missionModel = ModelFactory.CreateOrGet<MissionModel>();
-            gameWinPresenter.Initialize(gameWinPopup, missionModel);
 
             var stageLevelModel = ModelFactory.CreateOrGet<StageLevelListModel>();
             int starCount = 3;
             int stageLevel = stageLevelModel.selectedStageLevel;
-            var response = await ServerHandlerFactory.Get<ServerStageRequestHandler>().UpdateStageLevelRequest(stageLevel, starCount);
+            var ingameItemModel = ModelFactory.CreateOrGet<InGameItemModel>();
+            var response = await ServerHandlerFactory.Get<ServerStageRequestHandler>()
+                .StageClearRequest(stageLevel, starCount, ingameItemModel.ConvertToInGameItemDataList());
             if (response.responseCode != ServerErrorCode.Success)
             {
                 switch (response.responseCode)
@@ -138,9 +130,10 @@ namespace ThreeMatch.InGame.Manager
                 }
             }
 
-            stageLevelModel.openNewStage = true;
+            int lastStageLevel = response.stageLevelDataList.FindLastIndex(v => !v.IsLock);
+            stageLevelModel.openNewStage = stageLevel + 1 == lastStageLevel;
             stageLevelModel.AddStageLevelModelList(response.stageLevelDataList);
-            await gameWinPresenter.GameWinProcess();
+            await _gameWinPresenter.GameWinProcess();
         }
 
         private void InGameMenuButtonCallbackInitialize()

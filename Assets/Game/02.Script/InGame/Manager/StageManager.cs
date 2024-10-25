@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using ThreeMatch.Core;
@@ -55,6 +56,11 @@ namespace ThreeMatch.InGame.Manager
             {
                 _currentStage.OnItemUsagePendingAction(InGameItemType.HorizontalRocket);
             }
+        }
+
+        private void OnDestroy()
+        {
+            _currentStage?.Dispose();
         }
 
         public void ReloadStage(int stageLevel)

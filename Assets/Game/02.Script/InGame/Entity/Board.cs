@@ -63,13 +63,10 @@ namespace ThreeMatch.InGame
             {
                 for (int j = 0; j < _column; j++)
                 {
-                    _blockArray[i, j].Dispose();
-                    _cellArray[i, j].Dispose();
+                    _blockArray[i, j]?.Dispose();
+                    _cellArray[i, j]?.Dispose();
                 }
             }
-            
-            _blockArray = null;
-            _cellArray = null;
             
             InputPanel.OnPointerDownAction -= OnPointerDown;
             InputPanel.OnDragAction -= OnDrag;
