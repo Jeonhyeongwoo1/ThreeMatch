@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using ThreeMatch.InGame.Core;
+using ThreeMatch.Core;
 using ThreeMatch.InGame.Data;
 using ThreeMatch.InGame.Manager;
 using ThreeMatch.InGame.Model;

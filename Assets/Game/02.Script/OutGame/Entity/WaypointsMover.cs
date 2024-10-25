@@ -29,6 +29,12 @@ namespace ThreeMatch.OutGame.Entity
             }
         }
 
+        public void SetPosition(int index)
+        {
+            Transform target = Path.Waypoints[index];
+            transform.position = target.position;
+        }
+
         public void Move(int fromIndex, int toIndex, Action<Vector3> finishedAction)
         {
             Transform from = Path.Waypoints[fromIndex];

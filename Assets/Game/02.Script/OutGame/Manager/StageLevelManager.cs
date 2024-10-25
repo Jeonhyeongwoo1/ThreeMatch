@@ -1,15 +1,14 @@
 using System;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using FastFoodRush.Utils;
 using Sirenix.OdinInspector;
-using ThreeMatch.InGame.Core;
+using ThreeMatch.Core;
 using ThreeMatch.InGame.Manager;
 using ThreeMatch.OutGame.Data;
 using ThreeMatch.OutGame.Entity;
 using ThreeMatch.OutGame.Presenter;
 using ThreeMatch.OutGame.View;
-using UniRx;
+using ThreeMatch.Server;
+using ThreeMatch.Utils;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -22,10 +21,6 @@ namespace ThreeMatch.OutGame.Manager
         [SerializeField] private GameObject _idleParticleObj;
         [SerializeField] private ScreenFader _screenFader;
         
-        [SerializeField] private List<StageLevelModel> _dummyStageLevelModelList;
-        [SerializeField] private int _dummyCurrentIndex;
-        [SerializeField] private int _dummyNextIndex;
-
         private StageLevelListPresenter _stageLevelListPresenter;
 
         public static Action<int, Vector3> onArrivedWayPointAction;
@@ -38,17 +33,10 @@ namespace ThreeMatch.OutGame.Manager
             Initialize();
         }
 
-        [Button]
-        public void Move()
-        {
-            onStartMoveWayPointAction.Invoke();
-            _waypointsMover.Move(_dummyCurrentIndex, _dummyNextIndex, OnFinishedDestinationWayPoint);
-        }
-
         private void OnFinishedDestinationWayPoint(Vector3 position)
         {
-            int level = _dummyNextIndex;
-            _idleParticleObj.SetActive(true);
+            int level = 0;
+            // _idleParticleObj.SetActive(true);
             onArrivedWayPointAction?.Invoke(level, position);
             _stageLevelListPresenter.UnLockStageLevel(level);
         }
@@ -68,46 +56,88 @@ namespace ThreeMatch.OutGame.Manager
             {
                 return;
             }
+
+            var response = await ServerHandlerFactory.Get<ServerUserRequestHandler>().SelectStageRequest();
+            switch (response.responseCode)
+            {
+                case ServerErrorCode.Success:
+                    break;
+                case ServerErrorCode.FailedGetUserData:
+                    Debug.LogError("Failed get user data");
+                    return;
+                case ServerErrorCode.NotEnoughHeart:
+                    Debug.Log("heart 수가 부족합니다.");
+                    //Alret popup
+                    return;
+            }
+
+            userModel.heart.Value = response.userData.Heart;
             
             onSelectedStageAction?.Invoke();
             await _screenFader.FadeOut();
 
+            var stageLevelListModel = ModelFactory.CreateOrGet<StageLevelListModel>();
+            stageLevelListModel.selectedStageLevel = level;
             var operation = SceneManager.LoadSceneAsync(SceneType.InGame.ToString());
-            while (!operation.isDone)
-            {
-                await UniTask.Yield();
-            }
+            // while (!operation.isDone)
+            // {
+            //     await UniTask.Yield();
+            // }
 
-            userModel.heart.Value--;
-            PlayerPrefs.SetInt(PlayerPrefsKeys.selectedStageLevel, level);            
+            Debug.Log("level : " + level);            
         }
         
-        private void LoadStageLevel()
+        private async UniTask LoadStageLevel()
         {
-            var listModel = ModelFactory.CreateOrGet<StageLevelListModel>();
-            listModel.stageLevelModelList =
-                new ReactiveProperty<List<StageLevelModel>>();
-            var modelList = listModel.stageLevelModelList.Value;
-            modelList = new List<StageLevelModel>(Const.MaxStageLevelCount);
-            for (var i = 0; i < Const.MaxStageLevelCount; i++)
+            var stageLevelListModel = ModelFactory.CreateOrGet<StageLevelListModel>();
+            if (stageLevelListModel.stageLevelModelList == null)
             {
-                if (i < _dummyStageLevelModelList.Count)
+                var response = await ServerHandlerFactory.Get<ServerStageRequestHandler>().LoadStageDataRequest();
+                if (response.responseCode != ServerErrorCode.Success)
                 {
-                    var model = _dummyStageLevelModelList[i];
-                    model.level = i;
-                    modelList.Add(model);
+                    switch (response.responseCode)
+                    {
+                        case ServerErrorCode.FailedGetData:
+                            Debug.LogError("Failed loadStageLevel :" + response.errorMessage);
+                            SceneManager.LoadScene(SceneType.Title.ToString());
+                            return;
+                    }
                 }
-                else
-                {
-                    StageLevelModel model = new StageLevelModel();
-                    model.level = i;
-                    modelList.Add(model);
-                }
+                
+                stageLevelListModel.AddStageLevelModelList(response.stageLevelDataList);    
             }
-
-            listModel.stageLevelModelList.Value = modelList;
+            
             _stageLevelListPresenter = PresenterFactory.CreateOrGet<StageLevelListPresenter>();
-            _stageLevelListPresenter.Initialize(_stageLevelListView, listModel, OnSelectStage);
+            _stageLevelListPresenter.Initialize(_stageLevelListView, stageLevelListModel, OnSelectStage);
+
+            int lastStageLevelIndex = 0;
+            try
+            {
+                lastStageLevelIndex = stageLevelListModel.stageLevelModelList.Value.FindLastIndex(v => !v.isLock);
+            }
+            catch (Exception e)
+            {
+                lastStageLevelIndex = 0;
+                Debug.LogError("failed last index " + e);
+            }
+            
+            if (stageLevelListModel.openNewStage)
+            {
+                stageLevelListModel.openNewStage = false;
+                int prevIndex = lastStageLevelIndex - 1;
+                try
+                {
+                    await UniTask.WaitForSeconds(1f, cancelImmediately: true);
+                }
+                catch (Exception e)
+                {
+                }
+                _waypointsMover.Move(prevIndex, lastStageLevelIndex, OnFinishedDestinationWayPoint);
+            }
+            else
+            {
+                _waypointsMover.SetPosition(lastStageLevelIndex);
+            }
         }
     }
 }

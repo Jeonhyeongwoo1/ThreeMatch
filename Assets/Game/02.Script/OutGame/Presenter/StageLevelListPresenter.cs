@@ -1,11 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using ThreeMatch.InGame.Presenter;
 using ThreeMatch.OutGame.Data;
 using ThreeMatch.OutGame.View;
-using UnityEngine;
 
 namespace ThreeMatch.OutGame.Presenter
 {

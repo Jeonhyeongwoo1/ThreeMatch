@@ -1,5 +1,5 @@
 using System;
-using ThreeMatch.InGame.Core;
+using ThreeMatch.Core;
 using ThreeMatch.InGame.Manager;
 using ThreeMatch.InGame.Model;
 using ThreeMatch.InGame.UI;

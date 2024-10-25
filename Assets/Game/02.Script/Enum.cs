@@ -146,4 +146,15 @@ namespace ThreeMatch
         ClosePopup,
         ShowAd
     }
+
+    public enum ServerErrorCode
+    {
+        Success = 100,
+        FailedGetData = 200,
+        FailedGetUserData = 201,
+        NotEnoughHeart,
+        MaxHeartCount,
+        NotEnoughMoney,
+        FailedGetStageData
+    }
 }

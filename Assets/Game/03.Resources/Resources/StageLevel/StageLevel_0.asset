@@ -1391,5 +1391,5 @@ MonoBehaviour:
       Data: 
   missionInfoDataList:
   - missionType: 3
-    removeCount: 50
-  remainingMoveCount: 1
+    removeCount: 3
+  remainingMoveCount: 50

@@ -1,11 +1,10 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using ThreeMatch.InGame.Core;
+using ThreeMatch.Core;
 using ThreeMatch.InGame.Presenter;
 using ThreeMatch.OutGame.Data;
 using ThreeMatch.OutGame.Popup;
-using UnityEngine;
+using ThreeMatch.Server;
+using UniRx;
 
 namespace ThreeMatch.OutGame.Presenter
 {
@@ -13,12 +12,22 @@ namespace ThreeMatch.OutGame.Presenter
     {
         private UserModel _model;
         private HeartShopPopup _popup;
+
+        private CompositeDisposable _disposable = new();
         
         public void Initialize(UserModel userModel, HeartShopPopup heartShopPopup)
         {
             _model = userModel;
             _popup = heartShopPopup;
             _popup.Initialize(OnBuyLift, OnShowAd);
+
+            _disposable.Dispose();
+            _model.heart.Subscribe(OnHeartSubScribe).AddTo(_disposable);
+        }
+
+        private void OnHeartSubScribe(int heart)
+        {
+            CheckIfNeedToChargeHeart(heart);
         }
 
         public void OpenHeartShopPopup()
@@ -30,7 +39,6 @@ namespace ThreeMatch.OutGame.Presenter
 
         private void OnChargedHeart()
         {
-            _model.heart.Value++;
             int heartCount = _model.heart.Value;
             CheckIfNeedToChargeHeart(heartCount);
         }
@@ -39,7 +47,7 @@ namespace ThreeMatch.OutGame.Presenter
         {
             if (heartCount < Const.MaxUserHeartCount)
             {
-                DateTime chargeTime = DateTime.UtcNow.AddSeconds(Const.HeartChargeMinute + 10);
+                DateTime chargeTime = _model.heartRechargeTime.Value;
                 // DateTime chargeTime = DateTime.UtcNow.AddMinutes(Const.HeartChargeMinute);
                 _model.heartRechargeTime.Value = chargeTime;
                 _popup.StarHeartChargeTimer(_model.heartRechargeTime.Value, OnChargedHeart);
@@ -50,17 +58,22 @@ namespace ThreeMatch.OutGame.Presenter
             }
         }
         
-        private void OnBuyLift()
+        private async void OnBuyLift()
         {
-            int heartCount = _model.heart.Value;
-            // if (Const.MaxUserHeartCount <= heartCount || _model.money.Value < Const.HeartPurchaseCost)
-            // {
-            //     return;
-            // }
+            var response = await ServerHandlerFactory.Get<ServerUserRequestHandler>().BuyHeartRequest();
+            switch (response.responseCode)
+            {
+                case ServerErrorCode.Success:
+                    break;
+                case ServerErrorCode.MaxHeartCount:
+                    return;
+                case ServerErrorCode.NotEnoughMoney:
+                    return;
+            }
 
-            _model.money.Value -= Const.HeartPurchaseCost;
-            _model.heart.Value++;
-            heartCount++;
+            int heartCount = response.userData.Heart;
+            _model.money.Value = response.userData.Money;
+            _model.heart.Value = heartCount;
             if (heartCount == Const.MaxUserHeartCount)
             {
                 _model.heartRechargeTime.Value = DateTime.MinValue;

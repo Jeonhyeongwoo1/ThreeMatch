@@ -10,5 +10,7 @@ namespace ThreeMatch.OutGame.Data
         public ReactiveProperty<long> money = new ReactiveProperty<long>();
 
         public ReactiveProperty<DateTime> heartRechargeTime = new ReactiveProperty<DateTime>();
+        public string userId;
+        public bool isAnonymous;
     }
 }

@@ -1,10 +1,11 @@
 using System;
-using ThreeMatch.InGame.Core;
+using ThreeMatch.Core;
 using ThreeMatch.InGame.Model;
 using ThreeMatch.InGame.Presenter;
 using ThreeMatch.InGame.UI;
 using ThreeMatch.Manager;
 using ThreeMatch.OutGame.Data;
+using ThreeMatch.Server;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -121,6 +122,24 @@ namespace ThreeMatch.InGame.Manager
             var missionModel = ModelFactory.CreateOrGet<MissionModel>();
             gameWinPresenter.Initialize(gameWinPopup, missionModel);
 
+            var stageLevelModel = ModelFactory.CreateOrGet<StageLevelListModel>();
+            int starCount = 3;
+            int stageLevel = stageLevelModel.selectedStageLevel;
+            var response = await ServerHandlerFactory.Get<ServerStageRequestHandler>().UpdateStageLevelRequest(stageLevel, starCount);
+            if (response.responseCode != ServerErrorCode.Success)
+            {
+                switch (response.responseCode)
+                {
+                    case ServerErrorCode.FailedGetData:
+                    case ServerErrorCode.FailedGetStageData:
+                        //Alert
+                        SceneManager.LoadScene(SceneType.Title.ToString());
+                        return;
+                }
+            }
+
+            stageLevelModel.openNewStage = true;
+            stageLevelModel.AddStageLevelModelList(response.stageLevelDataList);
             await gameWinPresenter.GameWinProcess();
         }
 
@@ -142,8 +161,8 @@ namespace ThreeMatch.InGame.Manager
         private void OnRestartGame()
         {
             Debug.Log("OnRestartGame");
-            int stageLevel = PlayerPrefs.GetInt(PlayerPrefsKeys.lastStageLevel);
-            StageManager.Instance.ReloadStage(stageLevel);
+            var stageLevel = ModelFactory.CreateOrGet<StageLevelListModel>();
+            StageManager.Instance.ReloadStage(stageLevel.selectedStageLevel);
         }
 
         private void OnMoveToStageLevelScene()
@@ -160,11 +179,25 @@ namespace ThreeMatch.InGame.Manager
         private void OnChangeNextStage()
         {
             Debug.Log("OnChangeNextStage");
-            int stageLevel = PlayerPrefs.GetInt("selectedStageLevel");
-            PlayerPrefs.SetInt(PlayerPrefsKeys.unlockStageLevel, stageLevel + 1);
+            var model = ModelFactory.CreateOrGet<StageLevelListModel>();
+            model.selectedStageLevel++;
             SceneManager.LoadSceneAsync(SceneType.StageLevel.ToString());
         }
 
         private void UpdateState(GameState gameState) => _gameState = gameState;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

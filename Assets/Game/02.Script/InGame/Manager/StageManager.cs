@@ -1,10 +1,10 @@
-using System.Collections;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using ThreeMatch.InGame.Core;
+using ThreeMatch.Core;
 using ThreeMatch.InGame.Entity;
 using ThreeMatch.InGame.Model;
 using ThreeMatch.InGame.UI;
+using ThreeMatch.OutGame.Data;
 using UnityEngine;
 
 namespace ThreeMatch.InGame.Manager
@@ -39,8 +39,9 @@ namespace ThreeMatch.InGame.Manager
 
         private void Start()
         {
-            int stageLevel = PlayerPrefs.GetInt(PlayerPrefsKeys.lastStageLevel);
-            LoadStage(stageLevel).Forget();
+            var levelListModel = ModelFactory.CreateOrGet<StageLevelListModel>();
+            Debug.Log($"stageManager {levelListModel.selectedStageLevel}");
+            LoadStage(levelListModel.selectedStageLevel).Forget();
         }
 
         private void Update()

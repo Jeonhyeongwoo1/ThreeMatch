@@ -1,12 +1,12 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using ThreeMatch.InGame.Core;
+using ThreeMatch.Core;
 using ThreeMatch.InGame.Presenter;
 using ThreeMatch.Manager;
 using ThreeMatch.OutGame.Data;
 using ThreeMatch.OutGame.Popup;
 using ThreeMatch.OutGame.View;
+using ThreeMatch.Server;
+using UniRx;
 
 namespace ThreeMatch.OutGame.Presenter
 {
@@ -14,14 +14,16 @@ namespace ThreeMatch.OutGame.Presenter
     {
         private UserModel _model;
         private UserInfoView _view;
-
+        private readonly CompositeDisposable _compositeDisposable = new CompositeDisposable();
+        
         public void Initialize(UserInfoView view, UserModel model)
         {
             _model = model;
             _view = view;
             _view.Initialize(OpenHeartShopPopup, OpenGoldShopPopup, Const.MaxUserHeartCount <= _model.heart.Value);
-            UpdateUserHeart();
-            _view.UpdateGold(_model.money.Value.ToString());
+
+            _model.heart.Subscribe(v => UpdateUserHeart()).AddTo(_compositeDisposable);
+            _model.money.Subscribe(v => _view.UpdateGold(v.ToString())).AddTo(_compositeDisposable);
         }
 
         private void OpenGoldShopPopup()
@@ -53,12 +55,18 @@ namespace ThreeMatch.OutGame.Presenter
             CheckIfNeedToChargeHeart(heartCount);
         }
 
-        private void OnChargedHeart()
+        private async void OnChargedHeart()
         {
-            _model.heart.Value++;
             int heartCount = _model.heart.Value;
-            _view.UpdateHeartCount(heartCount.ToString(), heartCount == Const.MaxUserHeartCount);
-            CheckIfNeedToChargeHeart(heartCount);
+            var res = await ServerHandlerFactory.Get<ServerUserRequestHandler>()
+                .ChargedHeartRequest();
+
+            if (res.responseCode != ServerErrorCode.Success)
+            {
+                return;
+            }
+
+            _model.heart.Value = res.userData.Heart;
         }
 
         private void CheckIfNeedToChargeHeart(int heartCount)

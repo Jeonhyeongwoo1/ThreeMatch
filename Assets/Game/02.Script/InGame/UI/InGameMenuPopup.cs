@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ThreeMatch.InGame.Core;
+using ThreeMatch.Core;
 using ThreeMatch.InGame.Model;
 using TMPro;
 using UnityEngine;

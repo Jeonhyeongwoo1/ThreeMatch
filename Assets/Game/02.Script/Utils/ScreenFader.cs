@@ -3,7 +3,7 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FastFoodRush.Utils
+namespace ThreeMatch.Utils
 {
     public class ScreenFader : MonoBehaviour
     {

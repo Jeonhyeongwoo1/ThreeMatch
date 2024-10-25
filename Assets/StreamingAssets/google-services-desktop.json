@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "559662031084",
+    "project_id": "threematch-467bf",
+    "storage_bucket": "threematch-467bf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:559662031084:android:302a2e76e56663838105c9",
+        "android_client_info": {
+          "package_name": "com.hyeongwoo.threeMatch"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDnOS0lno6XXTJcyjET08Jk-J1m_AJj3M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

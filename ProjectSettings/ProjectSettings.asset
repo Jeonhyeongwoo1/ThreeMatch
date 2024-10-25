@@ -158,7 +158,7 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.CandySmith.Sweet_sugar
+    Android: com.hyeongwoo.threeMatch
     Standalone: com.Candy-Smith.Sweet-sugar
     Tizen: com.best2dgamesstudio.jellygarden
     iPhone: com.candysmith.sweetsugar
@@ -171,7 +171,7 @@ PlayerSettings:
   overrideDefaultApplicationIdentifier: 1
   AndroidBundleVersionCode: 1
   AndroidMinSdkVersion: 22
-  AndroidTargetSdkVersion: 31
+  AndroidTargetSdkVersion: 33
   AndroidPreferredInstallLocation: 1
   aotOptions: 
   stripEngineCode: 1
@@ -825,7 +825,7 @@ PlayerSettings:
   webGLPowerPreference: 2
   scriptingDefineSymbols:
     : IS_UNITYEDITOR_ANIMATIONS_AVAILABLE
-    Android: 
+    Android: ODIN_INSPECTOR;ODIN_INSPECTOR_3;ODIN_INSPECTOR_3_1;ODIN_INSPECTOR_3_2;ODIN_INSPECTOR_3_3
     Lumin: IS_UNITYEDITOR_ANIMATIONS_AVAILABLE
     Nintendo Switch: IS_UNITYEDITOR_ANIMATIONS_AVAILABLE
     PS4: IS_UNITYEDITOR_ANIMATIONS_AVAILABLE
