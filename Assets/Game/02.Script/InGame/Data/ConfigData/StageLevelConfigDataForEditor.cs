@@ -4,6 +4,7 @@ using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
+#if UNITY_EDITOR
 namespace ThreeMatch.InGame.Data
 {
     [CreateAssetMenu(fileName = "StageLevelConfigDataForEditor", menuName = "ThreeMatch/StageLevelConfigDataForEditor", order = 1)]
@@ -65,3 +66,4 @@ namespace ThreeMatch.InGame.Data
         }
     }
 }
+#endif

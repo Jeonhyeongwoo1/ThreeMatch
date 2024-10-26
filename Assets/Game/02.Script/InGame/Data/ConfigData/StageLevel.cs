@@ -9,8 +9,10 @@ namespace ThreeMatch.InGame.Data
     [CreateAssetMenu(fileName = "StageLevel", menuName = "ThreeMatch/StageLevel")]
     public class StageLevel : SerializedScriptableObject
     {
+        #if UNITY_EDITOR
         [TableMatrix(HorizontalTitle = "column", VerticalTitle = "row", RowHeight = 50, SquareCells = true,
             DrawElementMethod = nameof(DrawElement))]
+        #endif
         public BoardInfoData[,] boardInfoDataArray;
 
         public List<MissionInfoData> missionInfoDataList;
@@ -47,6 +49,7 @@ namespace ThreeMatch.InGame.Data
             this.remainingMoveCount = remainingMoveCount;
         }
 
+#if UNITY_EDITOR
         private BoardInfoData DrawElement(Rect rect, BoardInfoData value)
         {
             // 셀 내에 오브젝트 이름 표시
@@ -63,5 +66,6 @@ namespace ThreeMatch.InGame.Data
 
             return value;
         }
+#endif
     }
 }

@@ -170,8 +170,8 @@ PlayerSettings:
     tvOS: 0
   overrideDefaultApplicationIdentifier: 1
   AndroidBundleVersionCode: 1
-  AndroidMinSdkVersion: 22
-  AndroidTargetSdkVersion: 33
+  AndroidMinSdkVersion: 23
+  AndroidTargetSdkVersion: 34
   AndroidPreferredInstallLocation: 1
   aotOptions: 
   stripEngineCode: 1
@@ -253,18 +253,18 @@ PlayerSettings:
   templateDefaultScene: 
   useCustomMainManifest: 0
   useCustomLauncherManifest: 0
-  useCustomMainGradleTemplate: 0
+  useCustomMainGradleTemplate: 1
   useCustomLauncherGradleManifest: 0
   useCustomBaseGradleTemplate: 0
-  useCustomGradlePropertiesTemplate: 0
+  useCustomGradlePropertiesTemplate: 1
   useCustomGradleSettingsTemplate: 0
   useCustomProguardFile: 0
   AndroidTargetArchitectures: 3
   AndroidTargetDevices: 0
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: /Users/sergeydroba/Dropbox/Asset Store Projects/keystore.keystore
-  AndroidKeyaliasName: 
+  AndroidKeystoreName: /Users/hyeongwoojeon/Documents/Workspace/unityKey.keystore
+  AndroidKeyaliasName: unitykey
   AndroidEnableArmv9SecurityFeatures: 0
   AndroidBuildApkPerCpuArchitecture: 0
   AndroidTVCompatibility: 1
@@ -272,14 +272,14 @@ PlayerSettings:
   AndroidEnableTango: 0
   androidEnableBanner: 1
   androidUseLowAccuracyLocation: 0
-  androidUseCustomKeystore: 0
+  androidUseCustomKeystore: 1
   m_AndroidBanners:
   - width: 320
     height: 180
     banner: {fileID: 0}
   androidGamepadSupportLevel: 0
   chromeosInputEmulation: 1
-  AndroidMinifyRelease: 0
+  AndroidMinifyRelease: 1
   AndroidMinifyDebug: 0
   AndroidValidateAppBundleSize: 1
   AndroidAppBundleSizeToValidate: 150
@@ -825,15 +825,15 @@ PlayerSettings:
   webGLPowerPreference: 2
   scriptingDefineSymbols:
     : IS_UNITYEDITOR_ANIMATIONS_AVAILABLE
-    Android: ODIN_INSPECTOR;ODIN_INSPECTOR_3;ODIN_INSPECTOR_3_1;ODIN_INSPECTOR_3_2;ODIN_INSPECTOR_3_3
+    Android: ODIN_INSPECTOR;ODIN_INSPECTOR_3;ODIN_INSPECTOR_3_1;ODIN_INSPECTOR_3_2;ODIN_INSPECTOR_3_3;GOOGLE_MOBILE_ADS
     Lumin: IS_UNITYEDITOR_ANIMATIONS_AVAILABLE
     Nintendo Switch: IS_UNITYEDITOR_ANIMATIONS_AVAILABLE
     PS4: IS_UNITYEDITOR_ANIMATIONS_AVAILABLE
-    Standalone: ODIN_INSPECTOR;ODIN_INSPECTOR_3;ODIN_INSPECTOR_3_1;ODIN_INSPECTOR_3_2;ODIN_INSPECTOR_3_3
+    Standalone: ODIN_INSPECTOR;ODIN_INSPECTOR_3;ODIN_INSPECTOR_3_1;ODIN_INSPECTOR_3_2;ODIN_INSPECTOR_3_3;GOOGLE_MOBILE_ADS
     WebGL: IS_UNITYEDITOR_ANIMATIONS_AVAILABLE
-    Windows Store Apps: 
+    Windows Store Apps: GOOGLE_MOBILE_ADS
     XboxOne: IS_UNITYEDITOR_ANIMATIONS_AVAILABLE
-    iPhone: 
+    iPhone: GOOGLE_MOBILE_ADS
     tvOS: IS_UNITYEDITOR_ANIMATIONS_AVAILABLE
   additionalCompilerArguments: {}
   platformArchitecture:
@@ -869,7 +869,7 @@ PlayerSettings:
   useDeterministicCompilation: 1
   additionalIl2CppArgs: 
   scriptingRuntimeVersion: 1
-  gcIncremental: 0
+  gcIncremental: 1
   gcWBarrierValidation: 0
   apiCompatibilityLevelPerPlatform: {}
   m_RenderingPath: 1

@@ -1,10 +1,13 @@
 using System;
 using ThreeMatch.Core;
 using ThreeMatch.InGame.Presenter;
+using ThreeMatch.Manager;
 using ThreeMatch.OutGame.Data;
 using ThreeMatch.OutGame.Popup;
 using ThreeMatch.Server;
+using ThreeMatch.Title.Controller;
 using UniRx;
+using UnityEngine;
 
 namespace ThreeMatch.OutGame.Presenter
 {
@@ -21,7 +24,7 @@ namespace ThreeMatch.OutGame.Presenter
             _popup = heartShopPopup;
             _popup.Initialize(OnBuyLift, OnShowAd);
 
-            _disposable.Dispose();
+            _disposable.Clear();
             _model.heart.Subscribe(OnHeartSubScribe).AddTo(_disposable);
         }
 
@@ -81,13 +84,29 @@ namespace ThreeMatch.OutGame.Presenter
             }
             
             CheckIfNeedToChargeHeart(heartCount);
-            var userHeartPresenter = PresenterFactory.CreateOrGet<UserInfoPresenter>();
-            userHeartPresenter.UpdateUserHeart();
         }
 
         private void OnShowAd()
         {
-            
+            AdManager.Instance.ShowRewardAd(OnSuccessShowRewardAd, null);
+        }
+
+        private async void OnSuccessShowRewardAd()
+        {
+            var response = await ServerHandlerFactory.Get<ServerUserRequestHandler>().ChargedHeartRequest();
+            if (response.responseCode != ServerErrorCode.Success)
+            {
+                switch (response.responseCode)
+                {
+                    case ServerErrorCode.FailedGetUserData:
+                        //Alert
+                        return;
+                }
+            }
+
+            int heart = response.userData.Heart;
+            _model.heart.Value = heart;
+            CheckIfNeedToChargeHeart(heart);
         }
     }
 }

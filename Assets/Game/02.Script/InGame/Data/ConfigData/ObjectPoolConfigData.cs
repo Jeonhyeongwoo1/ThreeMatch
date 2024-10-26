@@ -25,6 +25,7 @@ namespace ThreeMatch.InGame.Data
         {
             get
             {
+#if UNITY_EDITOR
                 if (!_instance)
                 {
                     ObjectPoolConfigData configData =
@@ -32,6 +33,8 @@ namespace ThreeMatch.InGame.Data
                     _instance = configData;
                 }
 
+                return _instance;
+#endif
                 return _instance;
             }
         }

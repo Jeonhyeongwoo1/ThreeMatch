@@ -51,6 +51,7 @@ namespace ThreeMatch.OutGame.View
 
         public void UpdateGold(string value)
         {
+            Debug.Log(value);
             _goldCountText.text = value;
         }
 

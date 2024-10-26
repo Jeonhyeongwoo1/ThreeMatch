@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using ThreeMatch.Core;
 using ThreeMatch.Firebase;
@@ -7,6 +8,7 @@ using ThreeMatch.Firebase.Data;
 using ThreeMatch.InGame.Model;
 using ThreeMatch.OutGame.Data;
 using ThreeMatch.Server;
+using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -44,7 +46,6 @@ namespace ThreeMatch.Title.Controller
             }
             
             var userModel = ModelFactory.CreateOrGet<UserModel>();
-            userModel.userId = response.userData.UserId;
             userModel.heart.Value = response.userData.Heart;
             userModel.money.Value = response.userData.Money;
 
@@ -53,6 +54,9 @@ namespace ThreeMatch.Title.Controller
             {
                 ingameItemModel.SetInGameItemValue((InGameItemType) itemData.ItemId, itemData.ItemCount);
             }
+
+            var dailyRewardModel = ModelFactory.CreateOrGet<DailyRewardModel>();
+            dailyRewardModel.CreateDailyRewardItemList(response.dailyRewardHistoryData);
         }
 
         public void MoveToMemu()

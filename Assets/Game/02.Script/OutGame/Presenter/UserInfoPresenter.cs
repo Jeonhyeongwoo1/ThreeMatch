@@ -15,6 +15,7 @@ namespace ThreeMatch.OutGame.Presenter
         private UserModel _model;
         private UserInfoView _view;
         private readonly CompositeDisposable _compositeDisposable = new CompositeDisposable();
+        private HeartShopPresenter _heartShopPresenter;
         
         public void Initialize(UserInfoView view, UserModel model)
         {
@@ -22,8 +23,13 @@ namespace ThreeMatch.OutGame.Presenter
             _view = view;
             _view.Initialize(OpenHeartShopPopup, OpenGoldShopPopup, Const.MaxUserHeartCount <= _model.heart.Value);
 
-            _model.heart.Subscribe(v => UpdateUserHeart()).AddTo(_compositeDisposable);
-            _model.money.Subscribe(v => _view.UpdateGold(v.ToString())).AddTo(_compositeDisposable);
+            _compositeDisposable?.Clear();
+            _model.heart.Subscribe(v => UpdateUserHeart());
+            _model.money.Subscribe(v => _view.UpdateGold(v.ToString()));
+            
+            _heartShopPresenter = PresenterFactory.CreateOrGet<HeartShopPresenter>();
+            var heartShopPopup = PopupManager.Instance.GetPopup<HeartShopPopup>();
+            _heartShopPresenter.Initialize(_model, heartShopPopup);
         }
 
         private void OpenGoldShopPopup()
@@ -41,10 +47,7 @@ namespace ThreeMatch.OutGame.Presenter
                 return;
             }
             
-            var heartShopPresenter = PresenterFactory.CreateOrGet<HeartShopPresenter>();
-            var heartShopPopup = PopupManager.Instance.GetPopup<HeartShopPopup>();
-            heartShopPresenter.Initialize(_model, heartShopPopup);
-            heartShopPresenter.OpenHeartShopPopup();
+            _heartShopPresenter.OpenHeartShopPopup();
         }
 
         public void UpdateUserHeart()

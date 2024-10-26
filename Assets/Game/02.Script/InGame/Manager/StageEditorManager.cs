@@ -5,6 +5,7 @@ using ThreeMatch.InGame.Entity;
 using ThreeMatch.InGame.UI;
 using UnityEngine;
 
+#if UNITY_EDITOR
 namespace ThreeMatch.InGame.Manager
 {
     public class StageEditorManager : MonoBehaviour
@@ -65,3 +66,4 @@ namespace ThreeMatch.InGame.Manager
         }
     }
 }
+#endif

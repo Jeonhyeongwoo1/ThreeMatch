@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using Firebase.Firestore;
 using ThreeMatch.Firebase;
@@ -9,7 +8,6 @@ using ThreeMatch.Interface;
 using ThreeMatch.Keys;
 using ThreeMatch.Shared;
 using UnityEngine;
-using Object = System.Object;
 
 namespace ThreeMatch.Server
 {
@@ -77,10 +75,10 @@ namespace ThreeMatch.Server
             DocumentReference docRef = db.Collection(DBKeys.UserDB).Document(userID);
             UserData userData = null;
             List<InGameItemData> inGameItemDataList = null;
-            
+            DailyRewardHistoryData dailyRewardHistoryData = null;
             try
             {
-                var snapshot =  await docRef.GetSnapshotAsync();
+                var snapshot = await docRef.GetSnapshotAsync();
                 if (!snapshot.TryGetValue(nameof(UserData), out userData))
                 {
                     //Init
@@ -122,7 +120,31 @@ namespace ThreeMatch.Server
                 
                     userDict.Add(DBFields.InGameItemDataList, inGameItemDataList);
                 }
-                
+
+                if (!snapshot.TryGetValue(nameof(DailyRewardHistoryData),
+                        out  dailyRewardHistoryData))
+                {
+                    const int daily = 7;
+                    dailyRewardHistoryData = new DailyRewardHistoryData
+                    {
+                        DailyRewardDataList = new List<DailyRewardData>(daily)
+                    };
+                    
+                    for (int i = 0; i < 7; i++)
+                    {
+                        var data = new DailyRewardData
+                        {
+                            ItemId = i,
+                            IsGetReward = false,
+                            RewardValue = 10
+                        };
+                        
+                        dailyRewardHistoryData.DailyRewardDataList.Add(data);
+                    }
+                    
+                    userDict.Add(nameof(DailyRewardHistoryData), dailyRewardHistoryData);
+                }
+
                 await docRef.SetAsync(userDict, SetOptions.MergeAll);
             }
             catch (Exception e)
@@ -138,7 +160,8 @@ namespace ThreeMatch.Server
             {
                 responseCode = ServerErrorCode.Success,
                 userData = userData,
-                inGameItemDataList = inGameItemDataList
+                inGameItemDataList = inGameItemDataList,
+                dailyRewardHistoryData = dailyRewardHistoryData
             };
         }
 
@@ -250,6 +273,134 @@ namespace ThreeMatch.Server
             {
                 responseCode = ServerErrorCode.Success,
                 userData = userData
+            };
+        }
+
+        public async UniTask<DailyRewardHistoryResponse> GetDailyRewardRequest(int itemId)
+        {
+            string userID = _firebaseController.UserId;
+            FirebaseFirestore db = _firebaseController.DB;
+            DocumentReference docRef = db.Collection(DBKeys.UserDB).Document(userID);
+            
+            DocumentSnapshot snapshot = null;
+            try
+            {
+                snapshot = await docRef.GetSnapshotAsync();
+            }
+            catch (Exception e)
+            {
+                return new DailyRewardHistoryResponse()
+                {
+                    responseCode = ServerErrorCode.FailedFirebaseError,
+                };
+            }
+            
+            if (!snapshot.TryGetValue(nameof(UserData), out UserData userData))
+            {
+                return new DailyRewardHistoryResponse()
+                {
+                    responseCode = ServerErrorCode.FailedGetUserData,
+                };
+            }
+
+            if (!snapshot.TryGetValue(nameof(DailyRewardHistoryData),
+                    out DailyRewardHistoryData dailyRewardHistoryData))
+            {
+                return new DailyRewardHistoryResponse()
+                {
+                    responseCode = ServerErrorCode.FailedGetData
+                };
+            }
+
+            var rewardDataList = dailyRewardHistoryData.DailyRewardDataList;
+            var dailyRewardData = rewardDataList.Find(v => v.ItemId == itemId);
+            if (dailyRewardData == null)
+            {
+                return new DailyRewardHistoryResponse()
+                {
+                    responseCode = ServerErrorCode.FailedGetDailyReward
+                };
+            }
+
+            dailyRewardHistoryData.LastReceivedRewardTime = DateTime.UtcNow;
+            dailyRewardData.IsGetReward = true;
+            
+            int rewardValue = dailyRewardData.RewardValue;
+            userData.Money += rewardValue;
+
+            Dictionary<string, object> userDict = new Dictionary<string, object>();
+            userDict.Add(nameof(UserData), userData);
+            userDict.Add(nameof(DailyRewardHistoryData), dailyRewardHistoryData);
+            try
+            {
+                await docRef.SetAsync(userDict, SetOptions.MergeAll);
+            }
+            catch (Exception e)
+            {
+                return new DailyRewardHistoryResponse()
+                {
+                    responseCode = ServerErrorCode.FailedFirebaseError,
+                };
+            }
+
+            return new DailyRewardHistoryResponse()
+            {
+                dailyRewardHistoryData = dailyRewardHistoryData,
+                userMoney = userData.Money
+            };
+        }
+
+        public async UniTask<AdRewardResponse> GetAdRewardRequest()
+        {
+            string userID = _firebaseController.UserId;
+            FirebaseFirestore db = _firebaseController.DB;
+            DocumentReference docRef = db.Collection(DBKeys.UserDB).Document(userID);
+            
+            DocumentSnapshot snapshot = null;
+            try
+            {
+                snapshot = await docRef.GetSnapshotAsync();
+            }
+            catch (Exception e)
+            {
+                return new AdRewardResponse()
+                {
+                    errorMessage = e.ToString(),
+                    responseCode = ServerErrorCode.FailedFirebaseError,
+                };
+            }
+      
+            if (!snapshot.TryGetValue(nameof(UserData), out UserData userData))
+            {
+                return new AdRewardResponse()
+                {
+                    errorMessage = "Failed get user data",
+                    responseCode = ServerErrorCode.FailedGetUserData,
+                };
+            }
+
+            const int reward = 250;
+            userData.Money += reward;
+            
+            Dictionary<string, object> userDict = new Dictionary<string, object>();
+            userDict.Add(nameof(UserData), userData);
+
+            try
+            {
+                await docRef.SetAsync(userDict, SetOptions.MergeAll);
+            }
+            catch (Exception e)
+            {
+                return new AdRewardResponse()
+                {
+                    errorMessage = e.ToString(),
+                    responseCode = ServerErrorCode.FailedFirebaseError
+                };
+            }
+
+            return new AdRewardResponse()
+            {
+                money = reward
             };
         }
     }

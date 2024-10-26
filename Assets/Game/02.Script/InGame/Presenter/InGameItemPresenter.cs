@@ -24,6 +24,7 @@ namespace ThreeMatch.InGame.Presenter
             _inGameItemView.onPendingUseInGameItem += OnUseInGameItem;
             GameManager.onUsedInGameItemAction += OnUsedInGameItem;
 
+            _disposables.Clear();
             foreach (var ingameItem in _inGameItemModel.inGameItemDict)
             {
                 ingameItem.Value.Subscribe(value =>

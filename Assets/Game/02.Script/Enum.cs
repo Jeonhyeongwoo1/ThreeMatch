@@ -155,6 +155,8 @@ namespace ThreeMatch
         NotEnoughHeart,
         MaxHeartCount,
         NotEnoughMoney,
-        FailedGetStageData
+        FailedGetStageData,
+        FailedGetDailyReward,
+        FailedFirebaseError,
     }
 }

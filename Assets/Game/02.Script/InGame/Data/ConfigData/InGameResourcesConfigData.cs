@@ -8,21 +8,6 @@ namespace ThreeMatch.InGame.Data
     [CreateAssetMenu(fileName = "InGameResourcesConfigData", menuName = "ThreeMatch/InGameResourcesConfigData", order = 1)]
     public class InGameResourcesConfigData : ScriptableObject
     {
-        private static InGameResourcesConfigData _instance;
-        public static InGameResourcesConfigData Instance
-        {
-            get
-            {
-                if (!_instance)
-                {
-                    var configData = AssetDatabase.LoadAssetAtPath<InGameResourcesConfigData>(Const.InGameResourcesConfigData);
-                    _instance = configData;
-                }
-
-                return _instance;
-            }
-        }
-        
         [Serializable]
         public struct CellImageTypeSpriteData
         {
