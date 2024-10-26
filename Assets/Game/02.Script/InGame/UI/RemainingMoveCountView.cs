@@ -5,7 +5,7 @@ using ThreeMatch.InGame.Manager;
 using TMPro;
 using UnityEngine;
 
-namespace ThreeMatch.InGame.UI
+namespace ThreeMatch.InGame.Entity
 {
     public class RemainingMoveCountView : MonoBehaviour
     {

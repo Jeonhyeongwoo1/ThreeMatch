@@ -1,6 +1,5 @@
 using System;
 using Cysharp.Threading.Tasks;
-using Sirenix.OdinInspector;
 using ThreeMatch.Core;
 using ThreeMatch.InGame.Manager;
 using ThreeMatch.Manager;
@@ -65,22 +64,22 @@ namespace ThreeMatch.OutGame.Manager
                 return;
             }
 
-            var response = await ServerHandlerFactory.Get<ServerUserRequestHandler>().SelectStageRequest();
-            switch (response.responseCode)
+            var response = await ServerHandlerFactory.Get<ServerStageRequestHandler>().RemoveHeartRequest();
+            if (response.responseCode != ServerErrorCode.Success)
             {
-                case ServerErrorCode.Success:
-                    break;
-                case ServerErrorCode.FailedGetUserData:
-                    Debug.LogError("Failed get user data");
-                    return;
-                case ServerErrorCode.NotEnoughHeart:
-                    Debug.Log("heart 수가 부족합니다.");
-                    //Alret popup
-                    return;
+                switch (response.responseCode)
+                {
+                    case ServerErrorCode.FailedGetUserData:
+                        Debug.LogError("Failed get user data");
+                        return;
+                    case ServerErrorCode.NotEnoughHeart:
+                        Debug.Log("heart 수가 부족합니다.");
+                        //Alert popup
+                        return;
+                }
             }
 
             userModel.heart.Value = response.userData.Heart;
-            
             onSelectedStageAction?.Invoke();
             await _screenFader.FadeOut();
 
@@ -139,6 +138,7 @@ namespace ThreeMatch.OutGame.Manager
                 }
                 catch (Exception e)
                 {
+                    Debug.LogWarning("failed task wait : " + e);
                 }
                 _waypointsMover.Move(prevIndex, lastStageLevelIndex, OnFinishedDestinationWayPoint);
             }

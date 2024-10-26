@@ -11,22 +11,22 @@ namespace ThreeMatch.InGame.Entity
     {
         private Board _board;
         private Mission _mission;
+        private InGameScore _inGameScore;
         private int _remainingMoveCount;
 
         private event Action<CellType, int, ObstacleCellType, CellImageType> OnCheckMissionAction;
         private event Action OnEndDragAction;
+        private event Action<int> OnAddScoreAction;
 
-        public Stage(BoardInfoData[,] boardInfoArray, List<MissionInfoData> missionDataList, int remainingMoveCount)
+        public Stage(BoardInfoData[,] boardInfoArray, List<MissionInfoData> missionDataList, int remainingMoveCount, int aimScore)
         {
             AddEvents();
             
-            Board board = new Board(boardInfoArray, OnCheckMissionAction, OnEndDragAction);
-            _board = board;
-
-            Mission mission = new Mission(missionDataList);
-            _mission = mission;
-
+            _board = new Board(boardInfoArray, OnCheckMissionAction, OnEndDragAction, OnAddScoreAction);
+            _mission = new Mission(missionDataList);
+            _inGameScore = new InGameScore(aimScore);
             _remainingMoveCount = remainingMoveCount;
+            
             GameManager.onChangeRemainingMoveCountAction?.Invoke(_remainingMoveCount);
         }
         
@@ -34,6 +34,7 @@ namespace ThreeMatch.InGame.Entity
         {
             OnEndDragAction -= OnEndDrag;
             OnCheckMissionAction -= OnCheckMission;
+            OnAddScoreAction -= OnAddScore;
             GameManager.onInGameItemUsagePendingAction -= OnItemUsagePendingAction;
             _board?.Dispose();
             GC.SuppressFinalize(this);
@@ -43,22 +44,13 @@ namespace ThreeMatch.InGame.Entity
         {
             OnEndDragAction += OnEndDrag;
             OnCheckMissionAction += OnCheckMission;
+            OnAddScoreAction += OnAddScore; 
             GameManager.onInGameItemUsagePendingAction += OnItemUsagePendingAction;
         }
-
-        public async UniTask BuildAsync(Vector2 centerPosition, GameObject blockPrefab, GameObject cellPrefab, Transform container = null)
-        {
-            await _board.BuildAsync(centerPosition, blockPrefab, container);
-        }
         
-        public void CustomBuild(Vector2 centerPosition, GameObject blockPrefab, GameObject cellPrefab, Transform parent = null)
+        private void OnAddScore(int score)
         {
-            _board.Build(centerPosition, blockPrefab, parent);
-        }
-
-        public async UniTask BuildAfterProcessAsync()
-        {
-            await _board.BuildAfterProcess();
+            _inGameScore.AddScore(score);
         }
 
         private void OnEndDrag()
@@ -69,17 +61,18 @@ namespace ThreeMatch.InGame.Entity
             if (_remainingMoveCount == 0)
             {
                 bool isAllSuccessMission = _mission.IsAllSuccessMission();
+                int starCount = _inGameScore.GetStarCount();
                 if (isAllSuccessMission)
                 {
                     Debug.Log("Game Clear");
                     //Game Clear
-                    GameManager.onGameClearAction?.Invoke();
+                    GameManager.onGameClearAction?.Invoke(starCount);
                 }
                 else
                 {
                     Debug.Log("Game over");
                     //Game over
-                    GameManager.onGameOverAction?.Invoke();
+                    GameManager.onGameOverAction?.Invoke(starCount);
                 }
             }
         }
@@ -101,19 +94,35 @@ namespace ThreeMatch.InGame.Entity
             bool isAllSuccessMission = _mission.IsAllSuccessMission();
             if (isAllSuccessMission)
             {
+                int starCount = _inGameScore.GetStarCount();
                 if (_remainingMoveCount > 0)
                 {
                     Debug.Log("AllClear");
-                    GameManager.onGameClearAction?.Invoke();
+                    GameManager.onGameClearAction?.Invoke(starCount);
                     // GameManager.onAllSuccessMissionAction?.Invoke();
                 }
                 else
                 {
-                    GameManager.onGameOverAction?.Invoke();
+                    GameManager.onGameOverAction?.Invoke(starCount);
                 }
             }
         }
+        
+        public async UniTask BuildAsync(Vector2 centerPosition, GameObject blockPrefab, Transform container = null)
+        {
+            await _board.BuildAsync(centerPosition, blockPrefab, container);
+        }
+        
+        public void CustomBuild(Vector2 centerPosition, GameObject blockPrefab, Transform parent = null)
+        {
+            _board.Build(centerPosition, blockPrefab, parent);
+        }
 
+        public async UniTask BuildAfterProcessAsync()
+        {
+            await _board.BuildAfterProcess();
+        }
+        
         private MissionType DetermineMissionTypeByCellTypeAndCellImageType(CellType cellType, ObstacleCellType obstacleCellType = ObstacleCellType.None,
             CellImageType cellImageType = CellImageType.None)
         {

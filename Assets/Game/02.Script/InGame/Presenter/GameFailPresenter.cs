@@ -15,15 +15,14 @@ namespace ThreeMatch.InGame.Presenter
             _missionModel = missionModel;
         }
 
-        public async UniTask GameFailProcess()
+        public async UniTask GameFailProcess(int starCount, int stageLevel)
         {
             _gameFailedPopup.ShowAndHideFailTextObj(true);
 
             await UniTask.WaitForSeconds(2f, cancelImmediately: true);
             
-            bool isShowAds = false;
             _gameFailedPopup.ShowAndHideFailTextObj(false);
-            _gameFailedPopup.ShowAndHideFailPopupObj(true, isShowAds);
+            _gameFailedPopup.ShowAndHideFailPopupObj(true, starCount, stageLevel.ToString());
         }
     }
 }

@@ -41,8 +41,9 @@ namespace ThreeMatch.InGame
         private UniTaskCompletionSource _executeInGameItemTaskCompletionSource;
         private readonly Action<CellType, int, ObstacleCellType, CellImageType> _onCheckMissionAction;
         private readonly Action _onEndDragAction;
+        private readonly Action<int> _onAddScoreAction;
 
-        public Board(BoardInfoData[,] boardInfoDataArray, Action<CellType, int, ObstacleCellType, CellImageType> onCheckMissionAction, Action onEndDragAction)
+        public Board(BoardInfoData[,] boardInfoDataArray, Action<CellType, int, ObstacleCellType, CellImageType> onCheckMissionAction, Action onEndDragAction, Action<int> onAddScoreAction)
         {
             _row = boardInfoDataArray.GetLength(0);
             _column = boardInfoDataArray.GetLength(1);
@@ -54,6 +55,7 @@ namespace ThreeMatch.InGame
             InputPanel.OnPointerUpAction += OnPointerUp;
             _onCheckMissionAction = onCheckMissionAction;
             _onEndDragAction = onEndDragAction;
+            _onAddScoreAction = onAddScoreAction;
         }
         
         public void Dispose()
@@ -416,7 +418,6 @@ namespace ThreeMatch.InGame
 
         private bool RemoveCell(Cell cell)
         {
-            _onCheckMissionAction?.Invoke(cell.CellType, 1, cell.ObstacleCellType, cell.CellImageType);
             bool isSuccess = cell.TryRemoveCell();
             if (isSuccess)
             {
@@ -429,7 +430,9 @@ namespace ThreeMatch.InGame
                 {
                     _cellArray[cell.Row, cell.Column] = null;
                 }
-
+                
+                _onCheckMissionAction?.Invoke(cell.CellType, 1, cell.ObstacleCellType, cell.CellImageType);
+                _onAddScoreAction?.Invoke(10);
                 return true;
             }
 

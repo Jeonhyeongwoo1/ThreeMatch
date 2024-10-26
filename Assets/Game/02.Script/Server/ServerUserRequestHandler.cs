@@ -17,56 +17,6 @@ namespace ThreeMatch.Server
         {
         }
 
-        public async UniTask<UserResponse> SelectStageRequest()
-        {
-            string userID = _firebaseController.UserId;
-            FirebaseFirestore db = _firebaseController.DB;
-            DocumentReference docRef = db.Collection(DBKeys.UserDB).Document(userID);
-            
-            UserData userData = null;
-            try
-            {
-                var snapshot = await docRef.GetSnapshotAsync();
-                if (!snapshot.TryGetValue(nameof(UserData), out userData))
-                {
-                    return new UserResponse()
-                    {
-                        responseCode = ServerErrorCode.FailedGetUserData,
-                    };
-                }
-
-                if (userData.Heart <= 0)
-                {
-                    return new UserResponse()
-                    {
-                        responseCode = ServerErrorCode.FailedGetData
-                    };
-                }
-
-                userData.Heart--;
-                Dictionary<string, UserData> userDict = new Dictionary<string, UserData>()
-                {
-                    { nameof(UserData), userData }
-                };
-                
-                await docRef.SetAsync(userDict, SetOptions.MergeAll);
-            }
-            catch (Exception e)
-            {
-                return new UserResponse()
-                {
-                    responseCode = ServerErrorCode.FailedGetData,
-                    errorMessage = e.ToString()
-                };
-            }
-
-            return new UserResponse()
-            {
-                responseCode = ServerErrorCode.Success,
-                userData = userData
-            };
-        }
-
         public async UniTask<UserResponse> LoadUserDataRequest(UserRequest request)
         {
             string userID = _firebaseController.UserId;

@@ -15,17 +15,17 @@ namespace ThreeMatch.InGame
             if (stageLevel == null)
             {
                 Debug.LogError($"failed get stage {path}");
-                path = $"StageLevel_{0}";
-                stageLevel = Resources.Load<StageLevel>($"StageLevel/{path}");
+                stageLevel = Resources.Load<StageLevel>($"StageLevel/StageLevel_0");
                 Debug.Log("Load stage level 0");
             }
-            
-            return new Stage(stageLevel.GetBoardInfoDataArray(), stageLevel.missionInfoDataList, stageLevel.remainingMoveCount);
+
+            return new Stage(stageLevel.GetBoardInfoDataArray(), stageLevel.missionInfoDataList,
+                stageLevel.remainingMoveCount, stageLevel.aimScore);
         }
 
-        public Stage LoadStage(BoardInfoData[,] boardInfoArray, List<MissionInfoData> missionInfoDataList, int remainingMoveCount)
+        public Stage LoadStage(BoardInfoData[,] boardInfoArray, List<MissionInfoData> missionInfoDataList, int remainingMoveCount, int aimScore)
         {
-            return new Stage(boardInfoArray,  missionInfoDataList, remainingMoveCount);
+            return new Stage(boardInfoArray,  missionInfoDataList, remainingMoveCount, aimScore);
         }
     }
 }

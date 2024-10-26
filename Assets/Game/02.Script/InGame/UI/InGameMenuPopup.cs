@@ -47,15 +47,15 @@ namespace ThreeMatch.InGame.UI
             }
         }
 
-        public void Show()
+        public void Show(int starCount, string stageLevel)
         {
-            Debug.Log("Show");
             gameObject.SetActive(true);
+            UpdateStarObj(starCount);
+            UpdateStageLevel(stageLevel);
         }
 
         public void Hide()
         {
-            Debug.Log("Hide");
             gameObject.SetActive(false);
         }
 
@@ -63,7 +63,7 @@ namespace ThreeMatch.InGame.UI
         {
             for (var i = 0; i < _starObjList.Count; i++)
             {
-                _starObjList[i].SetActive(targetIndex < i);
+                _starObjList[i].SetActive(targetIndex - 1 >= i);
             }
         }
 

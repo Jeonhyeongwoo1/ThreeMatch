@@ -17,16 +17,16 @@ namespace ThreeMatch.InGame.Entity
         public Mission(List<MissionInfoData> missionDataList)
         {
              _missionModel = ModelFactory.CreateOrGet<MissionModel>();
-             var missionInfoDatas = new List<MissionInfoData>();
+             var missionInfoDataList = new List<MissionInfoData>();
              foreach (MissionInfoData missionInfoData in missionDataList)
              {
                  MissionInfoData data = new MissionInfoData();
                  data.removeCount = missionInfoData.removeCount;
                  data.missionType = missionInfoData.missionType;
-                 missionInfoDatas.Add(data);
+                 missionInfoDataList.Add(data);
              }
 
-             _missionModel.missionDataList = new ReactiveProperty<List<MissionInfoData>>(missionInfoDatas);
+             _missionModel.missionDataList = new ReactiveProperty<List<MissionInfoData>>(missionInfoDataList);
              _missionView = UIManager.Instance.GetView<MissionView>();
 
              var missionViewDataList = missionDataList.Select(missionData => new MissionView.Data

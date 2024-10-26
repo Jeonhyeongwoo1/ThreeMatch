@@ -85,7 +85,7 @@ namespace ThreeMatch.InGame.Manager
             }
             
             _boardContainer = Instantiate(_containerPrefab);
-            await stage.BuildAsync(centerPosition, _blockPrefab, _cellPrefab, _boardContainer.transform);
+            await stage.BuildAsync(centerPosition, _blockPrefab, _boardContainer.transform);
 
             UniTaskCompletionSource gameReadyCompletionSource = new();
             var gameReadyView = UIManager.Instance.GetView<GameReadyView>();

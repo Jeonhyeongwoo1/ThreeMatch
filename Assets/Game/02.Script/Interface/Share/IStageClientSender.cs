@@ -8,7 +8,7 @@ namespace ThreeMatch.Interface
     public interface IStageClientSender : IClientSender
     {
         UniTask<StageResponse> LoadStageDataRequest();
-        UniTask<StageResponse> StageClearRequest(int stageLevel, int starCount, List<InGameItemData> inGameItemDataList);
-        UniTask<Response> StageFailedRequest(List<InGameItemData> inGameItemDataList);
+        UniTask<StageResponse> StageClearOrFailRequest(int stageLevel, int starCount, bool isClear, List<InGameItemData> inGameItemDataList);
+        UniTask<UserResponse> RemoveHeartRequest();
     }
 }

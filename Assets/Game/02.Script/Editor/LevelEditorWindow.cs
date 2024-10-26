@@ -367,11 +367,11 @@ namespace ThreeMatch.InGame.Editor
             }
             
             _stageBuilder = new StageBuilder();
-            _stage = _stageBuilder.LoadStage(array, missionInfoDataList, remainingMoveCount);
+            _stage = _stageBuilder.LoadStage(array, missionInfoDataList, remainingMoveCount, aimScore);
 
             Vector2 centerPosition =
                 Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.5f));
-            _stage.CustomBuild(centerPosition, blockPrefab, cellPrefab, _boardContainer);
+            _stage.CustomBuild(centerPosition, blockPrefab, _boardContainer);
             _isShowBoardCellTypeMatrix = true;
             _stageLevelConfigDataForEditor.boardInfoDataArray = boardInfoDataArray;
             EditorUtility.SetDirty(_stageLevelConfigDataForEditor);
@@ -474,9 +474,16 @@ namespace ThreeMatch.InGame.Editor
                 Debug.Log("이동 가능한 횟수가 0입니다");
                 return;
             }
+
+            if (aimScore == 0)
+            {
+                DisplayDialog("에러", "목표 점수를 설정해주세요.", "OK");
+                Debug.Log("목표 점수가 0입니다.");
+                return;
+            }
             
             StageEditorManager.stageLevel = stageLevel;
-            stageLevel.Initialize(boardInfoDataArray, missionInfoDataList, remainingMoveCount);
+            stageLevel.Initialize(boardInfoDataArray, missionInfoDataList, remainingMoveCount, aimScore);
             AssetDatabase.SaveAssets();
             EditorUtility.FocusProjectWindow();
             EditorUtility.SetDirty(stageLevel); // 에디터에 변경 사항 알림
@@ -507,9 +514,9 @@ namespace ThreeMatch.InGame.Editor
             CreateCustomStage();
             
             var stageLevel = CreateInstance<StageLevel>();
-            stageLevel.Initialize(boardInfoDataArray, missionInfoDataList, remainingMoveCount);
+            stageLevel.Initialize(boardInfoDataArray, missionInfoDataList, remainingMoveCount, aimScore);
             _stageLevelConfigDataForEditor.Initialize(boardInfoDataArray,
-                missionInfoDataList, stageLevel.remainingMoveCount);
+                missionInfoDataList, stageLevel.remainingMoveCount, stageLevel.aimScore);
             int count = stageLevelList.Count;
             AssetDatabase.CreateAsset(stageLevel, $"{StageLevelPath}StageLevel_{count}.asset");
             AssetDatabase.SaveAssets();
@@ -601,9 +608,22 @@ namespace ThreeMatch.InGame.Editor
         [Title("이동 가능한 횟수")]
         public int remainingMoveCount;
 
+        [Space]
+        [PropertyOrder(9)]
+        [OnValueChanged(nameof(OnChangeAimScoreValue))]
+        [ShowIf(nameof(IsActiveStageEditor))]
+        [Title("목표 점수")]
+        public int aimScore;
+        
         private void OnChangeRemainingMoveCountValue()
         {
             _stageLevelConfigDataForEditor.remainingMoveCount = remainingMoveCount;
+            EditorUtility.SetDirty(_stageLevelConfigDataForEditor);
+        }
+
+        private void OnChangeAimScoreValue()
+        {
+            _stageLevelConfigDataForEditor.aimScore = aimScore;
             EditorUtility.SetDirty(_stageLevelConfigDataForEditor);
         }
         

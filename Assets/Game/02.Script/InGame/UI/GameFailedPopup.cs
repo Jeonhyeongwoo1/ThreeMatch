@@ -15,9 +15,16 @@ namespace ThreeMatch.InGame.UI
             _failAlarmTextObj.SetActive(isActive);
         }
 
-        public void ShowAndHideFailPopupObj(bool isActive, bool isShowAdsObj)
+        public void ShowAndHideFailPopupObj(bool isActive, int starCount, string stageLevel)
         {
-            _inGameMenuPopup.Show();
+            if (isActive)
+            {
+                _inGameMenuPopup.Show(starCount, stageLevel);
+            }
+            else
+            {
+                _inGameMenuPopup.Hide();
+            }
         }
 
         public void CloseFailPopup()

@@ -64,96 +64,137 @@ namespace ThreeMatch.Server
             };
         }
 
-        public async UniTask<StageResponse> StageClearRequest(int stageLevel, int starCount, List<InGameItemData> inGameItemDataList)
+        public async UniTask<StageResponse> StageClearOrFailRequest(int stageLevel, int starCount, bool isClear,
+            List<InGameItemData> inGameItemDataList)
         {
             string userID = _firebaseController.UserId;
             FirebaseFirestore db = _firebaseController.DB;
             DocumentReference docRef = db.Collection(DBKeys.UserDB).Document(userID);
 
             StageData stageData = null;
-            List<InGameItemData> dbItemDataList = null;
+            DocumentSnapshot snapshot = null;
             try
             {
-                var snapshot = await docRef.GetSnapshotAsync();
-                if (!snapshot.TryGetValue(nameof(StageData), out stageData))
+                snapshot = await docRef.GetSnapshotAsync();
+            }
+            catch (Exception e)
+            {
+                return new StageResponse()
                 {
-                    return new StageResponse()
-                    {
-                        responseCode = ServerErrorCode.FailedGetStageData
-                    };
-                }
+                    responseCode = ServerErrorCode.FailedFirebaseError,
+                    errorMessage = e.ToString()
+                };
+            }
 
-                var list = stageData.StageLevelDataList;
-                var stageLevelData = list.Find(v => v.Level == stageLevel);
+            if (!snapshot.TryGetValue(nameof(StageData), out stageData))
+            {
+                return new StageResponse()
+                {
+                    responseCode = ServerErrorCode.FailedGetStageData
+                };
+            }
+
+            var list = stageData.StageLevelDataList;
+            var stageLevelData = list.Find(v => v.Level == stageLevel);
+            if (stageLevelData.StarCount < starCount && isClear)
+            {
                 stageLevelData.StarCount = starCount;
+            }
 
+            if (isClear)
+            {
                 var nextStageLevelData = list.Find(v => v.Level == stageLevel + 1);
                 nextStageLevelData.IsLock = false;
+            }
 
-                var stageDict = new Dictionary<string, object>()
-                {
-                    { nameof(StageData), stageData }
-                };
+            var stageDict = new Dictionary<string, object>()
+            {
+                { nameof(StageData), stageData }
+            };
 
-                if (snapshot.TryGetValue(DBFields.InGameItemDataList, out dbItemDataList))
-                {
-                    dbItemDataList = inGameItemDataList;
-                    stageDict.Add(DBFields.InGameItemDataList, dbItemDataList);
-                }
+            if (snapshot.TryGetValue(DBFields.InGameItemDataList, out List<InGameItemData> dbItemDataList))
+            {
+                dbItemDataList = inGameItemDataList;
+                stageDict.Add(DBFields.InGameItemDataList, dbItemDataList);
+            }
 
+            try
+            {
                 await docRef.SetAsync(stageDict, SetOptions.MergeAll);
             }
             catch (Exception e)
             {
                 return new StageResponse()
                 {
-                    responseCode = ServerErrorCode.FailedGetData,
+                    responseCode = ServerErrorCode.FailedFirebaseError,
                     errorMessage = e.ToString()
                 };
             }
-
+            
             return new StageResponse()
             {
                 stageLevelDataList = stageData.StageLevelDataList
             };
         }
-
-        public async UniTask<Response> StageFailedRequest(List<InGameItemData> inGameItemDataList)
+        
+        public async UniTask<UserResponse> RemoveHeartRequest()
         {
             string userID = _firebaseController.UserId;
             FirebaseFirestore db = _firebaseController.DB;
             DocumentReference docRef = db.Collection(DBKeys.UserDB).Document(userID);
 
+            DocumentSnapshot snapshot = null;
             try
             {
-                var snapshot = await docRef.GetSnapshotAsync();
-                if (snapshot.TryGetValue(DBFields.InGameItemDataList, out List<InGameItemData> dbItemDataList))
-                {
-                    dbItemDataList = inGameItemDataList;
-                    var stageDict = new Dictionary<string, object>();
-                    stageDict.Add(DBFields.InGameItemDataList, dbItemDataList);
-                    await docRef.SetAsync(stageDict, SetOptions.MergeAll);
-                }
-                else
-                {
-                    return new Response()
-                    {
-                        responseCode = ServerErrorCode.FailedGetData
-                    };
-                }
+                snapshot = await docRef.GetSnapshotAsync();
             }
             catch (Exception e)
             {
-                return new StageResponse()
+                return new UserResponse()
                 {
-                    responseCode = ServerErrorCode.FailedGetData,
+                    responseCode = ServerErrorCode.FailedFirebaseError,
+                    errorMessage = e.ToString()
+                };
+            }
+            
+            if (!snapshot.TryGetValue(nameof(UserData), out UserData userData))
+            {
+                return new UserResponse()
+                {
+                    responseCode = ServerErrorCode.FailedGetUserData,
+                };
+            }
+
+            if (userData.Heart <= 0)
+            {
+                return new UserResponse()
+                {
+                    responseCode = ServerErrorCode.NotEnoughHeart
+                };
+            }
+
+            userData.Heart--;
+            Dictionary<string, UserData> userDict = new Dictionary<string, UserData>()
+            {
+                { nameof(UserData), userData }
+            };
+            try
+            {
+                await docRef.SetAsync(userDict, SetOptions.MergeAll);
+            }
+            catch (Exception e)
+            {
+                return new UserResponse()
+                {
+                    responseCode = ServerErrorCode.FailedFirebaseError,
                     errorMessage = e.ToString()
                 };
             }
 
-            return new Response()
+            return new UserResponse()
             {
-                responseCode = ServerErrorCode.Success
+                responseCode = ServerErrorCode.Success,
+                userData = userData
             };
         }
     }

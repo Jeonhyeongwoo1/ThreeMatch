@@ -17,6 +17,7 @@ namespace ThreeMatch.InGame.Data
 
         public List<MissionInfoData> missionInfoDataList;
         public int remainingMoveCount;
+        public int aimScore;
 
         public BoardInfoData[,] GetBoardInfoDataArray()
         {
@@ -42,11 +43,12 @@ namespace ThreeMatch.InGame.Data
             return array;
         }
 
-        public void Initialize(BoardInfoData[,] boardInfoDataArray, List<MissionInfoData> missionInfoDataList, int remainingMoveCount)
+        public void Initialize(BoardInfoData[,] boardInfoDataArray, List<MissionInfoData> missionInfoDataList, int remainingMoveCount, int aimScore)
         {
             this.boardInfoDataArray = boardInfoDataArray;
             this.missionInfoDataList = missionInfoDataList;
             this.remainingMoveCount = remainingMoveCount;
+            this.aimScore = aimScore;
         }
 
 #if UNITY_EDITOR

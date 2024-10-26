@@ -32,11 +32,11 @@ namespace ThreeMatch.InGame.UI
             _completeLevelObj.SetActive(isActive);
         }
 
-        public void ShowAndHideInGameWinMenuPopup(bool isActive)
+        public void ShowAndHideInGameWinMenuPopup(bool isActive, int starCount, string stageLevel)
         {
             if (isActive)
             {
-                _inGameWinMenuPopup.Show();
+                _inGameWinMenuPopup.Show(starCount, stageLevel);
             }
             else
             {

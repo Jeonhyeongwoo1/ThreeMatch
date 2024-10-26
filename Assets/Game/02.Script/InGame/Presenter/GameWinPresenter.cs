@@ -19,7 +19,7 @@ namespace ThreeMatch.InGame.Presenter
             _missionModel = missionModel;
         }
 
-        public async UniTask GameWinProcess()
+        public async UniTask GameWinProcess(int stageLevel, int starCount)
         {
             UniTaskCompletionSource task = new UniTaskCompletionSource();
 
@@ -35,7 +35,7 @@ namespace ThreeMatch.InGame.Presenter
             await task.Task;
 
             // _gameWinPopup.gameObject.SetActive(false);
-            _gameWinPopup.ShowAndHideInGameWinMenuPopup(true);
+            _gameWinPopup.ShowAndHideInGameWinMenuPopup(true, starCount, stageLevel.ToString());
         }
     }
 }

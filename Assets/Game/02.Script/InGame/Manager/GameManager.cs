@@ -1,4 +1,5 @@
 using System;
+using Cysharp.Threading.Tasks;
 using ThreeMatch.Core;
 using ThreeMatch.InGame.Model;
 using ThreeMatch.InGame.Presenter;
@@ -6,6 +7,7 @@ using ThreeMatch.InGame.UI;
 using ThreeMatch.Manager;
 using ThreeMatch.OutGame.Data;
 using ThreeMatch.Server;
+using ThreeMatch.Shared;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,8 +20,8 @@ namespace ThreeMatch.InGame.Manager
         public static Action onAllSuccessMissionAction;
         public static Action onGameReadyAction;
         public static Action onGameStartAction;
-        public static Action onGameClearAction;
-        public static Action onGameOverAction;
+        public static Action<int> onGameClearAction;
+        public static Action<int> onGameOverAction;
         public static Action<int> onChangeRemainingMoveCountAction;
         
         private InGameItemPresenter _inGameItemPresenter;
@@ -78,32 +80,45 @@ namespace ThreeMatch.InGame.Manager
             _gameWinPresenter.Initialize(gameWinPopup, missionModel);
         }
 
-        private async void OnGameOver()
+        private async void OnGameOver(int starCount)
         {
             if (GameState.Start != _gameState)
             {
                 return;
             }
             
+            var stageLevelModel = ModelFactory.CreateOrGet<StageLevelListModel>();
+            int stageLevel = stageLevelModel.selectedStageLevel;
+            
             UpdateState(GameState.End);
+            StageResponse response = await StageClearOrFailRequest(starCount, false, stageLevel);
+            stageLevelModel.AddStageLevelModelList(response.stageLevelDataList);
+            
+            await _gameFailPresenter.GameFailProcess(starCount, stageLevel);
+        }
+
+        private async UniTask<StageResponse> StageClearOrFailRequest(int starCount, bool isClear, int stageLevel)
+        {
             var ingameItemModel = ModelFactory.CreateOrGet<InGameItemModel>();
             var response = await ServerHandlerFactory.Get<ServerStageRequestHandler>()
-                .StageFailedRequest(ingameItemModel.ConvertToInGameItemDataList());
+                .StageClearOrFailRequest(stageLevel, starCount, isClear, ingameItemModel.ConvertToInGameItemDataList());
 
             if (response.responseCode != ServerErrorCode.Success)
             {
                 switch (response.responseCode)
                 {
                     case ServerErrorCode.FailedGetData:
+                    case ServerErrorCode.FailedGetStageData:
+                        //Alert
                         SceneManager.LoadScene(SceneType.Title.ToString());
-                        return;
+                        return null;
                 }
             }
-
-            await _gameFailPresenter.GameFailProcess();
+            
+            return response;
         }
 
-        private async void OnGameClear()
+        private async void OnGameClear(int starCount)
         {
             if (GameState.Start != _gameState)
             {
@@ -113,27 +128,13 @@ namespace ThreeMatch.InGame.Manager
             UpdateState(GameState.End);
 
             var stageLevelModel = ModelFactory.CreateOrGet<StageLevelListModel>();
-            int starCount = 3;
             int stageLevel = stageLevelModel.selectedStageLevel;
-            var ingameItemModel = ModelFactory.CreateOrGet<InGameItemModel>();
-            var response = await ServerHandlerFactory.Get<ServerStageRequestHandler>()
-                .StageClearRequest(stageLevel, starCount, ingameItemModel.ConvertToInGameItemDataList());
-            if (response.responseCode != ServerErrorCode.Success)
-            {
-                switch (response.responseCode)
-                {
-                    case ServerErrorCode.FailedGetData:
-                    case ServerErrorCode.FailedGetStageData:
-                        //Alert
-                        SceneManager.LoadScene(SceneType.Title.ToString());
-                        return;
-                }
-            }
+            StageResponse response = await StageClearOrFailRequest(starCount, true, stageLevel);
 
             int lastStageLevel = response.stageLevelDataList.FindLastIndex(v => !v.IsLock);
             stageLevelModel.openNewStage = stageLevel + 1 == lastStageLevel;
             stageLevelModel.AddStageLevelModelList(response.stageLevelDataList);
-            await _gameWinPresenter.GameWinProcess();
+            await _gameWinPresenter.GameWinProcess(stageLevel, starCount);
         }
 
         private void InGameMenuButtonCallbackInitialize()
@@ -145,15 +146,25 @@ namespace ThreeMatch.InGame.Manager
             ingameMenuButtonModel.AddCallback(InGameMenuPopupButtonType.RestartGame, OnRestartGame);
             ingameMenuButtonModel.AddCallback(InGameMenuPopupButtonType.ShowAd, OnShowAds);
         }
-
-        private void OnShowAds()
-        {
-            Debug.Log("OnShowAds");
-        }
-
-        private void OnRestartGame()
+        
+        private async void OnRestartGame()
         {
             Debug.Log("OnRestartGame");
+            var response = await ServerHandlerFactory.Get<ServerStageRequestHandler>().RemoveHeartRequest();
+            if (response.responseCode != ServerErrorCode.Success)
+            {
+                switch (response.responseCode)
+                {
+                    case ServerErrorCode.FailedGetUserData:
+                        Debug.LogError("Failed get user data");
+                        return;
+                    case ServerErrorCode.NotEnoughHeart:
+                        Debug.Log("heart 수가 부족합니다.");
+                        //Alert popup
+                        return;
+                }
+            }
+            
             var stageLevel = ModelFactory.CreateOrGet<StageLevelListModel>();
             StageManager.Instance.ReloadStage(stageLevel.selectedStageLevel);
         }
@@ -168,7 +179,12 @@ namespace ThreeMatch.InGame.Manager
         {
             Debug.Log("OnShare");
         }
-
+        
+        private void OnShowAds()
+        {
+            Debug.Log("OnShowAds");
+        }
+        
         private void OnChangeNextStage()
         {
             Debug.Log("OnChangeNextStage");

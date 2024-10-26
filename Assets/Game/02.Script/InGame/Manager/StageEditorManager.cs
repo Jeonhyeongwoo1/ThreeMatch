@@ -37,13 +37,14 @@ namespace ThreeMatch.InGame.Manager
             var stageLevel = Resources.Load<StageLevelConfigDataForEditor>("StageLevelConfigDataForEditor");
             Debug.Log($"stageLevel {stageLevel}");
             StageBuilder builder = new StageBuilder();
-            Stage stage = builder.LoadStage(stageLevel.GetBoardInfoDataArray(), stageLevel.missionInfoDataList, stageLevel.remainingMoveCount);
+            Stage stage = builder.LoadStage(stageLevel.GetBoardInfoDataArray(), stageLevel.missionInfoDataList,
+                stageLevel.remainingMoveCount, stageLevel.aimScore);
             _currentStage = stage;
             Vector2 centerPosition =
                 Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.5f));
 
             _boardContainer = Instantiate(_containerPrefab);
-            stage.BuildAsync(centerPosition, _blockPrefab, _cellPrefab, _boardContainer.transform);
+            stage.BuildAsync(centerPosition, _blockPrefab, _boardContainer.transform);
         }
 
         private void RemoveDummyObj()
@@ -54,8 +55,8 @@ namespace ThreeMatch.InGame.Manager
                 DestroyImmediate(go);
             }            
             
-            var MissionPanelArray = GameObject.FindGameObjectsWithTag("MissionPanel");
-            foreach (GameObject go in MissionPanelArray)
+            var missionPanelArray = GameObject.FindGameObjectsWithTag("MissionPanel");
+            foreach (GameObject go in missionPanelArray)
             {
                 var missionElement = go.transform.GetComponentsInChildren<MissionElement>();
                 foreach (MissionElement element in missionElement)
