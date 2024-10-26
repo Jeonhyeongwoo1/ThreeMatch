@@ -24,5 +24,10 @@ namespace ThreeMatch.InGame.Presenter
             _gameFailedPopup.ShowAndHideFailTextObj(false);
             _gameFailedPopup.ShowAndHideFailPopupObj(true, starCount, stageLevel.ToString());
         }
+
+        public void HideFailPopupObj()
+        {
+            _gameFailedPopup.ShowAndHideFailPopupObj(false, 0, null);
+        }
     }
 }

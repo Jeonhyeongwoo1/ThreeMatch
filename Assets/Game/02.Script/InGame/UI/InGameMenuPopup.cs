@@ -34,10 +34,10 @@ namespace ThreeMatch.InGame.UI
                     {
                         case InGameMenuPopupButtonType.MoveToStageLevelScene:
                         case InGameMenuPopupButtonType.NextStage:
-                        case InGameMenuPopupButtonType.RestartGame:
                         case InGameMenuPopupButtonType.ClosePopup:
                             gameObject.SetActive(false);
                             break;
+                        case InGameMenuPopupButtonType.RestartGame:
                         case InGameMenuPopupButtonType.Share:
                         case InGameMenuPopupButtonType.ShowAd:
                         default:

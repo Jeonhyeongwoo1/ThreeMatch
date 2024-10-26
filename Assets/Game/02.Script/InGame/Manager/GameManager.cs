@@ -23,7 +23,7 @@ namespace ThreeMatch.InGame.Manager
         public static Action<int> onGameClearAction;
         public static Action<int> onGameOverAction;
         public static Action<int> onChangeRemainingMoveCountAction;
-        
+    
         private InGameItemPresenter _inGameItemPresenter;
         private GameFailPresenter _gameFailPresenter;
         private GameWinPresenter _gameWinPresenter;
@@ -49,8 +49,6 @@ namespace ThreeMatch.InGame.Manager
             onGameStartAction -= OnGameStart;
             onGameOverAction -= OnGameOver;
             onGameClearAction -= OnGameClear;
-            
-            
         }
 
         private void OnGameStart()
@@ -165,13 +163,15 @@ namespace ThreeMatch.InGame.Manager
                 }
             }
             
+            _gameFailPresenter.HideFailPopupObj();
             var stageLevel = ModelFactory.CreateOrGet<StageLevelListModel>();
             StageManager.Instance.ReloadStage(stageLevel.selectedStageLevel);
         }
 
-        private void OnMoveToStageLevelScene()
+        private async void OnMoveToStageLevelScene()
         {
             Debug.Log("OnMoveToStageLevelScene");
+            await UIManager.Instance.ScreenFader.FadeOut();
             SceneManager.LoadSceneAsync(SceneType.StageLevel.ToString());
         }
 
@@ -185,11 +185,12 @@ namespace ThreeMatch.InGame.Manager
             Debug.Log("OnShowAds");
         }
         
-        private void OnChangeNextStage()
+        private async void OnChangeNextStage()
         {
             Debug.Log("OnChangeNextStage");
-            var model = ModelFactory.CreateOrGet<StageLevelListModel>();
-            model.selectedStageLevel++;
+            // var model = ModelFactory.CreateOrGet<StageLevelListModel>();
+            // model.selectedStageLevel++;
+            await UIManager.Instance.ScreenFader.FadeOut();
             SceneManager.LoadSceneAsync(SceneType.StageLevel.ToString());
         }
 

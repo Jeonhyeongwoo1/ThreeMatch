@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ThreeMatch.InGame.Interface;
+using ThreeMatch.Utils;
 using UnityEngine;
 
 namespace ThreeMatch.InGame.Manager
@@ -23,8 +24,11 @@ namespace ThreeMatch.InGame.Manager
             }
         }
         
-        private Dictionary<Type, IView> _viewDict = new();
+        public ScreenFader ScreenFader => _screenFader;
+        [SerializeField] private ScreenFader _screenFader;
 
+        private Dictionary<Type, IView> _viewDict = new();
+        
         public T GetView<T>() where T : IView, new ()
         {
             if (_viewDict.TryGetValue(typeof(T), out var view))

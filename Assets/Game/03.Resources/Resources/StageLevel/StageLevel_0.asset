@@ -1391,6 +1391,6 @@ MonoBehaviour:
       Data: 
   missionInfoDataList:
   - missionType: 3
-    removeCount: 10
+    removeCount: 1000
   remainingMoveCount: 2
   aimScore: 300
