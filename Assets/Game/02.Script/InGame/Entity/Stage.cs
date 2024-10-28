@@ -16,13 +16,12 @@ namespace ThreeMatch.InGame.Entity
 
         private event Action<CellType, int, ObstacleCellType, CellImageType> OnCheckMissionAction;
         private event Action OnEndDragAction;
-        private event Action<int> OnAddScoreAction;
 
         public Stage(BoardInfoData[,] boardInfoArray, List<MissionInfoData> missionDataList, int remainingMoveCount, int aimScore)
         {
             AddEvents();
             
-            _board = new Board(boardInfoArray, OnCheckMissionAction, OnEndDragAction, OnAddScoreAction);
+            _board = new Board(boardInfoArray, OnCheckMissionAction, OnEndDragAction, GameManager.onCellComboAction);
             _mission = new Mission(missionDataList);
             _inGameScore = new InGameScore(aimScore);
             _remainingMoveCount = remainingMoveCount;
@@ -34,7 +33,7 @@ namespace ThreeMatch.InGame.Entity
         {
             OnEndDragAction -= OnEndDrag;
             OnCheckMissionAction -= OnCheckMission;
-            OnAddScoreAction -= OnAddScore;
+            GameManager.onCellComboAction -= OnAddScore;
             GameManager.onInGameItemUsagePendingAction -= OnItemUsagePendingAction;
             _board?.Dispose();
             GC.SuppressFinalize(this);
@@ -44,13 +43,13 @@ namespace ThreeMatch.InGame.Entity
         {
             OnEndDragAction += OnEndDrag;
             OnCheckMissionAction += OnCheckMission;
-            OnAddScoreAction += OnAddScore; 
+            GameManager.onCellComboAction += OnAddScore; 
             GameManager.onInGameItemUsagePendingAction += OnItemUsagePendingAction;
         }
         
-        private void OnAddScore(int score)
+        private void OnAddScore(int score, int comboCount)
         {
-            _inGameScore.AddScore(score);
+            _inGameScore.AddScore(score, comboCount);
         }
 
         private void OnEndDrag()
@@ -120,7 +119,7 @@ namespace ThreeMatch.InGame.Entity
 
         public async UniTask BuildAfterProcessAsync()
         {
-            await _board.BuildAfterProcess();
+            await _board.PostSwapProcess();
         }
         
         private MissionType DetermineMissionTypeByCellTypeAndCellImageType(CellType cellType, ObstacleCellType obstacleCellType = ObstacleCellType.None,

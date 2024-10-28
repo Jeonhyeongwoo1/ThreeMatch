@@ -23,6 +23,7 @@ namespace ThreeMatch.InGame.Manager
         public static Action<int> onGameClearAction;
         public static Action<int> onGameOverAction;
         public static Action<int> onChangeRemainingMoveCountAction;
+        public static Action<int, int> onCellComboAction;
     
         private InGameItemPresenter _inGameItemPresenter;
         private GameFailPresenter _gameFailPresenter;

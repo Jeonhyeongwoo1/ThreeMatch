@@ -3777,6 +3777,7 @@ GameObject:
   - component: {fileID: 976330016}
   - component: {fileID: 976330015}
   - component: {fileID: 976330014}
+  - component: {fileID: 976330017}
   m_Layer: 0
   m_Name: character_main (1)
   m_TagString: Untagged
@@ -3869,6 +3870,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 976330012}
   m_CullTransparentMesh: 0
+--- !u!114 &976330017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 976330012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b6b2a7afbd064852925f86da0e910d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &978306570
 GameObject:
   m_ObjectHideFlags: 0
@@ -4962,6 +4975,41 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1788, y: 324}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1299591796
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1299591797}
+  m_Layer: 5
+  m_Name: ComboSpawnPivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1299591797
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1299591796}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1300279350}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 93.75, y: 37.5}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1300279349
 GameObject:
   m_ObjectHideFlags: 0
@@ -4996,6 +5044,7 @@ RectTransform:
   - {fileID: 1666896278}
   - {fileID: 248664223}
   - {fileID: 1340371825}
+  - {fileID: 1299591797}
   m_Father: {fileID: 794686872}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -5055,6 +5104,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _progressbarImage: {fileID: 1666896280}
   _scoreText: {fileID: 1340371826}
+  _comboCountSpawnPivotTransform: {fileID: 1299591797}
 --- !u!1 &1303091744
 GameObject:
   m_ObjectHideFlags: 0
@@ -5140,8 +5190,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 32.23427}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchoredPosition: {x: -0, y: 32.23427}
+  m_SizeDelta: {x: 265.52, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1340371826
 MonoBehaviour:
@@ -5190,12 +5240,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 50
+  m_fontSize: 60
   m_fontSizeBase: 50
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 60
   m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -8235,7 +8285,6 @@ GameObject:
   - component: {fileID: 2022180181}
   - component: {fileID: 2022180184}
   - component: {fileID: 2022180183}
-  - component: {fileID: 2022180182}
   m_Layer: 0
   m_Name: character_main
   m_TagString: Untagged
@@ -8263,19 +8312,6 @@ RectTransform:
   m_AnchoredPosition: {x: -0.54, y: 0.54}
   m_SizeDelta: {x: 229.73, y: 229.73}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2022180182
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2022180180}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d301aa7c57a5e4938bbb0e82a63fe958, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  anim: {fileID: 976330014}
 --- !u!114 &2022180183
 MonoBehaviour:
   m_ObjectHideFlags: 0

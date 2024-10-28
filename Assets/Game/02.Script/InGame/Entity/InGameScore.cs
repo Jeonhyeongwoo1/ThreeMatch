@@ -15,12 +15,20 @@ namespace ThreeMatch.InGame.Entity
             _currentScore = 0;
 
             _inGameScoreView = UIManager.Instance.GetView<InGameScoreView>();
-            _inGameScoreView.UpdateScore(0, 0.ToString());
+            _inGameScoreView?.UpdateScore(0, 0.ToString());
         }
 
-        public void AddScore(int score)
+        public void AddScore(int score, int comboCount)
         {
             _currentScore += score;
+
+            if (comboCount > 0)
+            {
+                var pool = ObjectPoolManager.Instance.GetPool(PoolKeyType.ComboCountText);
+                var comboBehaviour = pool.Get<ComboBehaviour>();
+                comboBehaviour.SetComboCount(comboCount.ToString());
+                comboBehaviour.Spawn(_inGameScoreView.ComboCountSpawnPivotTransform);
+            }
 
             float ratio = (float)_currentScore / _aimScore;
             _inGameScoreView.UpdateScore(ratio, _currentScore.ToString());

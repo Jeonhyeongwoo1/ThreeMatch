@@ -29,6 +29,11 @@ namespace ThreeMatch.InGame.Effect
             _pos2 = to;
         }
 
+        public void SetDuration(float duration)
+        {
+            _duration = duration;
+        }
+
         public void Spawn(Transform spawner, Action callback = null)
         {
             transform.position = Vector3.zero;

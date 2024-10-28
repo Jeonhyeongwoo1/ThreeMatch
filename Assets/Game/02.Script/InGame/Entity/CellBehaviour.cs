@@ -13,12 +13,13 @@ namespace ThreeMatch.InGame.Entity
     public class CellBehaviour : MonoBehaviour, IPoolable
     {
         public Vector2 Size => _collider2D.bounds.size;
-
         public PoolKeyType PoolKeyType { get; set; }
+        
         [SerializeField] protected SpriteRenderer _backgroundSprite;
         [SerializeField] protected SpriteRenderer _frontSprite;
         [SerializeField] protected InGameResourcesConfigData _data;
 
+        private Sequence _doPunchScaleSequence = null;
         private Collider2D _collider2D;
 
         public T Get<T>() where T : MonoBehaviour
@@ -137,5 +138,30 @@ namespace ThreeMatch.InGame.Entity
             }
         }
 
+        protected void DoPunchScaleAnimation(Transform target, float duration, bool isLoop, float delay)
+        {
+            _doPunchScaleSequence = DOTween.Sequence();
+            _doPunchScaleSequence.Append(target.DOPunchScale(Vector3.one * 0.13f, duration, 5));
+            _doPunchScaleSequence.AppendInterval(delay);
+            _doPunchScaleSequence.OnComplete(() => target.localScale = Vector3.one);
+            if (isLoop)
+            {
+                _doPunchScaleSequence.SetLoops(-1);
+            }
+        }
+
+        public void StopPunchScale()
+        {
+            if (_doPunchScaleSequence != null)
+            {
+                _doPunchScaleSequence.Kill(true);
+                _doPunchScaleSequence = null;
+            }
+        }
+
+        public virtual void ShowHintAnimation()
+        {
+            DoPunchScaleAnimation(transform, 1, true, 1f);
+        }
     }
 }

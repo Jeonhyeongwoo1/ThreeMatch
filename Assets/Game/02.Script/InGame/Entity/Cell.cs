@@ -27,14 +27,15 @@ namespace ThreeMatch.InGame.Entity
         private CellType _cellType;
         private ObstacleCellType _obstacleCellType;
 
-        public Cell(int row, int column, CellType cellType, ObstacleCellType obstacleCellType = ObstacleCellType.None, CellImageType cellImageType = CellImageType.None)
+        public Cell(int row, int column, CellType cellType, ObstacleCellType obstacleCellType = ObstacleCellType.None,
+            CellImageType cellImageType = CellImageType.None)
         {
             _column = column;
             _row = row;
             _cellType = cellType;
             _obstacleCellType = obstacleCellType;
             _cellMatchedType = CellMatchedType.None;
-            
+
             if (obstacleCellType == ObstacleCellType.Cage)
             {
                 int length = Enum.GetNames(typeof(CellImageType)).Length - 1;
@@ -46,7 +47,7 @@ namespace ThreeMatch.InGame.Entity
                 _cellImageType = cellImageType;
             }
         }
-        
+
         public void CreateCellBehaviour(Vector3 position, Transform parent = null)
         {
             IPoolable pool;
@@ -92,7 +93,7 @@ namespace ThreeMatch.InGame.Entity
         {
             _row = row;
             _column = column;
-            CellBehaviour.name = $"Cell {_row} / {_column}";
+            // CellBehaviour.name = $"Cell {_row} / {_column}";
         }
 
         public bool IsSameColorType(CellImageType cellImageType)
@@ -104,7 +105,6 @@ namespace ThreeMatch.InGame.Entity
         {
             _cellType = GetCellTypeByMatchedType(cellMatchedType);
             _cellMatchedType = cellMatchedType;
-            Vector3 position;
             PoolKeyType poolKeyType = PoolKeyType.None;
             switch (_cellType)
             {
@@ -119,14 +119,14 @@ namespace ThreeMatch.InGame.Entity
                     break;
                 case CellType.Normal:
                 case CellType.Obstacle:
-                case CellType.Generator:
+                default:
                     Debug.LogError($"failed change cell type from match  {cellMatchedType} {_cellType}");
                     poolKeyType = PoolKeyType.Cell_Normal;
                     break;
             }
             
             _cellBehaviour.Activate(false);
-            position = Position;
+            Vector3 position = Position;
             var poolable = ObjectPoolManager.Instance.GetPool(poolKeyType);
             _cellBehaviour = poolable.Get<CellBehaviour>();
             _cellBehaviour.Initialize(_cellType, parent, position, _obstacleCellType, _cellImageType, _cellMatchedType);
@@ -149,6 +149,11 @@ namespace ThreeMatch.InGame.Entity
         public void ActivateRocket()
         {
             
+        }
+
+        public void UpdateCellImageTypeForSimulation(CellImageType cellImageType)
+        {
+            _cellImageType = cellImageType;
         }
 
         public void ChangeCellType(CellType cellType)

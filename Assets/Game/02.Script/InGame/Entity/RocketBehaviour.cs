@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using DG.Tweening;
 using ThreeMatch.InGame.Manager;
 using UnityEngine;
 
@@ -7,6 +6,8 @@ namespace ThreeMatch.InGame.Entity
 {
     public class RocketBehaviour : CellBehaviour
     {
+        [SerializeField] private Transform _scaler;
+        
         private Animator _animator;
         
         protected override void Start()
@@ -14,6 +15,11 @@ namespace ThreeMatch.InGame.Entity
             base.Start();
 
             TryGetComponent(out _animator);
+        }
+
+        public override void ShowHintAnimation()
+        {
+            DoPunchScaleAnimation(_scaler, 1, true, 1f);
         }
 
         public override void Initialize(CellType cellType, Transform parent, Vector3 position,

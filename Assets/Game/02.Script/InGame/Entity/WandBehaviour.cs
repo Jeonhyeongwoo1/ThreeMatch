@@ -9,25 +9,19 @@ namespace ThreeMatch.InGame.Entity
 {
     public class WandBehaviour : CellBehaviour
     {
-        public void ShowLighting(CellType cellType, Cell cell)
+        public void ShowLighting(Cell cell, float duration = 0.8f)
         {
-            if (cellType == CellType.Wand)
-            {
-                var pool = ObjectPoolManager.Instance.GetPool(PoolKeyType.WandLightEffect);
-                var lighting = pool.Get<Lighting>();
-                lighting.SetPosition(transform.position, cell.Position);
-                lighting.Spawn(transform);
+            var pool = ObjectPoolManager.Instance.GetPool(PoolKeyType.WandLightEffect);
+            var lighting = pool.Get<Lighting>();
+            lighting.SetPosition(transform.position, cell.Position);
+            lighting.SetDuration(duration);
+            lighting.Spawn(transform);
+        }
 
-                var lightPool = ObjectPoolManager.Instance.GetPool(PoolKeyType.CellDisappearLightEffect);
-                var pooledObject = lightPool.Get<PooledObject>();
-                pooledObject.Spawn(cell.CellBehaviour.transform);
-                cell.CellBehaviour.Activate(false);
-
-                Sequence sequence = DOTween.Sequence();
-                sequence.Append(transform.DOScale(Vector3.one * 1.5f, 0.3f));
-                sequence.AppendInterval(0.5f);
-                sequence.OnComplete(() => Activate(false));
-            }
+        public void StartLightingAnimation()
+        {
+            Sequence sequence = DOTween.Sequence();
+            sequence.Append(transform.DOScale(Vector3.one * 1.5f, 0.3f));
         }
     }
 }

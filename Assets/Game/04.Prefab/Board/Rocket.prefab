@@ -169,6 +169,7 @@ MonoBehaviour:
   _backgroundSprite: {fileID: 0}
   _frontSprite: {fileID: 0}
   _data: {fileID: 11400000, guid: f8fbed9cb9b4d477cae9f24f8866f3eb, type: 2}
+  _scaler: {fileID: 5893785090272535974}
 --- !u!61 &7694831318831216190
 BoxCollider2D:
   m_ObjectHideFlags: 0

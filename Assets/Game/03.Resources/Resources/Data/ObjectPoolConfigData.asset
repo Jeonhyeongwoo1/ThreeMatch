@@ -112,3 +112,10 @@ MonoBehaviour:
     parentName: UI
     prefab: {fileID: 3464840296838899836, guid: e9516572427c64cf5bba48a858f87ea3,
       type: 3}
+  - poolCount: 5
+    poolKeyType: 15
+    sceneType: 3
+    isInit: 1
+    parentName: UI
+    prefab: {fileID: 7323209456666384844, guid: 996f2b9f3edab4fad978a2b120ee446a,
+      type: 3}

@@ -99,6 +99,7 @@ namespace ThreeMatch
         SwapPostProcess,
         PendingUseInGameItem,
         UseItem,
+        ShuffleByUnmatchableCell,
     }
 
     public enum PoolKeyType
@@ -118,7 +119,8 @@ namespace ThreeMatch
         Cell_Obstacle_OneHitBox,
         Cell_Generator,
         StarObject,
-        StageLevelText
+        StageLevelText,
+        ComboCountText
     }
 
     public enum GameState

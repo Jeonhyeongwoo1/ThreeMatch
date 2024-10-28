@@ -26,4 +26,15 @@ public static class Const
     public static int DefaultMoney = 0;
     public static int MaxStageLevel = 100;
     public static int DefaultInGameItemCount = 3;
+    public static int ShowHintTime = 3;
+
+    public static int MatchedCellScore = 30;
+    public static int MatchedSpecialCellScore = 50;
+    public static int ActivateRocketAndBombScore = 200;
+    public static int ActivateRocketAndRocketScore = 150;
+    public static int ActivateRocketAndWandScore = 200;
+    public static int ActivateBombAndWandScore = 200;
+    public static int ActivateBombAndBombScore = 250;
+    public static int ActivateWandAndWandScore = 250;
+    public static int ComboAddScore = 10;
 }
