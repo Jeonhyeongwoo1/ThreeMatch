@@ -9,6 +9,9 @@ using ThreeMatch.OutGame.Popup;
 using ThreeMatch.OutGame.Presenter;
 using ThreeMatch.OutGame.View;
 using ThreeMatch.Server;
+using ThreeMatch.Shared.Popup;
+using ThreeMatch.Shared.Presenter;
+using ThreeMatch.Shared.View;
 using ThreeMatch.Utils;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -54,6 +57,20 @@ namespace ThreeMatch.OutGame.Manager
             var dailyRewardPresenter = PresenterFactory.CreateOrGet<DailyRewardPresenter>();
             dailyRewardPresenter.Initialize(popupManager.GetPopup<DailyPopup>(),
                 ModelFactory.CreateOrGet<DailyRewardModel>(), userModel);
+
+            var settingPresenter = PresenterFactory.CreateOrGet<SettingPresenter>();
+            settingPresenter.Initialize(uiManager.GetView<SettingView>());
+            
+            var heartShopPresenter = PresenterFactory.CreateOrGet<HeartShopPresenter>();
+            var heartShopPopup = PopupManager.Instance.GetPopup<HeartShopPopup>();
+            heartShopPresenter.Initialize(userModel, heartShopPopup);
+            
+            var goldShopPresenter = PresenterFactory.CreateOrGet<GoldShopPresenter>();
+            var goldShopPopup = PopupManager.Instance.GetPopup<GoldShopPopup>();
+            goldShopPresenter.Initialize(userModel, goldShopPopup);
+            
+            var tutorialPresenter = PresenterFactory.CreateOrGet<TutorialPresenter>();
+            tutorialPresenter.Initialize(popupManager.GetPopup<TutorialPopup>());
         }
 
         private async void OnSelectStage(int level)

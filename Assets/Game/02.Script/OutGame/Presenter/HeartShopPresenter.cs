@@ -16,7 +16,8 @@ namespace ThreeMatch.OutGame.Presenter
         private UserModel _model;
         private HeartShopPopup _popup;
 
-        private CompositeDisposable _disposable = new();
+        private CompositeDisposable _compositeDisposable = new();
+        private IDisposable _disposable;
         
         public void Initialize(UserModel userModel, HeartShopPopup heartShopPopup)
         {
@@ -24,8 +25,10 @@ namespace ThreeMatch.OutGame.Presenter
             _popup = heartShopPopup;
             _popup.Initialize(OnBuyLift, OnShowAd);
 
-            _disposable.Clear();
-            _model.heart.Subscribe(OnHeartSubScribe).AddTo(_disposable);
+            _compositeDisposable?.Clear();
+            _disposable?.Dispose();
+            _model.heart.Subscribe(OnHeartSubScribe).AddTo(_compositeDisposable);
+            _disposable = EventManager.Subscribe(nameof(OpenHeartShopPopup), OpenHeartShopPopup);
         }
 
         private void OnHeartSubScribe(int heart)
@@ -35,8 +38,6 @@ namespace ThreeMatch.OutGame.Presenter
 
         public void OpenHeartShopPopup()
         {
-            int heartCount = _model.heart.Value;
-            int numberOfHeartNeeded = Const.MaxUserHeartCount - heartCount;
             _popup.Open(_model.heartRechargeTime.Value, Const.HeartPurchaseCost.ToString(), OnChargedHeart);
         }
 

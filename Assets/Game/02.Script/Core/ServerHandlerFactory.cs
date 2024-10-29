@@ -42,6 +42,7 @@ namespace ThreeMatch.Core
             ClearDict();
             Create<ServerUserRequestHandler>(firebaseController);
             Create<ServerStageRequestHandler>(firebaseController);
+            Create<ServerCommonRequestHandler>(firebaseController);
         }
     }
 }

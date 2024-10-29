@@ -1,6 +1,6 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.Security.Cryptography;
 using Cysharp.Threading.Tasks;
 using ThreeMatch.Core;
 using ThreeMatch.Firebase;
@@ -8,7 +8,6 @@ using ThreeMatch.Firebase.Data;
 using ThreeMatch.InGame.Model;
 using ThreeMatch.OutGame.Data;
 using ThreeMatch.Server;
-using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -20,7 +19,7 @@ namespace ThreeMatch.Title.Controller
         {
             await Initialize();
         }
-
+        
         private async UniTask Initialize()
         {
             var firebaseController = new FirebaseController();

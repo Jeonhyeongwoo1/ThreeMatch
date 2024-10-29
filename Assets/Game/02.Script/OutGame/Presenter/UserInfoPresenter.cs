@@ -7,15 +7,15 @@ using ThreeMatch.OutGame.Popup;
 using ThreeMatch.OutGame.View;
 using ThreeMatch.Server;
 using UniRx;
+using UnityEngine;
 
 namespace ThreeMatch.OutGame.Presenter
 {
-    public class UserInfoPresenter : BasePresenter
+    public class UserInfoPresenter : BasePresenter, IDisposable
     {
         private UserModel _model;
         private UserInfoView _view;
         private readonly CompositeDisposable _compositeDisposable = new CompositeDisposable();
-        private HeartShopPresenter _heartShopPresenter;
         
         public void Initialize(UserInfoView view, UserModel model)
         {
@@ -24,20 +24,17 @@ namespace ThreeMatch.OutGame.Presenter
             _view.Initialize(OpenHeartShopPopup, OpenGoldShopPopup, Const.MaxUserHeartCount <= _model.heart.Value);
 
             _compositeDisposable?.Clear();
-            _model.heart.Subscribe(v => UpdateUserHeart());
-            _model.money.Subscribe(v => _view.UpdateGold(v.ToString()));
-            
-            _heartShopPresenter = PresenterFactory.CreateOrGet<HeartShopPresenter>();
-            var heartShopPopup = PopupManager.Instance.GetPopup<HeartShopPopup>();
-            _heartShopPresenter.Initialize(_model, heartShopPopup);
+            _model.heart.Subscribe(v => UpdateUserHeart()).AddTo(_compositeDisposable);
+            _model.money.Subscribe(v => _view.UpdateGold(v.ToString())).AddTo(_compositeDisposable);
         }
 
         private void OpenGoldShopPopup()
         {
-            var goldShopPresenter = PresenterFactory.CreateOrGet<GoldShopPresenter>();
-            var goldShopPopup = PopupManager.Instance.GetPopup<GoldShopPopup>();
-            goldShopPresenter.Initialize(_model, goldShopPopup);
-            goldShopPresenter.OpenGoldShopPopup();
+            var goldShopPopup= PopupManager.Instance.GetPopup<GoldShopPopup>();
+            if (goldShopPopup != null)
+            {
+                goldShopPopup.Open();
+            }
         }
 
         private void OpenHeartShopPopup()
@@ -47,7 +44,7 @@ namespace ThreeMatch.OutGame.Presenter
                 return;
             }
             
-            _heartShopPresenter.OpenHeartShopPopup();
+            EventManager.RaiseEvent(nameof(HeartShopPresenter.OpenHeartShopPopup));
         }
 
         public void UpdateUserHeart()
@@ -86,6 +83,11 @@ namespace ThreeMatch.OutGame.Presenter
                 _view.StopHeartChargeTimer();
                 _view.UpdateHeartTimerText("FULL");
             }
+        }
+
+        public void Dispose()
+        {
+            _compositeDisposable?.Dispose();
         }
     }
 }
