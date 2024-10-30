@@ -1,15 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
-using ThreeMatch.Core;
-using ThreeMatch.InGame.Manager;
+using ThreeMatch.Common.Popup;
+using ThreeMatch.Common.View;
 using ThreeMatch.InGame.Presenter;
 using ThreeMatch.Manager;
-using ThreeMatch.Shared.Popup;
-using ThreeMatch.Shared.View;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace ThreeMatch.Shared.Presenter
+namespace ThreeMatch.Common.Presenter
 {
     public class SettingPresenter : BasePresenter
     {

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace ThreeMatch.Shared.Entity
+namespace ThreeMatch.Common.Entity
 {
     public class SettingObjectEventHandler : MonoBehaviour
     {

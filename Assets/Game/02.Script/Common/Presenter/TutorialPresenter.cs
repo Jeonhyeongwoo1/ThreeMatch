@@ -1,9 +1,9 @@
 using System;
+using ThreeMatch.Common.Popup;
 using ThreeMatch.InGame.Presenter;
 using ThreeMatch.Manager;
-using ThreeMatch.Shared.Popup;
 
-namespace ThreeMatch.Shared.Presenter
+namespace ThreeMatch.Common.Presenter
 {
     public class TutorialPresenter : BasePresenter
     {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace ThreeMatch.Shared.Entity
+namespace ThreeMatch.Common.Entity
 {
     public class TutorialElement : MonoBehaviour
     {

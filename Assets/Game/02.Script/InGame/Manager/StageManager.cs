@@ -41,7 +41,6 @@ namespace ThreeMatch.InGame.Manager
         private void Start()
         {
             var levelListModel = ModelFactory.CreateOrGet<StageLevelListModel>();
-            Debug.Log($"stageManager {levelListModel.selectedStageLevel}");
             LoadStage(levelListModel.selectedStageLevel).Forget();
         }
 

@@ -6,5 +6,6 @@ namespace ThreeMatch.Shared
     public class StageResponse : Response
     {
         public List<StageLevelData> stageLevelDataList;
+        public AchievementHistoryData achievementHistoryData;
     }
 }

@@ -2,12 +2,14 @@ using System;
 using System.Collections;
 using System.Security.Cryptography;
 using Cysharp.Threading.Tasks;
+using ThreeMatch.Common.Data;
 using ThreeMatch.Core;
 using ThreeMatch.Firebase;
 using ThreeMatch.Firebase.Data;
 using ThreeMatch.InGame.Model;
 using ThreeMatch.OutGame.Data;
 using ThreeMatch.Server;
+using ThreeMatch.Shared.Data;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -56,8 +58,11 @@ namespace ThreeMatch.Title.Controller
 
             var dailyRewardModel = ModelFactory.CreateOrGet<DailyRewardModel>();
             dailyRewardModel.CreateDailyRewardItemList(response.dailyRewardHistoryData);
-        }
 
+            var achievementModel = ModelFactory.CreateOrGet<AchievementModel>();
+            achievementModel.SetAchievementDataList(response.achievementHistoryData.AchievementDataList);
+        }
+        
         public void MoveToMemu()
         {
             StartCoroutine(Wait(2, () => SceneManager.LoadScene(SceneType.StageLevel.ToString())));

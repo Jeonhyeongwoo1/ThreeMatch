@@ -8,5 +8,6 @@ namespace ThreeMatch.Shared
         public UserData userData;
         public List<InGameItemData> inGameItemDataList;
         public DailyRewardHistoryData dailyRewardHistoryData;
+        public AchievementHistoryData achievementHistoryData;
     }
 }

@@ -25,6 +25,9 @@ namespace ThreeMatch.InGame.Entity
             public CellMatchedType cellMatchedType;
             public List<Cell> cellList;
         }
+
+        public int RemoveCellCount => _removeCellCount;
+        public int[] UsedItemCountArray => _usedItemCountArray;
         
         private Cell[,] _cellArray;
         private Block[,] _blockArray;
@@ -42,6 +45,9 @@ namespace ThreeMatch.InGame.Entity
         private readonly Action _onEndDragAction;
         private readonly Action<int, int> _onAddScoreAction;
         private int _comboCount;
+        private InGameItemType _pendingInGameItemType;
+        private int _removeCellCount;
+        private int[] _usedItemCountArray = { 0, 0, 0, 0 };
         
         private List<Vector2> _removedCellRowAndColumnList = new();
 
@@ -476,24 +482,28 @@ namespace ThreeMatch.InGame.Entity
         private bool RemoveCell(Cell cell)
         {
             bool isSuccess = cell.TryRemoveCell();
-            if (isSuccess)
+            if (!isSuccess)
             {
-                if (cell.CellType == CellType.Obstacle)
-                {
-                    //케이지는 부서지면 일반 셀로 변경
-                    cell.ChangeCellType(CellType.Normal);
-                }
-                else if (cell.CellType != CellType.Generator)
-                {
-                    _cellArray[cell.Row, cell.Column] = null;
-                }
-                
-                _onCheckMissionAction?.Invoke(cell.CellType, cell.Position, 1, cell.ObstacleCellType, cell.CellImageType);
-                // _onAddScoreAction?.Invoke(10);
-                return true;
+                return false;
+            }
+            
+            if (cell.CellType == CellType.Obstacle)
+            {
+                //케이지는 부서지면 일반 셀로 변경
+                cell.ChangeCellType(CellType.Normal);
+            }
+            else if (cell.CellType != CellType.Generator)
+            {
+                _cellArray[cell.Row, cell.Column] = null;
             }
 
-            return false;
+            if (cell.CellType == CellType.Normal)
+            {
+                _removeCellCount++;
+            }
+                
+            _onCheckMissionAction?.Invoke(cell.CellType, cell.Position, 1, cell.ObstacleCellType, cell.CellImageType);
+            return true;
         }
 
         private void RemoveCellProcess(int row, int column)
@@ -1416,7 +1426,6 @@ namespace ThreeMatch.InGame.Entity
 
         #region Player_Item
 
-        private InGameItemType _pendingInGameItemType;
         
         public void SetPendingUseInGameItemType(InGameItemType inGameItemType)
         {
@@ -1429,6 +1438,15 @@ namespace ThreeMatch.InGame.Entity
             UpdateBoardState(BoardState.UseItem);
             RemoveSimulationResult();
             GameManager.onUsedInGameItemAction?.Invoke(_pendingInGameItemType);
+
+            try
+            {
+                _usedItemCountArray[(int)_pendingInGameItemType]++;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
             
             switch (_pendingInGameItemType)
             {

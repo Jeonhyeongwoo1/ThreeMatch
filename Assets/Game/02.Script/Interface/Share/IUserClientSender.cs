@@ -10,5 +10,6 @@ namespace ThreeMatch.Interface
         UniTask<UserResponse> ChargedHeartRequest();
         UniTask<UserResponse> BuyHeartRequest();
         UniTask<DailyRewardHistoryResponse> GetDailyRewardRequest(int itemId);
+        UniTask<AchievementResponse> GetAchievementRewardRequest(int achievementId);
     }
 }

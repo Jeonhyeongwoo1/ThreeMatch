@@ -1,11 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using ThreeMatch.Common.Entity;
 using ThreeMatch.Interface;
-using ThreeMatch.Shared.Entity;
 using UnityEngine;
 
-namespace ThreeMatch.Shared.Popup
+namespace ThreeMatch.Common.Popup
 {
     public class TutorialPopup : MonoBehaviour, IPopup
     {

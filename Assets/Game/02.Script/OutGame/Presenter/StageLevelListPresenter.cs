@@ -26,7 +26,7 @@ namespace ThreeMatch.OutGame.Presenter
                 StageLevelPresenter presenter = new StageLevelPresenter(levelModel, levelView, onSelectStageLevel);
                 _stageLevelPresenterList.Add(presenter);
             }
-            
+
             foreach (StageLevelPresenter presenter in _stageLevelPresenterList)
             {
                 presenter.Initialize();

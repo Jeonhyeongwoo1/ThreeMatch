@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using ThreeMatch.Common.Data;
 using ThreeMatch.Core;
 using ThreeMatch.InGame.Model;
 using ThreeMatch.InGame.Presenter;
@@ -8,6 +9,7 @@ using ThreeMatch.Manager;
 using ThreeMatch.OutGame.Data;
 using ThreeMatch.Server;
 using ThreeMatch.Shared;
+using ThreeMatch.Shared.Data;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -20,8 +22,8 @@ namespace ThreeMatch.InGame.Manager
         public static Action onAllSuccessMissionAction;
         public static Action onGameReadyAction;
         public static Action onGameStartAction;
-        public static Action<int> onGameClearAction;
-        public static Action<int> onGameOverAction;
+        public static Action<GameResultData> onGameClearAction;
+        public static Action<GameResultData> onGameOverAction;
         public static Action<int> onChangeRemainingMoveCountAction;
         public static Action<int, int> onCellComboAction;
     
@@ -79,7 +81,7 @@ namespace ThreeMatch.InGame.Manager
             _gameWinPresenter.Initialize(gameWinPopup, missionModel);
         }
 
-        private async void OnGameOver(int starCount)
+        private async void OnGameOver(GameResultData gameResultData)
         {
             if (GameState.Start != _gameState)
             {
@@ -90,17 +92,20 @@ namespace ThreeMatch.InGame.Manager
             int stageLevel = stageLevelModel.selectedStageLevel;
             
             UpdateState(GameState.End);
-            StageResponse response = await StageClearOrFailRequest(starCount, false, stageLevel);
+            StageResponse response = await StageClearOrFailRequest(gameResultData, false, stageLevel);
             stageLevelModel.AddStageLevelModelList(response.stageLevelDataList);
+
+            var achievementModel = ModelFactory.CreateOrGet<AchievementModel>();
+            achievementModel.SetAchievementDataList(response.achievementHistoryData.AchievementDataList);
             
-            await _gameFailPresenter.GameFailProcess(starCount, stageLevel);
+            await _gameFailPresenter.GameFailProcess(gameResultData.starCount, stageLevel);
         }
 
-        private async UniTask<StageResponse> StageClearOrFailRequest(int starCount, bool isClear, int stageLevel)
+        private async UniTask<StageResponse> StageClearOrFailRequest(GameResultData gameResultData, bool isClear, int stageLevel)
         {
             var ingameItemModel = ModelFactory.CreateOrGet<InGameItemModel>();
             var response = await ServerHandlerFactory.Get<ServerStageRequestHandler>()
-                .StageClearOrFailRequest(stageLevel, starCount, isClear, ingameItemModel.ConvertToInGameItemDataList());
+                .StageClearOrFailRequest(stageLevel, gameResultData, isClear, ingameItemModel.ConvertToInGameItemDataList());
 
             if (response.responseCode != ServerErrorCode.Success)
             {
@@ -117,7 +122,7 @@ namespace ThreeMatch.InGame.Manager
             return response;
         }
 
-        private async void OnGameClear(int starCount)
+        private async void OnGameClear(GameResultData gameResultData)
         {
             if (GameState.Start != _gameState)
             {
@@ -128,12 +133,15 @@ namespace ThreeMatch.InGame.Manager
 
             var stageLevelModel = ModelFactory.CreateOrGet<StageLevelListModel>();
             int stageLevel = stageLevelModel.selectedStageLevel;
-            StageResponse response = await StageClearOrFailRequest(starCount, true, stageLevel);
+            StageResponse response = await StageClearOrFailRequest(gameResultData, true, stageLevel);
 
             int lastStageLevel = response.stageLevelDataList.FindLastIndex(v => !v.IsLock);
             stageLevelModel.openNewStage = stageLevel + 1 == lastStageLevel;
             stageLevelModel.AddStageLevelModelList(response.stageLevelDataList);
-            await _gameWinPresenter.GameWinProcess(stageLevel, starCount);
+            var achievementModel = ModelFactory.CreateOrGet<AchievementModel>();
+            achievementModel.SetAchievementDataList(response.achievementHistoryData.AchievementDataList);
+
+            await _gameWinPresenter.GameWinProcess(stageLevel, gameResultData.starCount);
         }
 
         private void InGameMenuButtonCallbackInitialize()

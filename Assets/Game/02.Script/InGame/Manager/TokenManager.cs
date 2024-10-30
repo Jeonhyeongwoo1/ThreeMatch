@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using ThreeMatch.InGame.Data;
 using ThreeMatch.InGame.Entity;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace ThreeMatch.InGame.Manager
 {
@@ -25,20 +26,36 @@ namespace ThreeMatch.InGame.Manager
         
         private static TokenManager _instance;
         
-        [SerializeField] private InGameResourcesConfigData _resourcesConfigData;
+        [SerializeField] private GameResourcesConfigData _resourcesConfigData;
         [SerializeField] private ResourceToken _resourceTokenPrefab;
 
         private List<ResourceToken> _resourceTokenList;
-        
-        public void GenerateTokenAsync(CellType cellType, Vector3 spawnPosition, Vector3 destinationPosition,
-            ObstacleCellType obstacleCellType, CellImageType cellImageType = CellImageType.None)
+
+        public void GenerateGoldToken(Vector3 spawnPosition, Vector3 destinationPosition, int tokenCount = 8,
+            UniTaskCompletionSource source = null)
         {
-            if (_resourceTokenList == null)
+            _resourceTokenList ??= new List<ResourceToken>();
+            Sprite sprite = _resourcesConfigData.GoldSprite;
+
+            for (int i = 0; i < tokenCount; i++)
             {
-                _resourceTokenList = new List<ResourceToken>();
+                ResourceToken token = TryGetUsableToken();
+                if (token == null)
+                {
+                    token = Instantiate(_resourceTokenPrefab, transform);
+                    _resourceTokenList.Add(token);
+                }
+
+                token.Spawn(sprite, Vector3.one, spawnPosition);
+                token.MoveToRandomlyAroundSpawnPosition(false, spawnPosition, destinationPosition, source).Forget();
             }
-            
-            Sprite sprite = GetSprite(cellType, obstacleCellType, cellImageType);
+        }
+
+        public void GenerateCellToken(CellType cellType, Vector3 spawnPosition, Vector3 destinationPosition,
+            ObstacleCellType obstacleCellType, CellImageType cellImageType = CellImageType.None, Action callback = null)
+        {
+            _resourceTokenList ??= new List<ResourceToken>();
+            Sprite sprite = GetCellSprite(cellType, obstacleCellType, cellImageType);
             if (sprite == null)
             {
                 return;
@@ -52,7 +69,11 @@ namespace ThreeMatch.InGame.Manager
             }
 
             Vector3 scale = GetTokenScale(cellType);
-            token.Spawn(sprite, scale, spawnPosition, destinationPosition, OnTokenMoveDone);
+            token.Spawn(sprite, scale, spawnPosition, () => callback?.Invoke());
+            Vector3 posA = spawnPosition + destinationPosition;
+            Vector3 posB = posA * 0.5f;
+            Vector3 controlPoint = posA / 2 + new Vector3(Random.Range(-posB.x, posB.x), Random.Range(-posB.y, posB.y));
+            token.BezierMoveAsync(spawnPosition, controlPoint, destinationPosition).Forget();
         }
 
         private Vector3 GetTokenScale(CellType cellType)
@@ -68,22 +89,17 @@ namespace ThreeMatch.InGame.Manager
             }
         }
 
-        private void OnTokenMoveDone(ResourceToken resourceToken)
-        {
-            // _resourceTokenList.Add(resourceToken);
-        }
-
         private ResourceToken TryGetUsableToken()
         {
             return _resourceTokenList.Find(v => !v.gameObject.activeSelf);
         }
 
-        private Sprite GetSprite(CellType cellType, ObstacleCellType obstacleCellType = ObstacleCellType.None, CellImageType cellImageType = CellImageType.None)
+        private Sprite GetCellSprite(CellType cellType, ObstacleCellType obstacleCellType = ObstacleCellType.None, CellImageType cellImageType = CellImageType.None)
         {
             switch (cellType)
             {
                 case CellType.Normal:
-                    InGameResourcesConfigData.CellImageTypeSpriteData data =
+                    GameResourcesConfigData.CellImageTypeSpriteData data =
                         _resourcesConfigData.GetCellImageTypeSpriteData(cellImageType);
                     return data.normalSprite;
                 case CellType.Obstacle:

@@ -5,8 +5,8 @@ using UnityEngine.Serialization;
 
 namespace ThreeMatch.InGame.Data
 {
-    [CreateAssetMenu(fileName = "InGameResourcesConfigData", menuName = "ThreeMatch/InGameResourcesConfigData", order = 1)]
-    public class InGameResourcesConfigData : ScriptableObject
+    [CreateAssetMenu(fileName = "GameResourcesConfigData", menuName = "ThreeMatch/GameResourcesConfigData", order = 1)]
+    public class GameResourcesConfigData : ScriptableObject
     {
         [Serializable]
         public struct CellImageTypeSpriteData
@@ -21,6 +21,7 @@ namespace ThreeMatch.InGame.Data
         public Sprite ObstacleCageSprite => _obstacle_CageSprite;
         public Sprite StarGeneratorSprite => _starGeneratorSprite;
         public Sprite StarSprite => _starSprite;
+        public Sprite GoldSprite => _goldSprite;
         
         [SerializeField] private CellImageTypeSpriteData[] _cellImageTypeSpriteDataArray;
         [SerializeField] private Sprite[] _hitableBoxSpriteArray;
@@ -29,6 +30,7 @@ namespace ThreeMatch.InGame.Data
         [SerializeField] private Sprite _obstacle_CageSprite;
         [SerializeField] private Sprite _starGeneratorSprite;
         [SerializeField] private Sprite _starSprite;
+        [SerializeField] private Sprite _goldSprite;
         
         public CellImageTypeSpriteData GetCellImageTypeSpriteData(CellImageType cellImageType)
         {

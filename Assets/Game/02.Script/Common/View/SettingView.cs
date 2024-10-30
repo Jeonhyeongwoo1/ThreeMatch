@@ -5,7 +5,7 @@ using ThreeMatch.InGame.Interface;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace ThreeMatch.Shared.View
+namespace ThreeMatch.Common.View
 {
     public class SettingView : MonoBehaviour, IView
     {

@@ -5681,16 +5681,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _inGameItemElemntList:
-  - itemType: 1
+  - itemType: 0
     button: {fileID: 4501250548728870269}
     amountText: {fileID: 3308080710684749133}
-  - itemType: 2
+  - itemType: 1
     button: {fileID: 25073455116637982}
     amountText: {fileID: 5806018011155576268}
-  - itemType: 3
+  - itemType: 2
     button: {fileID: 6833149925459720931}
     amountText: {fileID: 3144434224938186832}
-  - itemType: 4
+  - itemType: 3
     button: {fileID: 6328792262635488876}
     amountText: {fileID: 9192378886617093707}
 --- !u!1 &691652829280341313

@@ -17,7 +17,7 @@ namespace ThreeMatch.InGame.Entity
         
         [SerializeField] protected SpriteRenderer _backgroundSprite;
         [SerializeField] protected SpriteRenderer _frontSprite;
-        [SerializeField] protected InGameResourcesConfigData _data;
+        [SerializeField] protected GameResourcesConfigData _data;
 
         private Sequence _doPunchScaleSequence = null;
         private Collider2D _collider2D;

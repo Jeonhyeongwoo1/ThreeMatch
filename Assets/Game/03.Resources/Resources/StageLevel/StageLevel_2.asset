@@ -1387,5 +1387,6 @@ MonoBehaviour:
       Data: 
   missionInfoDataList:
   - missionType: 2
-    removeCount: 5
-  remainingMoveCount: 50
+    removeCount: 50
+  remainingMoveCount: 5
+  aimScore: 0

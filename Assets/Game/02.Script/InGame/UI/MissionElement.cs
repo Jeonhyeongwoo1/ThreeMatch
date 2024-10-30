@@ -1,6 +1,7 @@
 using ThreeMatch.InGame.Data;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace ThreeMatch.InGame.UI
@@ -22,7 +23,7 @@ namespace ThreeMatch.InGame.UI
         [SerializeField] private Image _missionIconImage2;
         [SerializeField] private GameObject _checkObj;
         [SerializeField] private GameObject _unCheckObj;
-        [SerializeField] private InGameResourcesConfigData _inGameResourcesConfigData;
+        [FormerlySerializedAs("_inGameResourcesConfigData")] [SerializeField] private GameResourcesConfigData gameResourcesConfigData;
         
         private MissionType _missionType;
         
@@ -36,7 +37,7 @@ namespace ThreeMatch.InGame.UI
             
             if (missionType == MissionType.RemoveStarGeneratorCell)
             {
-                _missionIconImage2.sprite = _inGameResourcesConfigData.StarSprite;
+                _missionIconImage2.sprite = gameResourcesConfigData.StarSprite;
             }
 
             _countText.text = count.ToString();
@@ -48,7 +49,7 @@ namespace ThreeMatch.InGame.UI
         private Sprite GetMissionSprite()
         {
             Sprite sprite = null;
-            InGameResourcesConfigData data = _inGameResourcesConfigData;
+            GameResourcesConfigData data = gameResourcesConfigData;
             switch (_missionType)
             {
                 case MissionType.RemoveNormalRedCell:

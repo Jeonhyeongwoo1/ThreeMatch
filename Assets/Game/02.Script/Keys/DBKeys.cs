@@ -10,4 +10,9 @@ namespace ThreeMatch.Keys
     {
         public const string InGameItemDataList = "InGameItemDataList";
     }
+
+    public static class DBDocument
+    {
+        public const string ConstDocument = "key";
+    }
 }

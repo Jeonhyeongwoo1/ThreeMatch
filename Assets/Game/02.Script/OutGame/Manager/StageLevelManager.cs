@@ -1,5 +1,9 @@
 using System;
 using Cysharp.Threading.Tasks;
+using ThreeMatch.Common.Data;
+using ThreeMatch.Common.Popup;
+using ThreeMatch.Common.Presenter;
+using ThreeMatch.Common.View;
 using ThreeMatch.Core;
 using ThreeMatch.InGame.Manager;
 using ThreeMatch.Manager;
@@ -9,9 +13,6 @@ using ThreeMatch.OutGame.Popup;
 using ThreeMatch.OutGame.Presenter;
 using ThreeMatch.OutGame.View;
 using ThreeMatch.Server;
-using ThreeMatch.Shared.Popup;
-using ThreeMatch.Shared.Presenter;
-using ThreeMatch.Shared.View;
 using ThreeMatch.Utils;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -24,16 +25,14 @@ namespace ThreeMatch.OutGame.Manager
         [SerializeField] private WaypointsMover _waypointsMover;
         [SerializeField] private GameObject _idleParticleObj;
         [SerializeField] private ScreenFader _screenFader;
-        
-        private StageLevelListPresenter _stageLevelListPresenter;
 
         public static Action<int, Vector3> onArrivedWayPointAction;
         public static Action onStartMoveWayPointAction;
         public static Action onSelectedStageAction;
-        
-        private void Start()
+
+        private async void Start()
         {
-            LoadStageLevel();
+            await LoadStageLevel();
             Initialize();
         }
 
@@ -42,7 +41,8 @@ namespace ThreeMatch.OutGame.Manager
             int level = 0;
             // _idleParticleObj.SetActive(true);
             onArrivedWayPointAction?.Invoke(level, position);
-            _stageLevelListPresenter.UnLockStageLevel(level);
+            var stageLevelListPresenter = PresenterFactory.CreateOrGet<StageLevelListPresenter>();
+            stageLevelListPresenter.UnLockStageLevel(level);
         }
 
         private void Initialize()
@@ -62,15 +62,24 @@ namespace ThreeMatch.OutGame.Manager
             settingPresenter.Initialize(uiManager.GetView<SettingView>());
             
             var heartShopPresenter = PresenterFactory.CreateOrGet<HeartShopPresenter>();
-            var heartShopPopup = PopupManager.Instance.GetPopup<HeartShopPopup>();
+            var heartShopPopup = popupManager.GetPopup<HeartShopPopup>();
             heartShopPresenter.Initialize(userModel, heartShopPopup);
             
             var goldShopPresenter = PresenterFactory.CreateOrGet<GoldShopPresenter>();
-            var goldShopPopup = PopupManager.Instance.GetPopup<GoldShopPopup>();
+            var goldShopPopup = popupManager.GetPopup<GoldShopPopup>();
             goldShopPresenter.Initialize(userModel, goldShopPopup);
             
             var tutorialPresenter = PresenterFactory.CreateOrGet<TutorialPresenter>();
             tutorialPresenter.Initialize(popupManager.GetPopup<TutorialPopup>());
+
+            var stageLevelListPresenter = PresenterFactory.CreateOrGet<StageLevelListPresenter>();
+            var stageLevelListModel = ModelFactory.CreateOrGet<StageLevelListModel>();
+            stageLevelListPresenter.Initialize(_stageLevelListView, stageLevelListModel, OnSelectStage);
+
+            var achievementPresenter = PresenterFactory.CreateOrGet<AchievementPresenter>();
+            var achievementModel = ModelFactory.CreateOrGet<AchievementModel>();
+            var achievementPopup = popupManager.GetPopup<AchievementPopup>();
+            achievementPresenter.Initialize(achievementModel, userModel, achievementPopup);
         }
 
         private async void OnSelectStage(int level)
@@ -102,13 +111,8 @@ namespace ThreeMatch.OutGame.Manager
 
             var stageLevelListModel = ModelFactory.CreateOrGet<StageLevelListModel>();
             stageLevelListModel.selectedStageLevel = level;
-            var operation = SceneManager.LoadSceneAsync(SceneType.InGame.ToString());
-            // while (!operation.isDone)
-            // {
-            //     await UniTask.Yield();
-            // }
-
-            Debug.Log("level : " + level);            
+            
+            SceneManager.LoadScene(SceneType.InGame.ToString());
         }
         
         private async UniTask LoadStageLevel()
@@ -131,9 +135,6 @@ namespace ThreeMatch.OutGame.Manager
                 stageLevelListModel.AddStageLevelModelList(response.stageLevelDataList);    
             }
             
-            _stageLevelListPresenter = PresenterFactory.CreateOrGet<StageLevelListPresenter>();
-            _stageLevelListPresenter.Initialize(_stageLevelListView, stageLevelListModel, OnSelectStage);
-
             int lastStageLevelIndex = 0;
             try
             {

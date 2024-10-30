@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using ThreeMatch.InGame.Data;
 using ThreeMatch.InGame.Manager;
+using ThreeMatch.Shared.Data;
 using UnityEngine;
 
 namespace ThreeMatch.InGame.Entity
@@ -60,20 +61,31 @@ namespace ThreeMatch.InGame.Entity
             if (_remainingMoveCount == 0)
             {
                 bool isAllSuccessMission = _mission.IsAllSuccessMission();
-                int starCount = _inGameScore.GetStarCount();
+                GameResultData gameResultData = MakeGameResultData();
+                
                 if (isAllSuccessMission)
                 {
                     Debug.Log("Game Clear");
                     //Game Clear
-                    GameManager.onGameClearAction?.Invoke(starCount);
+                    GameManager.onGameClearAction?.Invoke(gameResultData);
                 }
                 else
                 {
                     Debug.Log("Game over");
                     //Game over
-                    GameManager.onGameOverAction?.Invoke(starCount);
+                    GameManager.onGameOverAction?.Invoke(gameResultData);
                 }
             }
+        }
+
+        private GameResultData MakeGameResultData()
+        {
+            return new GameResultData
+            {
+                starCount = _inGameScore.GetStarCount(),
+                removeCellCount = _board.RemoveCellCount,
+                usedItemCountArray = _board.UsedItemCountArray
+            };
         }
 
         private void OnCheckMission(CellType cellType, Vector3 cellPosition, int removeCount, ObstacleCellType obstacleCellType = ObstacleCellType.None, CellImageType cellImageType = CellImageType.None)
@@ -85,8 +97,7 @@ namespace ThreeMatch.InGame.Entity
             }
 
             bool isClearMission = false;
-            Vector3 missionElementPosition = Vector3.zero;
-
+            Vector3 missionElementPosition;
             (isClearMission, missionElementPosition) = _mission.TryClearMission(missionType, removeCount);
             if (!isClearMission)
             {
@@ -95,23 +106,23 @@ namespace ThreeMatch.InGame.Entity
 
             if (missionElementPosition != Vector3.zero)
             {
-                TokenManager.Instance.GenerateTokenAsync(cellType, cellPosition, missionElementPosition,
+                TokenManager.Instance.GenerateCellToken(cellType, cellPosition, missionElementPosition,
                     obstacleCellType, cellImageType);
             }
             
             bool isAllSuccessMission = _mission.IsAllSuccessMission();
             if (isAllSuccessMission)
             {
-                int starCount = _inGameScore.GetStarCount();
+                GameResultData gameResultData = MakeGameResultData();
                 if (_remainingMoveCount > 0)
                 {
                     Debug.Log("AllClear");
-                    GameManager.onGameClearAction?.Invoke(starCount);
+                    GameManager.onGameClearAction?.Invoke(gameResultData);
                     // GameManager.onAllSuccessMissionAction?.Invoke();
                 }
                 else
                 {
-                    GameManager.onGameOverAction?.Invoke(starCount);
+                    GameManager.onGameOverAction?.Invoke(gameResultData);
                 }
             }
         }

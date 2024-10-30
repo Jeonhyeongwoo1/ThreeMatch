@@ -23,10 +23,19 @@ namespace ThreeMatch.Server
             
             DocumentReference docRef = db.Collection(DBKeys.ConstDB).Document(userID);
             FBCommonData fbCommonData = null;
+            AchievementCommonData achievementCommonData = null;
             try
             {
                 var snapshot = await docRef.GetSnapshotAsync();
                 if (!snapshot.TryGetValue(nameof(FBCommonData), out fbCommonData))
+                {
+                    return new CommonResponse()
+                    {
+                        responseCode = ServerErrorCode.FailedGetData
+                    };
+                }
+
+                if (!snapshot.TryGetValue(nameof(AchievementCommonData), out achievementCommonData))
                 {
                     return new CommonResponse()
                     {
@@ -47,6 +56,7 @@ namespace ThreeMatch.Server
             {
                 responseCode = ServerErrorCode.Success,
                 fbCommonData = fbCommonData,
+                achievementCommonData = achievementCommonData
             };
         }
     }

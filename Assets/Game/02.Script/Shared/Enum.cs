@@ -82,7 +82,7 @@ namespace ThreeMatch
 
     public enum InGameItemType
     {
-        None,
+        None = -1,
         Shuffle,
         Hammer,
         VerticalRocket,
@@ -149,6 +149,19 @@ namespace ThreeMatch
         ShowAd
     }
 
+    public enum AchievementType
+    {
+        None,
+        AttendanceCheck = 1000,
+        RemoveCells = 1001,
+        UseItem = 1002,
+        UseShuffleItem = UseItem,
+        UseHammerItem = 1003,
+        UseRocketItem = 1004,
+        UseBulldozerItem = 1005,
+        ReachStage = 1006
+    }
+
     public enum ServerErrorCode
     {
         Success = 100,
@@ -160,5 +173,8 @@ namespace ThreeMatch
         FailedGetStageData,
         FailedGetDailyReward,
         FailedFirebaseError,
+        FailedGetAchievement,
+        NotMatchedAchievementId,
+        AlreadyAchievementId
     }
 }

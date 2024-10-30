@@ -14,6 +14,7 @@ namespace ThreeMatch.Firebase.Data
     [FirestoreData]
     public class StageData
     {
+        [FirestoreProperty] public int UnlockMaxStageLevel { get; set; }
         [FirestoreProperty] public List<StageLevelData> StageLevelDataList { get; set; }
     }
 }

@@ -7,6 +7,8 @@ using ThreeMatch.Firebase.Data;
 using ThreeMatch.Interface;
 using ThreeMatch.Keys;
 using ThreeMatch.Shared;
+using ThreeMatch.Shared.Data;
+using UnityEngine;
 
 namespace ThreeMatch.Server
 {
@@ -41,6 +43,7 @@ namespace ThreeMatch.Server
                         stageData.StageLevelDataList.Add(stageLevelData);
                     }
 
+                    stageData.UnlockMaxStageLevel = 0;
                     var stageDict = new Dictionary<string, StageData>()
                     {
                         { nameof(StageData), stageData }
@@ -64,14 +67,13 @@ namespace ThreeMatch.Server
             };
         }
 
-        public async UniTask<StageResponse> StageClearOrFailRequest(int stageLevel, int starCount, bool isClear,
+        public async UniTask<StageResponse> StageClearOrFailRequest(int stageLevel, GameResultData gameResultData, bool isClear,
             List<InGameItemData> inGameItemDataList)
         {
             string userID = _firebaseController.UserId;
             FirebaseFirestore db = _firebaseController.DB;
             DocumentReference docRef = db.Collection(DBKeys.UserDB).Document(userID);
 
-            StageData stageData = null;
             DocumentSnapshot snapshot = null;
             try
             {
@@ -86,7 +88,7 @@ namespace ThreeMatch.Server
                 };
             }
 
-            if (!snapshot.TryGetValue(nameof(StageData), out stageData))
+            if (!snapshot.TryGetValue(nameof(StageData), out StageData stageData))
             {
                 return new StageResponse()
                 {
@@ -96,15 +98,23 @@ namespace ThreeMatch.Server
 
             var list = stageData.StageLevelDataList;
             var stageLevelData = list.Find(v => v.Level == stageLevel);
-            if (stageLevelData.StarCount < starCount && isClear)
+            if (stageLevelData.StarCount < gameResultData.starCount && isClear)
             {
-                stageLevelData.StarCount = starCount;
+                stageLevelData.StarCount = gameResultData.starCount;
             }
 
+            bool isUnlockNewStage = false;
             if (isClear)
             {
-                var nextStageLevelData = list.Find(v => v.Level == stageLevel + 1);
+                StageLevelData nextStageLevelData = list.Find(v => v.Level == stageLevel + 1);
                 nextStageLevelData.IsLock = false;
+
+                StageLevelData unlockMaxStageLevel = list.FindLast(v => !v.IsLock);
+                if (unlockMaxStageLevel == nextStageLevelData)
+                {
+                    isUnlockNewStage = true;
+                    stageData.UnlockMaxStageLevel = unlockMaxStageLevel.Level;
+                }
             }
 
             var stageDict = new Dictionary<string, object>()
@@ -116,6 +126,50 @@ namespace ThreeMatch.Server
             {
                 dbItemDataList = inGameItemDataList;
                 stageDict.Add(DBFields.InGameItemDataList, dbItemDataList);
+            }
+
+            if (snapshot.TryGetValue(nameof(AchievementHistoryData), out AchievementHistoryData achievementHistoryData))
+            {
+                var updatableAchievementDataList = new List<AchievementHistoryHelper.UpdatableAchievementData>();
+                var removeCellData = new AchievementHistoryHelper.UpdatableAchievementData
+                {
+                    achievementId = (int)AchievementType.RemoveCells,
+                    acquiredAmount = gameResultData.removeCellCount
+                };
+                
+                updatableAchievementDataList.Add(removeCellData);
+                
+                if (isUnlockNewStage)
+                {
+                    var updatableStageAchievementData = new AchievementHistoryHelper.UpdatableAchievementData
+                    {
+                        achievementId = (int)AchievementType.ReachStage,
+                        acquiredAmount = stageLevel + 1
+                    };
+                    
+                    updatableAchievementDataList.Add(updatableStageAchievementData);
+                }
+
+                int[] usedItemCountArray = gameResultData.usedItemCountArray;
+                for (int i = 0; i < usedItemCountArray.Length; i++)
+                {
+                    var updatableStageAchievementData = new AchievementHistoryHelper.UpdatableAchievementData
+                    {
+                        achievementId = (int)AchievementType.UseItem + i,
+                        acquiredAmount = usedItemCountArray[i]
+                    };
+                    
+                    updatableAchievementDataList.Add(updatableStageAchievementData);
+                }
+                
+                var resultData = AchievementHistoryHelper.TryUpdateAchievementHistoryData(achievementHistoryData,
+                    updatableAchievementDataList.ToArray());
+
+                if (resultData is { isSuccess: true })
+                {
+                    achievementHistoryData = resultData.achievementHistoryData;
+                    stageDict.Add(nameof(AchievementHistoryData), achievementHistoryData);
+                }
             }
 
             try
@@ -133,7 +187,8 @@ namespace ThreeMatch.Server
             
             return new StageResponse()
             {
-                stageLevelDataList = stageData.StageLevelDataList
+                stageLevelDataList = stageData.StageLevelDataList,
+                achievementHistoryData = achievementHistoryData
             };
         }
         

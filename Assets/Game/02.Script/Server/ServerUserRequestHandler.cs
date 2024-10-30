@@ -21,88 +21,151 @@ namespace ThreeMatch.Server
         {
             string userID = _firebaseController.UserId;
             FirebaseFirestore db = _firebaseController.DB;
-            
+
             DocumentReference docRef = db.Collection(DBKeys.UserDB).Document(userID);
             UserData userData = null;
-            List<InGameItemData> inGameItemDataList = null;
-            DailyRewardHistoryData dailyRewardHistoryData = null;
+            DocumentSnapshot snapshot = null;
+            DateTime lastLoginTime = DateTime.MinValue;
             try
             {
-                var snapshot = await docRef.GetSnapshotAsync();
-                if (!snapshot.TryGetValue(nameof(UserData), out userData))
-                {
-                    //Init
-                    userData = new UserData()
-                    {
-                        UserId = userID,
-                        LastLoginTime = DateTime.UtcNow,
-                        Heart = Const.DefaultHeartCount,
-                        Money = Const.DefaultMoney
-                    };
-                }
-                else
-                {
-                    userData.LastLoginTime = DateTime.UtcNow;
-                }
-
-                Dictionary<string, object> userDict = new Dictionary<string, object>();
-                userDict.Add(nameof(UserData), userData);
-                
-                if (!snapshot.TryGetValue(DBFields.InGameItemDataList, out inGameItemDataList))
-                {
-                    int length = Enum.GetValues(typeof(InGameItemType)).Length;
-                    inGameItemDataList = new List<InGameItemData>();
-                    for (int i = 0; i < length; i++)
-                    {
-                        if (i == (int)InGameItemType.None)
-                        {
-                            continue;
-                        }
-                        
-                        var data = new InGameItemData
-                        {
-                            ItemId = i,
-                            ItemCount = Const.DefaultInGameItemCount
-                        };
-                
-                        inGameItemDataList.Add(data);
-                    }
-                
-                    userDict.Add(DBFields.InGameItemDataList, inGameItemDataList);
-                }
-
-                if (!snapshot.TryGetValue(nameof(DailyRewardHistoryData),
-                        out  dailyRewardHistoryData))
-                {
-                    const int daily = 7;
-                    dailyRewardHistoryData = new DailyRewardHistoryData
-                    {
-                        DailyRewardDataList = new List<DailyRewardData>(daily)
-                    };
-                    
-                    for (int i = 0; i < 7; i++)
-                    {
-                        var data = new DailyRewardData
-                        {
-                            ItemId = i,
-                            IsGetReward = false,
-                            RewardValue = 10
-                        };
-                        
-                        dailyRewardHistoryData.DailyRewardDataList.Add(data);
-                    }
-                    
-                    userDict.Add(nameof(DailyRewardHistoryData), dailyRewardHistoryData);
-                }
-
-                await docRef.SetAsync(userDict, SetOptions.MergeAll);
+                snapshot = await docRef.GetSnapshotAsync();
             }
             catch (Exception e)
             {
                 Debug.LogError("failed get data :" + e);
+
                 return new UserResponse()
                 {
-                    responseCode = ServerErrorCode.FailedGetData
+                    responseCode = ServerErrorCode.FailedFirebaseError
+                };
+            }
+
+            if (!snapshot.TryGetValue(nameof(UserData), out userData))
+            {
+                //Init
+                userData = new UserData()
+                {
+                    UserId = userID,
+                    LastLoginTime = DateTime.UtcNow,
+                    Heart = Const.DefaultHeartCount,
+                    Money = Const.DefaultMoney
+                };
+            }
+            else
+            {
+                lastLoginTime = userData.LastLoginTime;
+                userData.LastLoginTime = DateTime.UtcNow;
+            }
+
+            Dictionary<string, object> userDict = new Dictionary<string, object>();
+            userDict.Add(nameof(UserData), userData);
+
+            if (!snapshot.TryGetValue(DBFields.InGameItemDataList, out List<InGameItemData> inGameItemDataList))
+            {
+                int length = Enum.GetValues(typeof(InGameItemType)).Length;
+                inGameItemDataList = new List<InGameItemData>();
+                for (int i = 0; i < length; i++)
+                {
+                    if (i == (int)InGameItemType.None)
+                    {
+                        continue;
+                    }
+
+                    var data = new InGameItemData
+                    {
+                        ItemId = i,
+                        ItemCount = Const.DefaultInGameItemCount
+                    };
+
+                    inGameItemDataList.Add(data);
+                }
+
+                userDict.Add(DBFields.InGameItemDataList, inGameItemDataList);
+            }
+
+            if (!snapshot.TryGetValue(nameof(DailyRewardHistoryData),
+                    out DailyRewardHistoryData dailyRewardHistoryData))
+            {
+                const int day = 7;
+                dailyRewardHistoryData = new DailyRewardHistoryData
+                {
+                    DailyRewardDataList = new List<DailyRewardData>(day)
+                };
+
+                for (int i = 0; i < 7; i++)
+                {
+                    var data = new DailyRewardData
+                    {
+                        ItemId = i,
+                        IsGetReward = false,
+                        RewardValue = 10
+                    };
+
+                    dailyRewardHistoryData.DailyRewardDataList.Add(data);
+                }
+
+                userDict.Add(nameof(DailyRewardHistoryData), dailyRewardHistoryData);
+            }
+
+            if (!snapshot.TryGetValue(nameof(AchievementHistoryData), out AchievementHistoryData achievementHistoryData))
+            {
+                DocumentReference commonRef = db.Collection(DBKeys.ConstDB).Document(DBDocument.ConstDocument);
+                var commonSnapshot = await commonRef.GetSnapshotAsync();
+                if (commonSnapshot.TryGetValue(nameof(AchievementCommonData),
+                        out AchievementCommonData achievementCommonData))
+                {
+                    List<AchievementCommonElementData> achievementDataList =
+                        achievementCommonData.AchievementDataList;
+                    achievementHistoryData = new AchievementHistoryData
+                    {
+                        AchievementDataList = new List<AchievementData>(achievementDataList.Count)
+                    };
+                    
+                    foreach (AchievementCommonElementData elementData in achievementDataList)
+                    {
+                        var data = new AchievementData
+                        {
+                            AchievementId = elementData.AchievementId,
+                            CurrentAchievementValue = 0,
+                            IsGet = false,
+                            AchievementAimValue = elementData.AchievementAimValue,
+                            AchievementRewardAmount = elementData.AchievementRewardAmount,
+                            Description = elementData.Description,
+                        };
+
+                        achievementHistoryData.AchievementDataList.Add(data);
+                    }
+                    
+                }
+            }
+
+            bool isPossibleAttendanceCheck = (DateTime.UtcNow - lastLoginTime).TotalDays >= 1;
+            if (isPossibleAttendanceCheck)
+            {
+                var data = new AchievementHistoryHelper.UpdatableAchievementData
+                {
+                    achievementId = (int)AchievementType.AttendanceCheck,
+                    acquiredAmount = 1
+                };
+
+                AchievementHistoryHelper.UpdateAchievementHistoryResultData resultData =
+                    AchievementHistoryHelper.TryUpdateAchievementHistoryData(achievementHistoryData, data);
+                if (resultData is { isSuccess: true })
+                {
+                    achievementHistoryData = resultData.achievementHistoryData;
+                    userDict.Add(nameof(AchievementHistoryData), achievementHistoryData);
+                }
+            }
+
+            try
+            {
+                await docRef.SetAsync(userDict, SetOptions.MergeAll);
+            }
+            catch (Exception e)
+            {
+                return new UserResponse()
+                {
+                    responseCode = ServerErrorCode.FailedFirebaseError
                 };
             }
 
@@ -111,7 +174,8 @@ namespace ThreeMatch.Server
                 responseCode = ServerErrorCode.Success,
                 userData = userData,
                 inGameItemDataList = inGameItemDataList,
-                dailyRewardHistoryData = dailyRewardHistoryData
+                dailyRewardHistoryData = dailyRewardHistoryData,
+                achievementHistoryData = achievementHistoryData
             };
         }
 
@@ -297,6 +361,81 @@ namespace ThreeMatch.Server
             {
                 dailyRewardHistoryData = dailyRewardHistoryData,
                 userMoney = userData.Money
+            };
+        }
+
+        public async UniTask<AchievementResponse> GetAchievementRewardRequest(int achievementId)
+        {
+            string userId = _firebaseController.UserId;
+            FirebaseFirestore db = _firebaseController.DB;
+            DocumentReference docRef = db.Collection(DBKeys.UserDB).Document(userId);
+            DocumentSnapshot snapshot = null;
+            try
+            {
+                snapshot = await docRef.GetSnapshotAsync();
+            }
+            catch (Exception e)
+            {
+                return new AchievementResponse()
+                {
+                    errorMessage = e.ToString(),
+                    responseCode = ServerErrorCode.FailedFirebaseError
+                };
+            }
+
+            if (!snapshot.Exists || !snapshot.TryGetValue(nameof(AchievementHistoryData),
+                    out AchievementHistoryData achievementHistoryData) || !snapshot.TryGetValue(nameof(UserData), out UserData userData))
+            {
+                return new AchievementResponse()
+                {
+                    responseCode = ServerErrorCode.FailedGetAchievement
+                };
+            }
+
+            AchievementData achievementData =
+                achievementHistoryData.AchievementDataList.Find(v => v.AchievementId == achievementId);
+            if (achievementData == null)
+            {
+                return new AchievementResponse()
+                {
+                    responseCode = ServerErrorCode.NotMatchedAchievementId
+                };
+            }
+
+            if (achievementData.IsGet)
+            {
+                return new AchievementResponse()
+                {
+                    responseCode = ServerErrorCode.AlreadyAchievementId
+                };
+            }
+
+            achievementData.IsGet = true;
+            userData.Money += achievementData.AchievementRewardAmount;
+            
+            var userAchievementDict = new Dictionary<string, object>
+            {
+                { nameof(AchievementHistoryData), achievementHistoryData },
+                { nameof(UserData), userData}
+            };
+
+            try
+            {
+                await docRef.SetAsync(userAchievementDict, SetOptions.MergeAll);
+            }
+            catch (Exception e)
+            {
+                return new AchievementResponse()
+                {
+                    responseCode = ServerErrorCode.FailedFirebaseError,
+                    errorMessage = e.ToString()
+                };
+            }
+            
+            return new AchievementResponse()
+            {
+                achievementHistoryData = achievementHistoryData,
+                money = userData.Money
             };
         }
 
