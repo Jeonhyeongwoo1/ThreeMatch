@@ -8,6 +8,14 @@ namespace ThreeMatch.InGame.UI
     public class MissionElement : MonoBehaviour
     {
         public MissionType MissionType => _missionType;
+
+        public Vector3 Position
+        {
+            get
+            {
+                return transform.position;
+            }
+        }
         
         [SerializeField] private TextMeshProUGUI _countText;
         [SerializeField] private Image _missionIconImage;

@@ -6,6 +6,7 @@ using ThreeMatch.InGame.Manager;
 using ThreeMatch.InGame.Model;
 using ThreeMatch.InGame.UI;
 using UniRx;
+using UnityEngine;
 
 namespace ThreeMatch.InGame.Entity
 {
@@ -34,22 +35,24 @@ namespace ThreeMatch.InGame.Entity
              _missionView.Initialize(missionViewDataList);
         }
 
-        public bool TryClearMission(MissionType missionType, int removeCount)
+        public (bool, Vector3) TryClearMission(MissionType missionType, int removeCount)
         {
             if (!IsContainMission(missionType))
             {
-                return false;
+                return (false, Vector3.zero);
             }
 
             MissionInfoData missionInfoData = _missionModel.missionDataList.Value.Find(v => v.missionType == missionType);
-            if (IsClearMission(missionInfoData))
+            if (IsAlreadyClearMission(missionInfoData))
             {
-                return true;
+                return (true, Vector3.zero);
             }
 
             missionInfoData.removeCount -= removeCount;
-            _missionView.UpdateUI(missionInfoData.missionType, missionInfoData.removeCount.ToString());
-            return true;
+            Vector3 missionElementPosition =
+                _missionView.GetMissionElementPositionAndUpdateUI(missionInfoData.missionType,
+                    missionInfoData.removeCount.ToString());
+            return (true, missionElementPosition);
         }
 
         public bool IsAllSuccessMission()
@@ -65,7 +68,7 @@ namespace ThreeMatch.InGame.Entity
             return true;
         }
 
-        private bool IsClearMission(MissionInfoData missionInfoData)
+        private bool IsAlreadyClearMission(MissionInfoData missionInfoData)
         {
             return missionInfoData.removeCount == 0;
         }

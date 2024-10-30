@@ -38,7 +38,7 @@ namespace ThreeMatch.InGame.Entity
         
         private Transform _boardContainerTransform;
         private UniTaskCompletionSource _executeInGameItemTaskCompletionSource;
-        private readonly Action<CellType, int, ObstacleCellType, CellImageType> _onCheckMissionAction;
+        private readonly Action<CellType, Vector3, int, ObstacleCellType, CellImageType> _onCheckMissionAction;
         private readonly Action _onEndDragAction;
         private readonly Action<int, int> _onAddScoreAction;
         private int _comboCount;
@@ -46,7 +46,7 @@ namespace ThreeMatch.InGame.Entity
         private List<Vector2> _removedCellRowAndColumnList = new();
 
         public Board(BoardInfoData[,] boardInfoDataArray,
-            Action<CellType, int, ObstacleCellType, CellImageType> onCheckMissionAction, Action onEndDragAction,
+            Action<CellType, Vector3, int, ObstacleCellType, CellImageType> onCheckMissionAction, Action onEndDragAction,
             Action<int, int> onAddScoreAction)
         {
             _row = boardInfoDataArray.GetLength(0);
@@ -483,12 +483,12 @@ namespace ThreeMatch.InGame.Entity
                     //케이지는 부서지면 일반 셀로 변경
                     cell.ChangeCellType(CellType.Normal);
                 }
-                else
+                else if (cell.CellType != CellType.Generator)
                 {
                     _cellArray[cell.Row, cell.Column] = null;
                 }
                 
-                _onCheckMissionAction?.Invoke(cell.CellType, 1, cell.ObstacleCellType, cell.CellImageType);
+                _onCheckMissionAction?.Invoke(cell.CellType, cell.Position, 1, cell.ObstacleCellType, cell.CellImageType);
                 // _onAddScoreAction?.Invoke(10);
                 return true;
             }

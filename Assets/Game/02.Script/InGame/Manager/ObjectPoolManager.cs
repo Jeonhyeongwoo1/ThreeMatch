@@ -28,7 +28,8 @@ namespace ThreeMatch.InGame.Manager
         private static ObjectPoolManager _instance;
 
         [SerializeField] private ObjectPoolConfigData _poolConfigData;
-
+        [SerializeField] private bool _isForceInit;
+        
         private ConcurrentDictionary<PoolKeyType, ConcurrentQueue<IPoolable>> _poolDict = new();
         private List<Transform> poolParentList;
         private readonly Object _lock = new();
@@ -59,9 +60,12 @@ namespace ThreeMatch.InGame.Manager
             Scene scene = SceneManager.GetActiveScene();
             for (int i = 0; i < count; i++)
             {
-                if (!itemData.isInit || String.Compare(itemType, scene.name, StringComparison.Ordinal) != 0)
+                if (!_isForceInit)
                 {
-                    break;
+                    if (!itemData.isInit || String.Compare(itemType, scene.name, StringComparison.Ordinal) != 0)
+                    {
+                        break;
+                    }
                 }
 
                 GameObject obj = Instantiate(prefab, parent);

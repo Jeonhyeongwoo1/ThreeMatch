@@ -1,7 +1,11 @@
 using System;
+using System.Linq;
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
+using ThreeMatch.Core;
 using ThreeMatch.InGame.Data;
 using ThreeMatch.InGame.Entity;
+using ThreeMatch.InGame.Model;
 using ThreeMatch.InGame.UI;
 using UnityEngine;
 
@@ -30,10 +34,11 @@ namespace ThreeMatch.InGame.Manager
         {
             LoadStage();
         }
-        private void LoadStage()
+        private async void LoadStage()
         {
             RemoveDummyObj();
 
+            GameManager.onGameReadyAction?.Invoke();
             var stageLevel = Resources.Load<StageLevelConfigDataForEditor>("StageLevelConfigDataForEditor");
             Debug.Log($"stageLevel {stageLevel}");
             StageBuilder builder = new StageBuilder();
@@ -44,7 +49,20 @@ namespace ThreeMatch.InGame.Manager
                 Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.5f));
 
             _boardContainer = Instantiate(_containerPrefab);
-            stage.BuildAsync(centerPosition, _blockPrefab, _boardContainer.transform);
+            await stage.BuildAsync(centerPosition, _blockPrefab, _boardContainer.transform);
+            
+            UniTaskCompletionSource gameReadyCompletionSource = new();
+            var gameReadyView = UIManager.Instance.GetView<GameReadyView>();
+            var missionModel = ModelFactory.CreateOrGet<MissionModel>();
+            var missionViewDataList = missionModel.missionDataList.Value.Select(missionData => new MissionView.Data
+                { missionType = missionData.missionType, count = missionData.removeCount }).ToList();
+            gameReadyView.Show(missionViewDataList, gameReadyCompletionSource);
+
+            await gameReadyCompletionSource.Task;
+            await UniTask.WaitForSeconds(0.5f);
+            await stage.BuildAfterProcessAsync();
+            
+            GameManager.onGameStartAction?.Invoke();
         }
 
         private void RemoveDummyObj()

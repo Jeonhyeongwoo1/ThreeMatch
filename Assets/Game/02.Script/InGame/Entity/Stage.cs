@@ -14,7 +14,7 @@ namespace ThreeMatch.InGame.Entity
         private InGameScore _inGameScore;
         private int _remainingMoveCount;
 
-        private event Action<CellType, int, ObstacleCellType, CellImageType> OnCheckMissionAction;
+        private event Action<CellType, Vector3, int, ObstacleCellType, CellImageType> OnCheckMissionAction;
         private event Action OnEndDragAction;
 
         public Stage(BoardInfoData[,] boardInfoArray, List<MissionInfoData> missionDataList, int remainingMoveCount, int aimScore)
@@ -76,18 +76,27 @@ namespace ThreeMatch.InGame.Entity
             }
         }
 
-        private void OnCheckMission(CellType cellType, int removeCount, ObstacleCellType obstacleCellType = ObstacleCellType.None, CellImageType cellImageType = CellImageType.None)
+        private void OnCheckMission(CellType cellType, Vector3 cellPosition, int removeCount, ObstacleCellType obstacleCellType = ObstacleCellType.None, CellImageType cellImageType = CellImageType.None)
         {
             MissionType missionType = DetermineMissionTypeByCellTypeAndCellImageType(cellType, obstacleCellType, cellImageType);
             if (missionType == MissionType.None)
             {
                 return;
             }
-            
-            bool isClearMission = _mission.TryClearMission(missionType, removeCount);
+
+            bool isClearMission = false;
+            Vector3 missionElementPosition = Vector3.zero;
+
+            (isClearMission, missionElementPosition) = _mission.TryClearMission(missionType, removeCount);
             if (!isClearMission)
             {
                 return;
+            }
+
+            if (missionElementPosition != Vector3.zero)
+            {
+                TokenManager.Instance.GenerateTokenAsync(cellType, cellPosition, missionElementPosition,
+                    obstacleCellType, cellImageType);
             }
             
             bool isAllSuccessMission = _mission.IsAllSuccessMission();
@@ -151,9 +160,9 @@ namespace ThreeMatch.InGame.Entity
                 case CellType.Obstacle:
                     switch (obstacleCellType)
                     {
-                        case ObstacleCellType.Box:
+                        case ObstacleCellType.OneHitBox:
                             return MissionType.RemoveObstacleOneHitBoxCell;
-                        case ObstacleCellType.IceBox:
+                        case ObstacleCellType.HitableBox:
                             return MissionType.RemoveObstacleHitableBoxCell;
                         case ObstacleCellType.Cage:
                             return MissionType.RemoveObstacleCageCell;

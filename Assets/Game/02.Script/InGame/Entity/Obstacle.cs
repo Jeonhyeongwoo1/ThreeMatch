@@ -29,9 +29,9 @@ namespace ThreeMatch.InGame.Entity
             
             switch (obstacleCellType)
             {
-                case ObstacleCellType.Box:
+                case ObstacleCellType.OneHitBox:
                     break;
-                case ObstacleCellType.IceBox:
+                case ObstacleCellType.HitableBox:
                     _backgroundSprite.sprite = _data.HitableBoxSpriteArray[Health.HP - 1];
                     break;
                 case ObstacleCellType.Cage:
@@ -50,7 +50,7 @@ namespace ThreeMatch.InGame.Entity
             int hp = Health.TakeDamage(1);
             if (hp > 0)
             {
-                if (obstacleCellType == ObstacleCellType.IceBox)
+                if (obstacleCellType == ObstacleCellType.HitableBox)
                 {
                     _backgroundSprite.sprite = _data.HitableBoxSpriteArray[hp - 1];
                 }
@@ -59,7 +59,7 @@ namespace ThreeMatch.InGame.Entity
             {
                 switch (obstacleCellType)
                 {
-                    case ObstacleCellType.IceBox:
+                    case ObstacleCellType.HitableBox:
                         Activate(false);
                         break;
                     case ObstacleCellType.Cage:

@@ -17,6 +17,7 @@ TagManager:
   - Multicolor_firework
   - Simple_firework
   - BoardContainer
+  - MissionPanel
   layers:
   - Default
   - TransparentFX
@@ -65,4 +66,7 @@ TagManager:
     locked: 0
   - name: Particle
     uniqueID: 648820259
+    locked: 0
+  - name: Token
+    uniqueID: 2910048195
     locked: 0

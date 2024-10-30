@@ -57,8 +57,8 @@ namespace ThreeMatch.InGame.Entity
                 CellType.Normal => PoolKeyType.Cell_Normal,
                 CellType.Obstacle => _obstacleCellType switch
                 {
-                    ObstacleCellType.Box => PoolKeyType.Cell_Obstacle_OneHitBox,
-                    ObstacleCellType.IceBox => PoolKeyType.Cell_Obstacle_HitableBox,
+                    ObstacleCellType.OneHitBox => PoolKeyType.Cell_Obstacle_OneHitBox,
+                    ObstacleCellType.HitableBox => PoolKeyType.Cell_Obstacle_HitableBox,
                     ObstacleCellType.Cage => PoolKeyType.Cell_Obstacle_Cage,
                     _ => poolKeyType
                 },
@@ -178,10 +178,10 @@ namespace ThreeMatch.InGame.Entity
                 case CellType.Obstacle:
                     switch (_obstacleCellType)
                     {
-                        case ObstacleCellType.Box:
+                        case ObstacleCellType.OneHitBox:
                             _cellBehaviour.Disappear(_cellImageType);
                             return true;
-                        case ObstacleCellType.IceBox:
+                        case ObstacleCellType.HitableBox:
                         case ObstacleCellType.Cage: 
                             var obstacle = _cellBehaviour as Obstacle;
                             return obstacle.Hit(_obstacleCellType);
@@ -193,9 +193,7 @@ namespace ThreeMatch.InGame.Entity
                     bomb.Disappear(_cellImageType);
                     return true;
                 case CellType.Generator:
-                    var generator = _cellBehaviour as Generator;
-                    generator.CreateStarObject();
-                    return false;
+                    return true;
                 default:
                 case CellType.None:
                     Debug.Log($"failed remove cell {_cellType}");

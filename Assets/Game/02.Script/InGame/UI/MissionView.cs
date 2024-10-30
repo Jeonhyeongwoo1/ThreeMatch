@@ -40,16 +40,17 @@ namespace ThreeMatch.InGame.UI
             });
         }
 
-        public void UpdateUI(MissionType missionType, string count)
+        public Vector3 GetMissionElementPositionAndUpdateUI(MissionType missionType, string count)
         {
             var missionElement = _missionElementList.Find(v => v.MissionType == missionType);
             if (missionElement == null)
             {
                 Debug.LogError($"Failed mission element {missionType}");
-                return;
+                return Vector3.zero;
             }
             
             missionElement.UpdateCountText(count);
+            return missionElement.Position;
         }
     }
 }

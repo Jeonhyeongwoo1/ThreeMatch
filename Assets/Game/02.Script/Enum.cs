@@ -20,8 +20,8 @@ namespace ThreeMatch
     public enum ObstacleCellType
     {
         None,
-        Box,
-        IceBox,
+        OneHitBox,
+        HitableBox,
         Cage
     }
 

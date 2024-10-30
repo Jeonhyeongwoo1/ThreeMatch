@@ -38,9 +38,6 @@ namespace ThreeMatch.InGame.Editor
         public GameObject boardContainerPrefab;
         [ReadOnly]
         [ShowIf(nameof(IsActiveStageEditor))]
-        public GameObject cellPrefab;
-        [ReadOnly]
-        [ShowIf(nameof(IsActiveStageEditor))]
         public GameObject blockPrefab;
         [ReadOnly]
         [ShowIf(nameof(IsActiveStageEditor))]
@@ -55,14 +52,14 @@ namespace ThreeMatch.InGame.Editor
         public int column;
 
         [OnValueChanged(nameof(OnBoardInfoValueChanged))]
-        [ShowIf(nameof(_isShowBoardCellTypeMatrix))]
+        [ShowIf(nameof(IsActiveStageEditor))]
         [TableMatrix(HorizontalTitle = "column", VerticalTitle = "row", SquareCells = true,
             DrawElementMethod = nameof(BoardInfoDrawElement))]
         [Title("보드판")]
         public BoardInfoData[,] boardInfoDataArray;//사용하는 board
 
         [Space]
-        [ShowIf(nameof(_isShowBoardCellTypeMatrix))]
+        [ShowIf(nameof(IsActiveStageEditor))]
         [TableMatrix(HorizontalTitle = "column", VerticalTitle = "row", RowHeight = 50, SquareCells = true,
             DrawElementMethod = nameof(CellPrefabDrawElement))]
         [Title("보드에서 사용가능한 에셋")]
@@ -244,7 +241,6 @@ namespace ThreeMatch.InGame.Editor
             base.OnEnable();
             
             boardContainerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BoardContainerPrefabPath);
-            cellPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(CellPrefabPath);
             blockPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BlockPrefabPath);
             missionElementPrefab = AssetDatabase.LoadAssetAtPath<MissionElement>(MissionElementPrefabPath);
             
