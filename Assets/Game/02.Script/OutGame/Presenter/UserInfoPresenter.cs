@@ -30,7 +30,7 @@ namespace ThreeMatch.OutGame.Presenter
 
         private void OpenGoldShopPopup()
         {
-            var goldShopPopup= PopupManager.Instance.GetPopup<GoldShopPopup>();
+            var goldShopPopup= PopupManager.Instance.GetPopup<ShopPopup>();
             if (goldShopPopup != null)
             {
                 goldShopPopup.Open();

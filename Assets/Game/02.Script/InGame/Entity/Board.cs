@@ -364,7 +364,7 @@ namespace ThreeMatch.InGame.Entity
         }
 
 
-        private async UniTask ActivateRocketProcessAsync(int row, int column, int startIndex, int endIndex,
+        private async UniTask ActivateLineRemoverProcessAsync(int row, int column, int startIndex, int endIndex,
             bool isPositive, bool isUpDir)
         {
             int step = isPositive ? 1 : -1;
@@ -584,12 +584,12 @@ namespace ThreeMatch.InGame.Entity
                     switch (activateCell.CellMatchedType)
                     {
                         case CellMatchedType.Vertical_Four:
-                            taskList.Add(ActivateRocketProcessAsync(row, column, row, _row, true, true));
-                            taskList.Add(ActivateRocketProcessAsync(row, column, row, -1, false, true));
+                            taskList.Add(ActivateLineRemoverProcessAsync(row, column, row, _row, true, true));
+                            taskList.Add(ActivateLineRemoverProcessAsync(row, column, row, -1, false, true));
                             break;
                         case CellMatchedType.Horizontal_Four:
-                            taskList.Add(ActivateRocketProcessAsync(row, column, column, _column, true, false));
-                            taskList.Add(ActivateRocketProcessAsync(row, column, column, -1, false, false));
+                            taskList.Add(ActivateLineRemoverProcessAsync(row, column, column, _column, true, false));
+                            taskList.Add(ActivateLineRemoverProcessAsync(row, column, column, -1, false, false));
                             break;
                     }
                     
@@ -710,10 +710,10 @@ namespace ThreeMatch.InGame.Entity
                     RemoveCellProcess(cellB.Row, cellB.Column);
                     
                     //가로 세로 1줄 로켓 발사
-                    UniTask upTask = ActivateRocketProcessAsync(row, column, row, _row, true, true);
-                    UniTask downTask = ActivateRocketProcessAsync(row, column, row, -1, false, true);
-                    UniTask rightTask = ActivateRocketProcessAsync(row, column, column, _column, true, false);
-                    UniTask leftTask = ActivateRocketProcessAsync(row, column, column, -1, false, false);
+                    UniTask upTask = ActivateLineRemoverProcessAsync(row, column, row, _row, true, true);
+                    UniTask downTask = ActivateLineRemoverProcessAsync(row, column, row, -1, false, true);
+                    UniTask rightTask = ActivateLineRemoverProcessAsync(row, column, column, _column, true, false);
+                    UniTask leftTask = ActivateLineRemoverProcessAsync(row, column, column, -1, false, false);
                     await UniTask.WhenAll(rightTask, leftTask, upTask, downTask);
                     AddScore(Const.ActivateRocketAndRocketScore);
                     return true;
@@ -764,12 +764,12 @@ namespace ThreeMatch.InGame.Entity
                         switch (cell.CellMatchedType)
                         {
                             case CellMatchedType.Vertical_Four:
-                                taskList.Add(ActivateRocketProcessAsync(row, column, row, _row, true, true));
-                                taskList.Add(ActivateRocketProcessAsync(row, column, row, -1, false, true));
+                                taskList.Add(ActivateLineRemoverProcessAsync(row, column, row, _row, true, true));
+                                taskList.Add(ActivateLineRemoverProcessAsync(row, column, row, -1, false, true));
                                 break;
                             case CellMatchedType.Horizontal_Four:
-                                taskList.Add(ActivateRocketProcessAsync(row, column, column, _column, true, false));
-                                taskList.Add(ActivateRocketProcessAsync(row, column, column, -1, false, false));
+                                taskList.Add(ActivateLineRemoverProcessAsync(row, column, column, _column, true, false));
+                                taskList.Add(ActivateLineRemoverProcessAsync(row, column, column, -1, false, false));
                                 break;
                         }
                     });
@@ -1453,20 +1453,20 @@ namespace ThreeMatch.InGame.Entity
                 case InGameItemType.Shuffle:
                     await ExecuteShuffleCell();
                     break;
-                case InGameItemType.Hammer:
-                    ExecuteHammer();
+                case InGameItemType.OneCellRemover:
+                    ExecuteOnCellRemover();
                     break;
-                case InGameItemType.VerticalRocket:
+                case InGameItemType.VerticalLineRemover:
                     int row = _selectedCell.Row;
                     int column = _selectedCell.Column;
-                    await UniTask.WhenAll(ActivateRocketProcessAsync(row, column, row, _row, true, true),
-                        ActivateRocketProcessAsync(row, column, row, -1, false, true));
+                    await UniTask.WhenAll(ActivateLineRemoverProcessAsync(row, column, row, _row, true, true),
+                        ActivateLineRemoverProcessAsync(row, column, row, -1, false, true));
                     break;
-                case InGameItemType.HorizontalRocket:
+                case InGameItemType.HorizontalLineRemover:
                     row = _selectedCell.Row;
                     column = _selectedCell.Column;
-                    await UniTask.WhenAll(ActivateRocketProcessAsync(row, column, column, _column, true, false),
-                        ActivateRocketProcessAsync(row, column, column, -1, false, false));
+                    await UniTask.WhenAll(ActivateLineRemoverProcessAsync(row, column, column, _column, true, false),
+                        ActivateLineRemoverProcessAsync(row, column, column, -1, false, false));
                     break;
             }
 
@@ -1476,7 +1476,7 @@ namespace ThreeMatch.InGame.Entity
             ResetDrag();
         }
 
-        private void ExecuteHammer()
+        private void ExecuteOnCellRemover()
         {
             RemoveCellProcess(_selectedCell.Row, _selectedCell.Column);
         }

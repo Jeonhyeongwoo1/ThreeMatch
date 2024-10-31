@@ -6,12 +6,12 @@ using ThreeMatch.OutGame.Popup;
 
 namespace ThreeMatch.OutGame.Presenter
 {
-    public class GoldShopPresenter : BasePresenter
+    public class ShopPresenter : BasePresenter
     {
         private UserModel _model;
-        private GoldShopPopup _popup;
+        private ShopPopup _popup;
 
-        public void Initialize(UserModel model, GoldShopPopup popup)
+        public void Initialize(UserModel model, ShopPopup popup)
         {
             _model = model;
             _popup = popup;

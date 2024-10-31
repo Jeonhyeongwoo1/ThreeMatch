@@ -48,12 +48,12 @@ namespace ThreeMatch.InGame.Manager
         {
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                _currentStage.OnItemUsagePendingAction(InGameItemType.VerticalRocket);
+                _currentStage.OnItemUsagePendingAction(InGameItemType.VerticalLineRemover);
             }
             
             if (Input.GetKeyDown(KeyCode.Alpha2))
             {
-                _currentStage.OnItemUsagePendingAction(InGameItemType.HorizontalRocket);
+                _currentStage.OnItemUsagePendingAction(InGameItemType.HorizontalLineRemover);
             }
         }
 

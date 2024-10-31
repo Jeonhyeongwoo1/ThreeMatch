@@ -65,8 +65,8 @@ namespace ThreeMatch.OutGame.Manager
             var heartShopPopup = popupManager.GetPopup<HeartShopPopup>();
             heartShopPresenter.Initialize(userModel, heartShopPopup);
             
-            var goldShopPresenter = PresenterFactory.CreateOrGet<GoldShopPresenter>();
-            var goldShopPopup = popupManager.GetPopup<GoldShopPopup>();
+            var goldShopPresenter = PresenterFactory.CreateOrGet<ShopPresenter>();
+            var goldShopPopup = popupManager.GetPopup<ShopPopup>();
             goldShopPresenter.Initialize(userModel, goldShopPopup);
             
             var tutorialPresenter = PresenterFactory.CreateOrGet<TutorialPresenter>();

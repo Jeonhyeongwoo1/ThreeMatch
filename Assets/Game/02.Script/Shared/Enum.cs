@@ -84,9 +84,9 @@ namespace ThreeMatch
     {
         None = -1,
         Shuffle,
-        Hammer,
-        VerticalRocket,
-        HorizontalRocket
+        OneCellRemover,
+        VerticalLineRemover,
+        HorizontalLineRemover
     }
 
     public enum BoardState
