@@ -4,7 +4,8 @@
 [3.트러블 슈팅](#트러블-슈팅)<br/>
 [4.MVP 패턴](#MVP-패턴)<br/>
 [5.팩토리 패턴](#팩토리-패턴)<br/>
-[6.Client-Server 구조](#Client-Server-구조)<br/>
+[6.Stage 생성 Sequence Diagram](#Stage-생성)<br/>
+[7.콘텐츠 설명](#콘텐츠-설명)<br/>
 
 ## 프로젝트 개요
 
@@ -97,7 +98,8 @@ public static class ModelFactory
 }
 ```
 
-## Stage 생성 Sequence Diagram
+## Stage 생성 
+###Sequence Diagram
 
 ---
 
