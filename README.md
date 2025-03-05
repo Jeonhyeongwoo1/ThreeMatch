@@ -5,7 +5,8 @@
 [4.MVP 패턴](#MVP-패턴)<br/>
 [5.팩토리 패턴](#팩토리-패턴)<br/>
 [6.Stage 생성 Sequence Diagram](#Stage-생성)<br/>
-[7.콘텐츠 설명](#콘텐츠-설명)<br/>
+[7.에디터 툴](#에디터-툴)<br/>
+[8.콘텐츠 설명](#콘텐츠-설명)<br/>
 
 ## 프로젝트 개요
 
@@ -118,8 +119,33 @@ public static class ModelFactory
     - PostSwapProcess()를 통해 매칭 검사를 수행하고, CheckingMatchingCell()이 루프를 돌면서 연속 매칭을 감지.
     - 최종적으로, StartHitProcess()를 호출하여 유저 힌트 비동기 프로세스 수행.
 
+## 에디터 툴
 
- ## 콘텐츠 설명
+- 목표 : 에디터 툴을 개발하여 코드 없이도 다른 개발자들이 편리하게 스테이지 및 보드 생성을 할 수 있게 하여 생산성을 높인다.
+- 사용법
+    1. Tools → Level Editor 클릭
+    2. 프로젝트 내에서 StageEditor 검색 후 씬 선택
+    - 보드 구성 방법
+    - 스테이지 생성 버튼 클릭
+    - <div align="center">
+        <img width="330" alt="Image" src="https://github.com/user-attachments/assets/73e173e5-f046-4b44-aa67-e9335796bb3a" />
+      </div>
+    - 생성된 보드에 "보드에서 사용가능한 에셋"에 있는 셀을 활용하여 보드판의 원하는 위치에 드래그앤 드랍
+    - <div align="center">
+        <img width="327" alt="Image" src="https://github.com/user-attachments/assets/81fb350e-2e45-4818-98a9-f17f08025315" />
+      </div>
+    - 완료된 스테이지 저장
+    - <div align="center">
+        <img width="329" alt="Image" src="https://github.com/user-attachments/assets/ef7a49a3-333c-402f-bf1d-8ea46c86899c" />
+      </div>
+    - 저장 경로 : Resources/StageLevel/StageLevel_{}.asset
+- 주의 사항
+  - 미션 및 이동 가능한 횟수와 목표 점수를 반드시 추가해야함.
+- 테스트 실행 방법
+  - StageEditor 실행 버튼 클릭
+
+
+## 콘텐츠 설명
 
 ---
 
