@@ -99,7 +99,7 @@ public static class ModelFactory
 ```
 
 ## Stage 생성 
-###Sequence Diagram
+### Sequence Diagram
 
 ---
 
