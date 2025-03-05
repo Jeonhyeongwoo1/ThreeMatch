@@ -127,15 +127,15 @@ public static class ModelFactory
     2. 프로젝트 내에서 StageEditor 검색 후 씬 선택
     - 보드 구성 방법
     - 스테이지 생성 버튼 클릭
-    - <div align="center">
+     <div align="center">
         <img width="330" alt="Image" src="https://github.com/user-attachments/assets/73e173e5-f046-4b44-aa67-e9335796bb3a" />
       </div>
     - 생성된 보드에 "보드에서 사용가능한 에셋"에 있는 셀을 활용하여 보드판의 원하는 위치에 드래그앤 드랍
-    - <div align="center">
+      <div align="center">
         <img width="327" alt="Image" src="https://github.com/user-attachments/assets/81fb350e-2e45-4818-98a9-f17f08025315" />
       </div>
     - 완료된 스테이지 저장
-    - <div align="center">
+      <div align="center">
         <img width="329" alt="Image" src="https://github.com/user-attachments/assets/ef7a49a3-333c-402f-bf1d-8ea46c86899c" />
       </div>
     - 저장 경로 : Resources/StageLevel/StageLevel_{}.asset
